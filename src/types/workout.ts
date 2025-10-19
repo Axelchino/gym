@@ -21,6 +21,8 @@ export interface WorkoutExercise {
   targetSets: number;
   targetReps: number;
   targetWeight?: number;
+  targetRIR?: number; // Target Reps in Reserve
+  warmupSets?: number; // Number of warmup sets before working sets
   restSeconds?: number;
   notes?: string;
 }
@@ -28,6 +30,7 @@ export interface WorkoutExercise {
 export interface LoggedExercise {
   exerciseId: string;
   exerciseName: string;
+  equipment: string; // Added for dumbbell volume calculation
   orderIndex: number;
   sets: Set[];
   totalVolume: number;

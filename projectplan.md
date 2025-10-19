@@ -304,25 +304,30 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Add muscle diagram visualization
 
 2. **Workout Template Builder**
-   - [ ] Create template list view
-   - [ ] Build template creation flow
+   - [x] Create template list view ✅
+   - [x] Build template creation flow ✅
    - [ ] Implement drag-and-drop exercise ordering
-   - [ ] Add exercise selection from library
-   - [ ] Set target sets/reps for each exercise
-   - [ ] Add workout notes and instructions
+   - [x] Add exercise selection from library ✅
+   - [x] Set target sets/reps for each exercise ✅
+   - [x] Set warmup sets and target RIR per exercise ✅
+   - [x] Add workout notes and instructions ✅
+   - [x] Template editing functionality ✅
    - [ ] Create template duplication feature
 
 3. **Active Workout Interface**
-   - [ ] Build workout start flow (from template or blank)
-   - [ ] Create exercise card for active workout
-   - [ ] Implement set logging interface (weight + reps)
-   - [ ] Add set completion checkmarks
+   - [x] Build workout start flow (from template or blank) ✅
+   - [x] Create exercise card for active workout ✅
+   - [x] Implement set logging interface (weight + reps + RIR) ✅
+   - [x] Add set completion checkmarks ✅
+   - [x] Set type indicators (Warmup/Normal/Failure) with color coding ✅
+   - [x] Edit completed workouts from Dashboard ✅
    - [ ] Display previous workout data (side-by-side)
-   - [ ] Add/remove sets dynamically
-   - [ ] Show rest timer (optional, non-intrusive)
+   - [x] Add/remove sets dynamically ✅
+   - [x] Show rest timer (optional, non-intrusive) ✅
    - [ ] Add exercise notes during workout
-   - [ ] Calculate volume in real-time
-   - [ ] Build workout summary screen
+   - [x] Calculate volume in real-time ✅
+   - [x] Build workout summary screen ✅
+   - [x] Warning for uncompleted sets before saving ✅
 
 4. **Performance Optimization**
    - [ ] Optimize set logging to <3 seconds
@@ -332,21 +337,27 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Cache frequently accessed data
 
 5. **UI Components**
-   - [ ] Create `SetRow` component (weight/reps inputs)
+   - [x] Create `SetRow` component (weight/reps/RIR inputs, set type cycling) ✅
    - [x] Build `ExerciseCard` component ✅
    - [ ] Create `MuscleDiagram` component
    - [x] Design `BottomNav` component ✅
    - [ ] Build `TopNav` with profile access
-   - [ ] Create `WorkoutTimer` component
+   - [x] Create `WorkoutTimer` component ✅
    - [x] Create `Layout` component ✅
+   - [x] Create `TemplateBuilder` component ✅
+   - [x] Create `ExerciseSelector` component (with enhanced search) ✅
+   - [x] Create `WorkoutEditModal` component ✅
 
 ### Deliverables
-- ✅ Complete exercise library with 191+ exercises covering all equipment
-- ✅ Intelligent multi-field search with result grouping
-- [ ] Workout template builder - IN PROGRESS
-- [ ] Functional workout logging interface
-- [ ] Real-time workout tracking
-- [ ] Set logging under 3 seconds consistently
+- ✅ Complete exercise library with 1,146 exercises covering all equipment
+- ✅ Intelligent multi-field search with result grouping and relevance scoring
+- ✅ Workout template builder with exercise selection and configuration
+- ✅ Functional workout logging interface
+- ✅ Real-time workout tracking with volume calculation
+- ✅ Set logging with weight/reps/RIR tracking
+- ✅ Rest timer with configurable duration
+- ✅ Unit toggle (kg/lbs) with persistent settings
+- ✅ Dumbbell weight calculation (2x multiplier)
 
 ### User Experience Milestones
 - User can create a workout template in <2 minutes
@@ -1209,11 +1220,11 @@ This is a personal project focused on building an exceptional user experience fo
 
 ---
 
-_Last Updated: 2025-10-16_
-_Project Status: Phase 2 - In Progress_
-_Current Focus: Building workout logging interface and template system_
+_Last Updated: 2025-10-18_
+_Project Status: Phase 2 - Nearly Complete (90%)_
+_Current Focus: Core workout tracking complete, ready for Phase 3 (Analytics)_
 
-### Recent Updates (2025-10-17)
+### Recent Updates (2025-10-18)
 - ✅ Completed routing setup with React Router
 - ✅ Implemented OLED black theme with Coolors palette
 - ✅ Built comprehensive Exercise Library with 191+ exercises
@@ -1236,4 +1247,34 @@ _Current Focus: Building workout logging interface and template system_
   - Equipment matching in search
   - Single-target muscle exercises get bonus points
 - ✅ Created [exercisesProjectPlan.md](../../exercisesProjectPlan.md) for tracking exercise library tasks
-- 🟡 Next: Add category/muscle group filters and movement type filters
+- ✅ **WORKOUT LOGGER COMPLETE:** Full workout tracking system implemented:
+  - Active workout interface with real-time stats (volume, sets, duration)
+  - Set logging with weight, reps, RIR, and notes
+  - Dumbbell weight calculation (2x multiplier)
+  - Rest timer with collapsible UI
+  - Unit toggle (kg/lbs) with persistent user settings
+  - Exercise addition/removal during workout
+  - Dynamic set management (add/update/delete)
+  - Workout save/cancel confirmation modals
+- ✅ **TEMPLATE SYSTEM COMPLETE:** Full workout template functionality:
+  - Template builder modal with exercise selection
+  - Configure target sets/reps/rest/warmup sets/target RIR per exercise
+  - Exercise details display (name, equipment, movement type)
+  - Template list view with exercise previews and hover tooltips
+  - Start workout from template (auto-populates exercises and sets)
+  - Template editing with in-place updates
+  - Template deletion with confirmation
+  - Template storage in IndexedDB
+- ✅ **ADVANCED SET TRACKING:** Enhanced set management features:
+  - Set type indicators (W=Warmup, N=Normal, UF=Until Failure)
+  - Color-coded borders (Orange/Blue/Red) for visual distinction
+  - Click to cycle set types (W → N → UF)
+  - Uncompleted set warnings before saving workouts
+  - Edit completed workouts from Dashboard
+  - Full workout edit modal with all set controls
+- ✅ **ENHANCED SEARCH:** Improved exercise discovery:
+  - Plural form handling (legs, arms, shoulders, traps)
+  - Muscle group aliases (delts, lats, pecs, quads, hams, bis, tris)
+  - Comprehensive muscle mappings (legs→quads/hams/glutes/calves)
+  - Smart search expansion for all common terms
+- 🟡 Next: Add category/muscle group filters, analytics dashboard (Phase 3)
