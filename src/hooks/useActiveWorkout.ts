@@ -1,8 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { WorkoutLog, LoggedExercise, Set } from '../types/workout';
 import type { Exercise } from '../types/exercise';
 import { db } from '../services/database';
+import { detectPR } from '../utils/analytics';
+
+const ACTIVE_WORKOUT_KEY = 'gym-tracker-active-workout';
 
 interface ActiveWorkout {
   name: string;
@@ -10,9 +13,40 @@ interface ActiveWorkout {
   exercises: LoggedExercise[];
 }
 
+// Helper function to load workout from localStorage
+function loadWorkoutFromStorage(): ActiveWorkout | null {
+  try {
+    const stored = localStorage.getItem(ACTIVE_WORKOUT_KEY);
+    if (!stored) return null;
+
+    const parsed = JSON.parse(stored);
+    // Convert startTime string back to Date object
+    if (parsed.startTime) {
+      parsed.startTime = new Date(parsed.startTime);
+    }
+    // Convert all set timestamps back to Date objects
+    parsed.exercises?.forEach((exercise: LoggedExercise) => {
+      exercise.sets?.forEach((set: Set) => {
+        if (set.timestamp) {
+          set.timestamp = new Date(set.timestamp);
+        }
+      });
+    });
+
+    return parsed;
+  } catch (error) {
+    console.error('Failed to load workout from localStorage:', error);
+    localStorage.removeItem(ACTIVE_WORKOUT_KEY);
+    return null;
+  }
+}
+
 export function useActiveWorkout() {
-  const [activeWorkout, setActiveWorkout] = useState<ActiveWorkout | null>(null);
-  const [isWorkoutActive, setIsWorkoutActive] = useState(false);
+  const [activeWorkout, setActiveWorkout] = useState<ActiveWorkout | null>(loadWorkoutFromStorage);
+  const [isWorkoutActive, setIsWorkoutActive] = useState(() => {
+    const stored = loadWorkoutFromStorage();
+    return stored !== null;
+  });
 
   // Helper function to calculate volume (handles dumbbell 2x multiplier)
   const calculateVolume = useCallback((sets: Set[], equipment: string) => {
@@ -21,6 +55,37 @@ export function useActiveWorkout() {
       .filter(s => !s.isWarmup && s.completed)
       .reduce((sum, s) => sum + (s.weight * s.reps * multiplier), 0);
   }, []);
+
+  // Persist active workout to localStorage whenever it changes
+  useEffect(() => {
+    if (activeWorkout) {
+      try {
+        localStorage.setItem(ACTIVE_WORKOUT_KEY, JSON.stringify(activeWorkout));
+      } catch (error) {
+        console.error('Failed to save workout to localStorage:', error);
+      }
+    } else {
+      localStorage.removeItem(ACTIVE_WORKOUT_KEY);
+    }
+  }, [activeWorkout]);
+
+  // Warn user before closing/reloading page if workout is active
+  useEffect(() => {
+    if (!isWorkoutActive) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // Modern browsers require returnValue to be set
+      e.returnValue = '';
+      return '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isWorkoutActive]);
 
   // Start a new workout
   const startWorkout = useCallback((name: string = 'Workout') => {
@@ -211,14 +276,49 @@ export function useActiveWorkout() {
       await db.sets.bulkAdd(allSets);
     }
 
-    // Check for PRs (optional - can be implemented later)
-    // await detectPersonalRecords(workoutLog);
+    // Detect and save Personal Records
+    const allPRs = [];
+    for (const exercise of activeWorkout.exercises) {
+      // Get historical sets for this exercise (excluding current workout)
+      const historicalWorkouts = await db.workoutLogs
+        .orderBy('date')
+        .reverse()
+        .toArray();
+
+      const historicalSets: Set[] = [];
+      for (const workout of historicalWorkouts) {
+        if (workout.id === workoutLog.id) continue; // Skip current workout
+        const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.exerciseId);
+        if (exerciseData) {
+          historicalSets.push(...exerciseData.sets);
+        }
+      }
+
+      // Check each completed working set for PRs
+      for (const set of exercise.sets) {
+        if (!set.isWarmup && set.completed) {
+          const prs = detectPR(
+            set,
+            exercise.exerciseId,
+            exercise.exerciseName,
+            workoutLog.id,
+            historicalSets
+          );
+          allPRs.push(...prs);
+        }
+      }
+    }
+
+    // Save all PRs to database
+    if (allPRs.length > 0) {
+      await db.personalRecords.bulkAdd(allPRs);
+    }
 
     // Clear active workout
     setActiveWorkout(null);
     setIsWorkoutActive(false);
 
-    return workoutLog.id;
+    return { workoutId: workoutLog.id, prs: allPRs };
   }, [activeWorkout, calculateVolume]);
 
   // Cancel workout (with confirmation)

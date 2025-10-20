@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Play, Plus, Save, X, Trash2, Clock, Timer, Edit, Dumbbell } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Play, Plus, Save, X, Trash2, Clock, Timer, Edit, Dumbbell, Trophy, TrendingUp, Zap, Download, Upload } from 'lucide-react';
 import { useActiveWorkout } from '../hooks/useActiveWorkout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useRestTimer } from '../hooks/useRestTimer';
@@ -10,6 +10,7 @@ import { db } from '../services/database';
 import { v4 as uuidv4 } from 'uuid';
 import type { Exercise } from '../types/exercise';
 import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
+import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile } from '../utils/csvExport';
 
 export function WorkoutLogger() {
   const {
@@ -45,6 +46,11 @@ export function WorkoutLogger() {
   const [showTimer, setShowTimer] = useState(false);
   const [showTemplateBuilder, setShowTemplateBuilder] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<WorkoutTemplate | null>(null);
+  const [previousWorkoutData, setPreviousWorkoutData] = useState<Map<string, any[]>>(new Map());
+  const [showPRCelebration, setShowPRCelebration] = useState(false);
+  const [detectedPRs, setDetectedPRs] = useState<any[]>([]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadTemplates();
@@ -53,6 +59,36 @@ export function WorkoutLogger() {
   useEffect(() => {
     loadTemplateExerciseNames();
   }, [templates]);
+
+  useEffect(() => {
+    if (activeWorkout) {
+      loadPreviousWorkoutData();
+    }
+  }, [activeWorkout?.exercises.length]);
+
+  async function loadPreviousWorkoutData() {
+    if (!activeWorkout) return;
+
+    const previousData = new Map();
+
+    for (const exercise of activeWorkout.exercises) {
+      // Find the most recent workout that contains this exercise
+      const recentWorkouts = await db.workoutLogs
+        .orderBy('date')
+        .reverse()
+        .toArray();
+
+      for (const workout of recentWorkouts) {
+        const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.exerciseId);
+        if (exerciseData && exerciseData.sets.length > 0) {
+          previousData.set(exercise.exerciseId, exerciseData.sets);
+          break; // Found the most recent, stop searching
+        }
+      }
+    }
+
+    setPreviousWorkoutData(previousData);
+  }
 
   async function loadTemplateExerciseNames() {
     const nameMap = new Map<string, Map<string, string>>();
@@ -95,8 +131,14 @@ export function WorkoutLogger() {
   }
 
   async function handleSaveWorkout() {
-    await saveWorkout();
+    const result = await saveWorkout();
     setShowSaveConfirm(false);
+
+    // Show PR celebration if any PRs were detected
+    if (result && result.prs && result.prs.length > 0) {
+      setDetectedPRs(result.prs);
+      setShowPRCelebration(true);
+    }
   }
 
   function handleCancelWorkout() {
@@ -207,6 +249,53 @@ export function WorkoutLogger() {
     }
   }
 
+  function handleExportTemplates() {
+    if (templates.length === 0) {
+      alert('No templates to export');
+      return;
+    }
+
+    const csv = exportTemplatesToCSV(templates);
+    const filename = `gym-templates-${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csv, filename);
+  }
+
+  async function handleImportTemplates() {
+    fileInputRef.current?.click();
+  }
+
+  async function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const csvContent = await readCSVFile(file);
+      const importedTemplates = importTemplatesFromCSV(csvContent);
+
+      // Add imported templates to database
+      for (const template of importedTemplates) {
+        // Check if template with same ID already exists
+        const existing = await db.workoutTemplates.get(template.id);
+        if (existing) {
+          // Update ID to avoid conflicts
+          template.id = uuidv4();
+        }
+        await db.workoutTemplates.add(template);
+      }
+
+      await loadTemplates();
+      alert(`Successfully imported ${importedTemplates.length} template(s)!`);
+    } catch (error) {
+      console.error('Import error:', error);
+      alert('Failed to import templates. Please check the file format.');
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }
+
   // If no active workout, show start screen
   if (!isWorkoutActive || !activeWorkout) {
     return (
@@ -229,14 +318,55 @@ export function WorkoutLogger() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Workout Templates</h2>
-            <button
-              onClick={() => setShowTemplateBuilder(true)}
-              className="text-primary-blue text-sm flex items-center gap-1 hover:text-primary-blue/80 transition-colors"
-            >
-              <Plus size={16} />
-              New Template
-            </button>
+            <div className="flex items-center gap-3">
+              {templates.length > 0 && (
+                <>
+                  <button
+                    onClick={handleExportTemplates}
+                    className="text-primary-green text-sm flex items-center gap-1 hover:text-primary-green/80 transition-colors"
+                    title="Export all templates"
+                  >
+                    <Download size={16} />
+                    Export
+                  </button>
+                  <button
+                    onClick={handleImportTemplates}
+                    className="text-primary-yellow text-sm flex items-center gap-1 hover:text-primary-yellow/80 transition-colors"
+                    title="Import templates"
+                  >
+                    <Upload size={16} />
+                    Import
+                  </button>
+                </>
+              )}
+              {templates.length === 0 && (
+                <button
+                  onClick={handleImportTemplates}
+                  className="text-primary-yellow text-sm flex items-center gap-1 hover:text-primary-yellow/80 transition-colors"
+                  title="Import templates"
+                >
+                  <Upload size={16} />
+                  Import
+                </button>
+              )}
+              <button
+                onClick={() => setShowTemplateBuilder(true)}
+                className="text-primary-blue text-sm flex items-center gap-1 hover:text-primary-blue/80 transition-colors"
+              >
+                <Plus size={16} />
+                New Template
+              </button>
+            </div>
           </div>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleFileSelected}
+            className="hidden"
+          />
 
           {templates.length === 0 ? (
             <div className="card text-center py-12 text-gray-400">
@@ -433,11 +563,26 @@ export function WorkoutLogger() {
           <div key={exercise.exerciseId} className="card-elevated">
             {/* Exercise Header */}
             <div className="flex items-center justify-between mb-3">
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold text-lg">{exercise.exerciseName}</h3>
-                <p className="text-sm text-gray-400">
-                  {exercise.totalVolume.toFixed(0)} {weightUnit} total volume
-                </p>
+                <div className="flex items-center gap-3 text-sm">
+                  <span className="text-gray-400">
+                    {exercise.totalVolume.toFixed(0)} {weightUnit} volume
+                  </span>
+                  {previousWorkoutData.has(exercise.exerciseId) && (() => {
+                    const prevSets = previousWorkoutData.get(exercise.exerciseId)!;
+                    const bestPrevSet = prevSets
+                      .filter(s => !s.isWarmup)
+                      .reduce((best, set) =>
+                        (set.weight > best.weight || (set.weight === best.weight && set.reps > best.reps)) ? set : best
+                      , prevSets[0]);
+                    return (
+                      <span className="text-primary-blue text-xs">
+                        Last: {bestPrevSet.weight}{weightUnit} × {bestPrevSet.reps}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
               <button
                 onClick={() => removeExercise(exercise.exerciseId)}
@@ -458,7 +603,30 @@ export function WorkoutLogger() {
               <div></div>
             </div>
 
-            {/* Sets */}
+            {/* Previous Workout Sets (if available) */}
+            {previousWorkoutData.has(exercise.exerciseId) && (
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2 px-2">
+                  <div className="h-px bg-gray-700 flex-1"></div>
+                  <span className="text-xs text-gray-500 font-medium">Last Workout</span>
+                  <div className="h-px bg-gray-700 flex-1"></div>
+                </div>
+                <div className="space-y-2 opacity-60">
+                  {previousWorkoutData.get(exercise.exerciseId)!.slice(0, 5).map((prevSet, idx) => (
+                    <SetRow
+                      key={`prev-${idx}`}
+                      set={prevSet}
+                      onUpdate={() => {}}
+                      onDelete={() => {}}
+                      isPreviousSet={true}
+                      weightUnit={weightUnit}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Current Sets */}
             <div className="space-y-2">
               {exercise.sets.map((set) => (
                 <SetRow
@@ -587,6 +755,125 @@ export function WorkoutLogger() {
                 Discard
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* PR Celebration Modal */}
+      {showPRCelebration && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-primary-blue/20 to-primary-yellow/20 border-2 border-primary-blue rounded-lg p-8 max-w-lg w-full animate-fadeIn">
+            {/* Trophy Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <Trophy size={64} className="text-primary-yellow animate-bounce" />
+                <div className="absolute inset-0 blur-xl bg-primary-yellow/50 animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-primary-yellow via-primary-blue to-primary-yellow bg-clip-text text-transparent">
+              NEW PERSONAL RECORD{detectedPRs.length > 1 ? 'S' : ''}!
+            </h2>
+            <p className="text-center text-gray-300 mb-6">
+              You just set {detectedPRs.length} new PR{detectedPRs.length > 1 ? 's' : ''}!
+            </p>
+
+            {/* PR List */}
+            <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+              {detectedPRs.map((pr, index) => {
+                const prIcon = {
+                  weight: TrendingUp,
+                  reps: Zap,
+                  volume: Dumbbell,
+                  '1rm': Trophy,
+                }[pr.type];
+                const Icon = prIcon || Trophy;
+
+                const prTypeLabel = {
+                  weight: 'Weight PR',
+                  reps: 'Rep PR',
+                  volume: 'Volume PR',
+                  '1rm': '1RM PR',
+                }[pr.type];
+
+                return (
+                  <div
+                    key={index}
+                    className="bg-gray-900/50 border border-primary-blue/30 rounded-lg p-4 animate-slideInLeft"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Icon size={24} className="text-primary-blue mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-white">{pr.exerciseName}</h3>
+                          <span className="text-xs font-bold text-primary-yellow uppercase tracking-wide">
+                            {prTypeLabel}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-300">
+                          {pr.type === 'weight' && (
+                            <p>
+                              <span className="text-primary-blue font-bold">{pr.weight}{weightUnit}</span> × {pr.reps} reps
+                              {pr.previousRecord && (
+                                <span className="text-gray-500 ml-2">
+                                  (+{(pr.improvement || 0).toFixed(1)}{weightUnit} from {pr.previousRecord}{weightUnit})
+                                </span>
+                              )}
+                            </p>
+                          )}
+                          {pr.type === 'reps' && (
+                            <p>
+                              <span className="text-primary-blue font-bold">{pr.reps} reps</span> at {pr.weight}{weightUnit}
+                              {pr.previousRecord && (
+                                <span className="text-gray-500 ml-2">
+                                  (+{pr.improvement} reps from {pr.previousRecord})
+                                </span>
+                              )}
+                            </p>
+                          )}
+                          {pr.type === 'volume' && (
+                            <p>
+                              <span className="text-primary-blue font-bold">{pr.value.toFixed(0)} {weightUnit}</span> single-set volume
+                              <span className="text-gray-400 ml-2">
+                                ({pr.weight}{weightUnit} × {pr.reps})
+                              </span>
+                              {pr.previousRecord && (
+                                <span className="text-gray-500 ml-2">
+                                  (+{(pr.improvement || 0).toFixed(0)}{weightUnit})
+                                </span>
+                              )}
+                            </p>
+                          )}
+                          {pr.type === '1rm' && (
+                            <p>
+                              <span className="text-primary-blue font-bold">{pr.value.toFixed(1)}{weightUnit}</span> estimated 1RM
+                              <span className="text-gray-400 ml-2">
+                                ({pr.weight}{weightUnit} × {pr.reps})
+                              </span>
+                              {pr.previousRecord && (
+                                <span className="text-gray-500 ml-2">
+                                  (+{(pr.improvement || 0).toFixed(1)}{weightUnit} from {pr.previousRecord.toFixed(1)}{weightUnit})
+                                </span>
+                              )}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowPRCelebration(false)}
+              className="w-full btn-primary py-3 text-lg font-semibold"
+            >
+              Let's Go! 💪
+            </button>
           </div>
         </div>
       )}
