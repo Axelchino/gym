@@ -669,6 +669,12 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
      - [ ] Training goal (strength/hypertrophy/endurance)
      - [ ] Experience level (beginner/intermediate/advanced)
      - [ ] Unit preferences (kg/lbs, cm/ft)
+   - [ ] **Actual 1RM Tracking:**
+     - [ ] Input fields for actual tested 1RMs (Squat, Bench, Deadlift, OHP, custom)
+     - [ ] Last tested date for each lift
+     - [ ] Display alongside calculated 1RM in Analytics
+     - [ ] Comparison: "Estimated: 102kg | Actual: 100kg (+2kg)"
+     - [ ] Note: App calculates 1RM using both Brzycki and Epley formulas
    - [ ] Profile picture upload (optional)
    - [ ] Settings management (theme, notifications, privacy)
 
@@ -695,7 +701,8 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ### Deliverables
 - ✅ Working authentication system
-- ✅ Complete profile management
+- ✅ Complete profile management with actual 1RM tracking
+- ✅ 1RM comparison: Calculated (Brzycki + Epley) vs Actual
 - ✅ Cloud sync for all user data
 - ✅ Cross-device data access
 - ✅ Backup and restore functionality
@@ -1528,3 +1535,10 @@ _Current Focus: Phase 3 complete. New Phase 3.5 added based on ProgTracking.pdf 
 - Complete Phase 3.5 features before starting Phase 4
 - Prioritize features that drive daily/weekly engagement
 - Ensure all features respect intermediate lifters' need for efficiency (no "fluff")
+
+**Phase 5 Enhancement (2025-10-20):**
+- Added actual 1RM tracking to profile system
+- Users can input their tested 1RMs (Squat, Bench, Deadlift, OHP, custom lifts)
+- Compare calculated 1RM (using Brzycki + Epley formulas) vs actual tested 1RM
+- Show both in Analytics: "Estimated: 102kg | Actual: 100kg (+2kg above!)"
+- **Rationale**: Calculated 1RMs are estimates; letting users track actual tested maxes provides validation and more accurate strength standards comparison
