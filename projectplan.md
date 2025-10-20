@@ -369,7 +369,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ## Phase 3: Analytics Engine & Visualization
 **Timeline:** Weeks 7-9
-**Status:** Not Started
+**Status:** ✅ COMPLETE
 **Dependencies:** Phase 2
 
 ### Objectives
@@ -381,76 +381,99 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 ### Tasks
 
 1. **Analytics Calculation Engine**
-   - [ ] Calculate total volume (weight × reps × sets)
-   - [ ] Calculate volume by muscle group
-   - [ ] Estimate 1RM from rep maxes (Brzycki formula)
-   - [ ] Detect personal records (weight, reps, volume, 1RM)
-   - [ ] Calculate training frequency (workouts per week)
-   - [ ] Track workout consistency (streak calculations)
-   - [ ] Calculate progressive overload trends
-   - [ ] Aggregate weekly/monthly statistics
+   - [x] Calculate total volume (weight × reps × sets) ✅
+   - [x] Calculate volume by muscle group ✅
+   - [x] Estimate 1RM from rep maxes (Brzycki formula) ✅
+   - [x] Detect personal records (weight, reps, volume, 1RM) ✅
+   - [x] Calculate training frequency (workouts per week) ✅
+   - [x] Track workout consistency (streak calculations) ✅
+   - [x] Calculate progressive overload trends ✅
+   - [x] Aggregate weekly/monthly statistics ✅
 
 2. **Personal Records System**
-   - [ ] Implement PR detection algorithm
-   - [ ] Store PR history per exercise
-   - [ ] Create PR comparison logic (new vs previous)
-   - [ ] Build PR notification system
-   - [ ] Design PR history timeline
-   - [ ] Track multiple PR types (weight, reps, volume, 1RM)
-   - [ ] Create PR celebration animations
+   - [x] Implement PR detection algorithm ✅
+   - [x] Store PR history per exercise ✅
+   - [x] Create PR comparison logic (new vs previous) ✅
+   - [x] Build PR notification system ✅
+   - [x] Design PR history timeline ✅
+   - [x] Track multiple PR types (weight, reps, volume, 1RM) ✅
+   - [x] Create PR celebration animations ✅
 
 3. **Data Visualization Components**
-   - [ ] **Strength Progression Chart**
+   - [x] **Strength Progression Chart** ✅
      - Line chart showing weight progression over time
-     - Per-exercise or aggregated view
-     - Date range selector (1M, 3M, 6M, 1Y, All)
+     - Per-exercise view with exercise selector
+     - Time filter (7d, 30d, 90d, All)
 
-   - [ ] **Volume Progression Chart**
-     - Bar chart showing weekly/monthly volume
-     - Color-coded by muscle group
-     - Trend line overlay
+   - [x] **Volume Progression Chart** ✅
+     - Bar chart showing workout-by-workout volume
+     - Time-based filtering
+     - Responsive design
 
-   - [ ] **1RM Tracking Chart**
+   - [x] **1RM Tracking Chart** ✅
      - Line chart for estimated 1RM over time
-     - Multiple exercises on same chart
-     - PR markers highlighted
+     - Per-exercise tracking with dual-axis chart
+     - Weight and 1RM on same chart
 
-   - [ ] **Training Frequency Heatmap**
-     - Calendar heatmap showing workout days
-     - Color intensity = volume/intensity
-     - Streak indicators
+   - [ ] **Training Frequency Heatmap & Calendar** - MOVE TO PHASE 3.5 (HIGH PRIORITY)
+     - Calendar heatmap showing workout days (like Hevy's consistency calendar)
+     - Mark workout days in blue/color coded
+     - Show weekly streak counter prominently (e.g., "31 weeks streak")
+     - Click date to see that day's session details
+     - Add missed workout retroactively
+     - Rest days since last workout indicator
+     - **Rationale**: PDF research emphasizes this is critical for intermediate lifter engagement
 
-   - [ ] **Muscle Group Balance Chart**
+   - [ ] **Muscle Group Balance Chart** - deferred to Phase 6
      - Radar chart showing volume distribution
      - Identify under-trained muscle groups
 
-   - [ ] **Body Measurements Chart**
+   - [ ] **Body Measurements Chart** - deferred to Phase 6
      - Line chart for weight, measurements
      - Multiple metrics on same timeline
 
 4. **Dashboard Views**
-   - [ ] **Home Dashboard**
+   - [ ] **Home Dashboard** - deferred (using existing Dashboard page)
      - Quick stats (streak, weekly volume, recent PRs)
      - Upcoming scheduled workouts
      - Recent workout summary
 
-   - [ ] **Progress Dashboard**
+   - [x] **Progress Dashboard** ✅
      - All analytics charts
-     - Sortable/filterable by exercise, date, muscle group
-     - Export chart data
+     - Time-based filtering (7d, 30d, 90d, all)
+     - PR timeline with full history
+     - Exercise-specific progression charts
+     - Overall statistics (workouts, volume, PRs, streak)
 
-   - [ ] **Exercise Detail Analytics**
+   - [x] **Exercise Detail Analytics** ✅
      - Per-exercise progression charts
-     - PR history for that exercise
-     - Set records across rep ranges
-     - Volume trends for that exercise
+     - Exercise selector dropdown
+     - Weight and 1RM tracking over time
+     - Volume trends for selected exercise
+
+   - [ ] **Aggregated Progress Reports** (inspired by Alpha Progression) - HIGH PRIORITY
+     - Weekly, monthly, and yearly summary reports
+     - Report metrics: total workouts, hours trained, training frequency by week/month
+     - Top 3 most-performed exercises with set counts
+     - PRs and achievements earned during period
+     - Volume milestones and trends
+     - Percent change from previous period
+     - Shareable report cards (generate image or link for social sharing)
+     - **Rationale**: Research shows these "year in review" summaries are fantastic for retention
 
 5. **Insights & Recommendations**
-   - [ ] Generate weekly summary statistics
-   - [ ] Identify training imbalances
-   - [ ] Suggest under-trained muscle groups
-   - [ ] Calculate recovery time between muscle groups
-   - [ ] Provide progressive overload readiness score
+   - [x] Generate workout summary statistics ✅
+   - [x] Track most frequent exercises ✅
+   - [ ] **Comparative Strength Standards** - HIGH PRIORITY (from ProgTracking.pdf research)
+     - Compare user's 1RM to strength standards (Beginner/Intermediate/Advanced/Elite)
+     - Segment by age, weight, and sex for accuracy
+     - Show rating for the big 3 lifts (squat, bench, deadlift)
+     - Display progress toward next level (e.g., "85% to Advanced")
+     - **Rationale**: Gamifies strength progression, motivates users to reach next tier
+   - [ ] Identify training imbalances - deferred to Phase 7
+   - [ ] Suggest under-trained muscle groups - deferred to Phase 7
+   - [ ] Calculate recovery time between muscle groups - deferred to Phase 7
+   - [ ] Provide progressive overload readiness score - deferred to Phase 7
 
 ### Deliverables
 - ✅ Complete analytics calculation engine
@@ -467,10 +490,72 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ---
 
-## Phase 4: Programming & Scheduling System
-**Timeline:** Weeks 10-12
+## Phase 3.5: Enhanced Analytics & Engagement Features
+**Timeline:** Weeks 9-10
 **Status:** Not Started
 **Dependencies:** Phase 3
+**Priority:** HIGH (Based on ProgTracking.pdf research)
+
+### Objectives
+- Implement aggregated progress reports for retention
+- Add consistency tracking with calendar heatmap
+- Build comparative strength standards system
+- Enhance engagement through better progress visualization
+
+### Tasks
+
+1. **Aggregated Progress Reports** (Alpha Progression-style)
+   - [ ] Create report generation system (weekly, monthly, yearly)
+   - [ ] Calculate report metrics:
+     - [ ] Total workouts and percent change from previous period
+     - [ ] Total hours trained
+     - [ ] Training frequency chart (workouts per week/month)
+     - [ ] Top 3 most-performed exercises with set counts
+     - [ ] PRs and achievements earned during period
+     - [ ] Volume milestones reached
+   - [ ] Build report UI with shareable card design
+   - [ ] Add social sharing functionality (generate image or link)
+   - [ ] Implement "year in review" summary
+
+2. **Training Frequency Calendar & Streaks**
+   - [ ] Build calendar heatmap component
+   - [ ] Mark workout days with color coding
+   - [ ] Implement weekly streak counter (consecutive weeks with ≥1 workout)
+   - [ ] Show "days since last workout" indicator
+   - [ ] Add click-to-view workout details from calendar
+   - [ ] Support retroactive workout logging
+   - [ ] Create streak celebration animations
+   - [ ] Add loss aversion messaging ("Don't break your streak!")
+
+3. **Comparative Strength Standards**
+   - [ ] Research and implement strength standard formulas
+   - [ ] Create strength level classifications (Beginner/Intermediate/Advanced/Elite)
+   - [ ] Segment by age, weight, and sex
+   - [ ] Build strength level display for big 3 lifts
+   - [ ] Show progress toward next level (percentage)
+   - [ ] Add level-up celebrations when user advances
+   - [ ] Implement rank badge system
+
+### Deliverables
+- ✅ Weekly, monthly, and yearly progress reports
+- ✅ Calendar heatmap with streak tracking
+- ✅ Strength standard comparison system
+- ✅ Enhanced user engagement features
+
+### Engagement Milestones
+- Users receive weekly summary notifications
+- Streak counter drives consistent training
+- Strength level progression provides clear goals
+- Shareable reports increase social engagement
+
+**Rationale:** Research from ProgTracking.pdf emphasizes that aggregated reports, consistency tracking, and comparative standards are critical for intermediate lifter engagement and retention. These features should be implemented before programming tools.
+
+---
+
+## Phase 4: Programming & Scheduling System
+**Timeline:** Weeks 11-13
+**Status:** Not Started
+**Dependencies:** Phase 3.5
 
 ### Objectives
 - Build weekly/monthly programming system
@@ -623,12 +708,16 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ---
 
-## Phase 6: Enhancement Features
-**Timeline:** Weeks 15-17
+## Phase 6: Gamification & Social Features
+**Timeline:** Weeks 15-18
 **Status:** Not Started
 **Dependencies:** Phase 5
 
 ### Objectives
+- **Gamification System** (Duolingo-inspired engagement)
+- **Quest/Challenge System** for motivation
+- **Social Features** for workout buddies
+- **Template Sharing** with friends
 - Add achievement/milestone system
 - Integrate video demonstrations
 - Implement body measurements tracking
@@ -636,20 +725,78 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ### Tasks
 
-1. **Achievement System**
+1. **Gamification & Quest System** (Duolingo-Inspired)
+   - [ ] **Daily Quests:**
+     - [ ] "Complete 3 sets of any exercise"
+     - [ ] "Hit a new PR today"
+     - [ ] "Complete a full workout"
+     - [ ] "Log 500kg total volume"
+   - [ ] **Weekly Quests:**
+     - [ ] "Train 4 times this week"
+     - [ ] "Hit 5 PRs this week"
+     - [ ] "Complete 20 sets of chest exercises"
+     - [ ] "Train all major muscle groups"
+   - [ ] **Monthly Challenges:**
+     - [ ] "Complete 16 workouts this month"
+     - [ ] "Hit 10 PRs this month"
+     - [ ] "Lift 50,000kg total volume"
+   - [ ] **Quest UI:**
+     - [ ] Daily quest tracker widget on Dashboard
+     - [ ] Quest progress bars with animations
+     - [ ] Quest completion celebrations
+     - [ ] Quest history and statistics
+   - [ ] **Rewards System (Honor System):**
+     - [ ] XP/Points for completing quests
+     - [ ] Level system (1-100+)
+     - [ ] Unlockable badges and titles
+     - [ ] Streak bonuses for consistency
+   - [ ] **Quest Generation:**
+     - [ ] Auto-generate daily quests at midnight
+     - [ ] Personalized quests based on training history
+     - [ ] Special event quests (holidays, milestones)
+
+2. **Social Features for Workout Buddies**
+   - [ ] **Friend System:**
+     - [ ] Add friends by username/code
+     - [ ] Friend list with activity feed
+     - [ ] See friends' recent workouts (opt-in)
+     - [ ] Friend workout streak tracking
+   - [ ] **Template Sharing:**
+     - [ ] Generate shareable template link/code
+     - [ ] Import template from friend's link
+     - [ ] Browse community templates (optional)
+     - [ ] Template rating system
+   - [ ] **Challenges with Friends:**
+     - [ ] Create group challenges
+     - [ ] "Who can hit more PRs this week?"
+     - [ ] "Who can lift more volume this month?"
+     - [ ] Challenge leaderboards
+   - [ ] **Workout Comparisons:**
+     - [ ] Compare stats with friends
+     - [ ] Side-by-side exercise progress
+     - [ ] Friendly competition tracking
+   - [ ] **Motivation Features:**
+     - [ ] Send/receive encouragement messages
+     - [ ] Celebrate friend's PRs
+     - [ ] Workout reminders from friends
+     - [ ] Virtual gym buddy notifications
+
+3. **Achievement System**
    - [ ] Define achievement types:
      - [ ] Workout milestones (10, 50, 100, 500 workouts)
      - [ ] Volume milestones (100k, 500k, 1M lbs lifted)
      - [ ] Consistency streaks (7, 30, 100, 365 days)
      - [ ] PR achievements (first PR, 10 PRs, etc.)
      - [ ] Strength milestones (bench 225, squat 315, deadlift 405)
+     - [ ] Social achievements (help 5 friends, share 10 templates)
    - [ ] Create achievement badge designs
    - [ ] Implement achievement detection logic
    - [ ] Build achievement notification system
    - [ ] Design achievements showcase page
    - [ ] Add progress toward locked achievements
+   - [ ] Share achievements with friends
 
-2. **Video Demonstrations**
+4. **Video Demonstrations**
    - [ ] Source or create exercise videos (50+ exercises)
    - [ ] Set up video hosting (YouTube embed or CDN)
    - [ ] Add video player to exercise detail modal
@@ -657,7 +804,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Add video playback controls
    - [ ] Optimize video loading (lazy load)
 
-3. **Body Measurements Tracking**
+5. **Body Measurements Tracking**
    - [ ] Create measurements data model:
      - [ ] Weight (daily/weekly)
      - [ ] Body fat % (optional)
@@ -670,7 +817,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Calculate measurement trends
    - [ ] Compare measurements over time
 
-4. **UI/UX Polish**
+6. **UI/UX Polish**
    - [ ] Add loading states and skeletons
    - [ ] Implement error boundaries
    - [ ] Add success/error toast notifications
@@ -680,7 +827,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Optimize for mobile (touch gestures)
    - [ ] Add keyboard shortcuts documentation
 
-5. **Data Export Enhancement**
+7. **Data Export Enhancement**
    - [ ] CSV export for all data types
    - [ ] JSON export for complete backup
    - [ ] PDF workout reports (optional)
@@ -688,17 +835,30 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Add export scheduling (automatic weekly exports)
 
 ### Deliverables
-- ✅ Complete achievement system with 20+ achievements
+- ✅ Complete gamification system with daily/weekly/monthly quests
+- ✅ Friend system with activity feed and challenges
+- ✅ Template sharing via links/codes
+- ✅ Achievement system with 30+ achievements (including social)
 - ✅ Video demonstrations for 50+ exercises
 - ✅ Body measurements tracking with charts
 - ✅ Polished UI with animations and feedback
 - ✅ Enhanced data export options
 
 ### Enhancement Milestones
+- Quests feel engaging and achievable (like Duolingo)
+- Friend features encourage long-distance workout buddies
+- Template sharing is effortless
 - Achievements feel rewarding and motivating
 - Videos load quickly and play smoothly
 - UI feels premium and responsive
 - Users understand all features intuitively
+
+### Design Notes (Gamification)
+- **Honor System:** All tracking is self-reported, based on trust
+- **Non-Competitive Option:** Users can opt out of leaderboards
+- **Positive Reinforcement:** Focus on encouragement, not shame
+- **Streak Protection:** Allow 1-2 "freeze days" per month for life events
+- **Friend Privacy:** All social features are opt-in with granular controls
 
 ---
 
@@ -1197,12 +1357,13 @@ chore: Update dependencies
 | **Phase 1** | Weeks 2-3 | Data Layer | Database, models, offline foundation |
 | **Phase 2** | Weeks 4-6 | Workout Tracking | Exercise library, logging, templates |
 | **Phase 3** | Weeks 7-9 | Analytics | Charts, PRs, insights, dashboard |
-| **Phase 4** | Weeks 10-12 | Programming | Multi-week programs, scheduling |
-| **Phase 5** | Weeks 13-14 | Multi-User | Auth, profiles, cloud sync |
-| **Phase 6** | Weeks 15-17 | Enhancements | Achievements, videos, measurements |
-| **Phase 7** | Weeks 18-20 | Optimization | RPE/RIR, suggestions, performance |
+| **Phase 3.5** | Weeks 9-10 | Enhanced Analytics | Progress reports, streaks, strength standards |
+| **Phase 4** | Weeks 11-13 | Programming | Multi-week programs, scheduling |
+| **Phase 5** | Weeks 14-15 | Multi-User | Auth, profiles, cloud sync |
+| **Phase 6** | Weeks 16-18 | Enhancements | Achievements, videos, measurements |
+| **Phase 7** | Weeks 19-21 | Optimization | RPE/RIR, suggestions, performance |
 
-**Total Estimated Timeline:** 20 weeks (~5 months)
+**Total Estimated Timeline:** 21 weeks (~5.5 months)
 
 ---
 
@@ -1220,11 +1381,13 @@ This is a personal project focused on building an exceptional user experience fo
 
 ---
 
-_Last Updated: 2025-10-18_
-_Project Status: Phase 2 - Nearly Complete (90%)_
-_Current Focus: Core workout tracking complete, ready for Phase 3 (Analytics)_
+_Last Updated: 2025-10-20_
+_Project Status: Phase 3 Complete (Analytics Engine), Phase 3.5 Planned_
+_Current Focus: Phase 3 complete. New Phase 3.5 added based on ProgTracking.pdf research to implement high-priority engagement features before programming._
 
 ### Recent Updates (2025-10-18)
+
+**Phase 2 Updates:**
 - ✅ Completed routing setup with React Router
 - ✅ Implemented OLED black theme with Coolors palette
 - ✅ Built comprehensive Exercise Library with 191+ exercises
@@ -1277,4 +1440,91 @@ _Current Focus: Core workout tracking complete, ready for Phase 3 (Analytics)_
   - Muscle group aliases (delts, lats, pecs, quads, hams, bis, tris)
   - Comprehensive muscle mappings (legs→quads/hams/glutes/calves)
   - Smart search expansion for all common terms
-- 🟡 Next: Add category/muscle group filters, analytics dashboard (Phase 3)
+
+**Phase 3 Updates (Analytics Engine):**
+- ✅ **ANALYTICS UTILITIES COMPLETE** (`src/utils/analytics.ts`):
+  - Volume calculation with dumbbell 2x multiplier
+  - 1RM estimation (Brzycki and Epley formulas)
+  - PR detection for 4 types: weight, reps, volume, 1RM
+  - Workout statistics calculation
+  - Workout streak tracking
+  - Volume by muscle group analysis
+  - Exercise progression tracking
+- ✅ **PR DETECTION & TRACKING COMPLETE:**
+  - Automatic PR detection on workout save
+  - Historical data comparison against all past workouts
+  - PR storage in IndexedDB `personalRecords` table
+  - PR celebration modal with animations
+  - Multiple PR type support (weight/reps/volume/1RM)
+  - Previous record comparison and improvement tracking
+- ✅ **PROGRESS DASHBOARD COMPLETE** (`src/pages/Analytics.tsx`):
+  - 4 stat cards: Total Workouts, Total Volume, Recent PRs (30d), Workout Streak
+  - Time filter: 7 days, 30 days, 90 days, All Time
+  - Volume Over Time bar chart (Recharts)
+  - Exercise Progression line chart with dual-axis (weight + 1RM)
+  - Exercise selector dropdown for progression tracking
+  - Personal Records timeline with full history
+  - PR detail cards showing type, value, and improvement
+  - Overall statistics panel (total sets, reps, avg duration/volume)
+  - Most Frequent Exercises with usage bars
+- ✅ **PR CELEBRATION SYSTEM:**
+  - Animated trophy modal on PR achievement
+  - Gradient title with pulse animations
+  - Slide-in animations for PR cards
+  - Type-specific icons (TrendingUp, Zap, Dumbbell, Trophy)
+  - Detailed PR information (previous record, improvement)
+  - Celebration CSS animations
+
+**Phase 3+ Additional Features (Post-Analytics):**
+- ✅ **CSV EXPORT/IMPORT SYSTEM** (`src/utils/csvExport.ts`):
+  - Template export to CSV (ID, name, exercises, sets/reps, weights, RIR, rest times)
+  - Template import from CSV with conflict resolution (auto-generates new IDs)
+  - Workout history export with full set data (weight, reps, RIR, RPE, set types)
+  - File download/upload utilities for cross-device data sharing
+  - CSV parsing with proper quote handling for special characters
+  - Export buttons in WorkoutLogger (templates) and Analytics (history)
+  - Import functionality with user-friendly file picker
+  - **Use Case:** Share templates with workout buddies, backup data, transfer between devices
+- ✅ **CRITICAL BUG FIX: Active Workout Persistence:**
+  - Added localStorage auto-save for active workouts
+  - Workout data now survives HMR (Hot Module Reload) during development
+  - Automatic recovery of active workout on app reload
+  - beforeunload warning when closing app during active workout
+  - Prevents data loss during workout sessions
+  - **Impact:** Fixes critical bug where workout data was lost on page refresh
+
+**Status:** Phase 3 Complete! Ready for Phase 4 (Programming & Scheduling System)
+
+### Recent Updates (2025-10-20)
+
+**Phase 3 Review & ProgTracking.pdf Research Integration:**
+- ✅ **Phase 3 Complete:** Core analytics engine validated and working
+- ✅ **Research Analysis:** Reviewed ProgTracking.pdf - comprehensive research on intermediate lifter engagement
+- ✅ **New Phase 3.5 Created:** Added high-priority engagement features identified in research
+
+**Key Findings from ProgTracking.pdf:**
+- Intermediate lifters want "convenient, powerful way to log and review" without beginner fluff
+- **Critical metrics**: 1RMs, PRs, volume per muscle group, progression graphs ✅ (already have)
+- **Missing features identified**:
+  1. Aggregated Progress Reports (weekly/monthly/yearly summaries) - like Alpha Progression
+  2. Training Frequency Calendar with streak tracking - like Hevy's consistency calendar
+  3. Comparative Strength Standards (Beginner/Intermediate/Advanced/Elite) - like Hevy's strength levels
+- **Gamification insights**: Streaks, badges, achievements work IF tied to real training milestones
+- **Social features**: Community sharing of templates and progress reports drives retention
+
+**Phase 3.5 Added (Weeks 9-10):**
+- Aggregated Progress Reports (yearly/monthly/weekly summaries)
+- Training Frequency Calendar & Heatmap with weekly streak counter
+- Comparative Strength Standards (Beginner → Elite progression)
+- **Rationale**: Research shows these features are critical for retention BEFORE implementing programming tools
+
+**Phase Timeline Adjustment:**
+- Phase 4 (Programming) moved to Weeks 11-13 (was 10-12)
+- Phase 5 (Multi-User) moved to Weeks 14-15 (was 13-14)
+- Phase 6 (Gamification) moved to Weeks 16-18 (was 15-17)
+- Total timeline: 21 weeks (was 20 weeks)
+
+**Next Steps:**
+- Complete Phase 3.5 features before starting Phase 4
+- Prioritize features that drive daily/weekly engagement
+- Ensure all features respect intermediate lifters' need for efficiency (no "fluff")
