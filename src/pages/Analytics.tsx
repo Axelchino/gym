@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, BarChart3, Award, Trophy, Zap, Dumbbell, Calendar, Filter, Download } from 'lucide-react';
+import { TrendingUp, BarChart3, Award, Trophy, Zap, Dumbbell, Calendar, Filter, Download, X } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { db } from '../services/database';
 import { calculateWorkoutStats, calculateStreak, getExerciseProgression, calculate1RM } from '../utils/analytics';
@@ -7,6 +7,8 @@ import type { PersonalRecord } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { exportWorkoutLogsToCSV, downloadCSV } from '../utils/csvExport';
+import { CalendarHeatmap } from '../components/CalendarHeatmap';
+import { StreakDisplay } from '../components/StreakDisplay';
 
 export function Analytics() {
   const { weightUnit } = useUserSettings();
@@ -16,6 +18,7 @@ export function Analytics() {
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [exerciseList, setExerciseList] = useState<{ id: string; name: string }[]>([]);
   const [timeFilter, setTimeFilter] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
+  const [selectedDateWorkouts, setSelectedDateWorkouts] = useState<{ date: Date; workouts: WorkoutLog[] } | null>(null);
 
   useEffect(() => {
     loadData();
@@ -428,6 +431,99 @@ export function Analytics() {
           </div>
         </div>
       </div>
+
+      {/* Calendar & Streak Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <StreakDisplay workouts={workouts} />
+        <CalendarHeatmap
+          workouts={workouts}
+          onDateClick={(date, dayWorkouts) => setSelectedDateWorkouts({ date, workouts: dayWorkouts })}
+        />
+      </div>
+
+      {/* Workout Details Modal */}
+      {selectedDateWorkouts && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">
+                {selectedDateWorkouts.date.toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </h2>
+              <button
+                onClick={() => setSelectedDateWorkouts(null)}
+                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Workouts */}
+            <div className="space-y-4">
+              {selectedDateWorkouts.workouts.map((workout, idx) => (
+                <div key={workout.id} className="card bg-gray-800/50">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-lg">{workout.name}</h3>
+                    <div className="text-sm text-gray-400">
+                      {workout.duration ? `${workout.duration} min` : ''}
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-900/50 rounded-lg">
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">Volume</div>
+                      <div className="text-lg font-bold text-primary-blue">
+                        {workout.totalVolume.toFixed(0)} {weightUnit}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">Exercises</div>
+                      <div className="text-lg font-bold text-primary-green">
+                        {workout.exercises.length}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">Sets</div>
+                      <div className="text-lg font-bold text-primary-yellow">
+                        {workout.exercises.reduce((sum, ex) => sum + ex.sets.filter(s => !s.isWarmup).length, 0)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Exercises */}
+                  <div className="space-y-2">
+                    {workout.exercises.map((exercise, exIdx) => (
+                      <div key={exIdx} className="bg-gray-900/50 rounded-lg p-3">
+                        <div className="font-medium text-sm mb-2">{exercise.exerciseName}</div>
+                        <div className="grid grid-cols-4 gap-2 text-xs">
+                          {exercise.sets.filter(s => !s.isWarmup && s.completed).map((set, setIdx) => (
+                            <div key={setIdx} className="bg-gray-800 rounded px-2 py-1 text-center">
+                              {set.weight}{weightUnit} × {set.reps}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {workout.notes && (
+                    <div className="mt-3 p-3 bg-gray-900/50 rounded-lg">
+                      <div className="text-xs text-gray-500 mb-1">Notes:</div>
+                      <div className="text-sm text-gray-300">{workout.notes}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

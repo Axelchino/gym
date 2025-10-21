@@ -11,6 +11,7 @@ export interface Set {
   isDropSet: boolean;
   isFailure: boolean;
   completed: boolean;
+  isUserInput?: boolean; // Track if values are user-entered (true) or pre-filled from previous workout (false/undefined)
   notes?: string;
   timestamp: Date;
 }

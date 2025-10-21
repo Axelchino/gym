@@ -174,55 +174,94 @@ export function WorkoutLogger() {
   }
 
   async function handleStartFromTemplate(template: WorkoutTemplate) {
-    console.log('Starting workout from template:', template);
-
     // Build the complete workout structure with all exercises and sets
     const exercises = [];
+
+    // Get all recent workouts to find previous data
+    const recentWorkouts = await db.workoutLogs
+      .orderBy('date')
+      .reverse()
+      .toArray();
 
     for (let i = 0; i < template.exercises.length; i++) {
       const templateEx = template.exercises[i];
       const exercise = await db.exercises.get(templateEx.exerciseId);
 
       if (exercise) {
-        console.log('Loading exercise:', exercise.name);
-        const sets = [];
-        let setNumber = 1;
-
-        // Add warmup sets first
-        const warmupSets = templateEx.warmupSets || 0;
-        for (let j = 0; j < warmupSets; j++) {
-          sets.push({
-            id: uuidv4(),
-            workoutLogId: '',
-            exerciseId: exercise.id,
-            setNumber: setNumber++,
-            weight: 0,
-            reps: templateEx.targetReps,
-            rir: templateEx.targetRIR,
-            isWarmup: true,
-            isDropSet: false,
-            isFailure: false,
-            completed: false,
-            timestamp: new Date(),
-          });
+        // Find previous workout data for this exercise
+        let previousSets: any[] = [];
+        for (const workout of recentWorkouts) {
+          const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.id);
+          if (exerciseData && exerciseData.sets.length > 0) {
+            previousSets = exerciseData.sets;
+            break; // Found the most recent
+          }
         }
 
-        // Add working sets
-        for (let j = 0; j < templateEx.targetSets; j++) {
-          sets.push({
-            id: uuidv4(),
-            workoutLogId: '',
-            exerciseId: exercise.id,
-            setNumber: setNumber++,
-            weight: templateEx.targetWeight || 0,
-            reps: templateEx.targetReps,
-            rir: templateEx.targetRIR,
-            isWarmup: false,
-            isDropSet: false,
-            isFailure: false,
-            completed: false,
-            timestamp: new Date(),
-          });
+        const sets = [];
+
+        // If we have previous workout data, use it to create sets
+        if (previousSets.length > 0) {
+          for (let j = 0; j < previousSets.length; j++) {
+            const prevSet = previousSets[j];
+            sets.push({
+              id: uuidv4(),
+              workoutLogId: '',
+              exerciseId: exercise.id,
+              setNumber: j + 1,
+              weight: prevSet.weight || 0,
+              reps: prevSet.reps || 0,
+              rir: prevSet.rir,
+              isWarmup: prevSet.isWarmup || false,
+              isDropSet: prevSet.isDropSet || false,
+              isFailure: prevSet.isFailure || false,
+              completed: false,
+              isUserInput: false, // Mark as pre-filled (will show gray)
+              timestamp: new Date(),
+            });
+          }
+        } else {
+          // No previous data - use template defaults
+          let setNumber = 1;
+
+          // Add warmup sets first
+          const warmupSets = templateEx.warmupSets || 0;
+          for (let j = 0; j < warmupSets; j++) {
+            sets.push({
+              id: uuidv4(),
+              workoutLogId: '',
+              exerciseId: exercise.id,
+              setNumber: setNumber++,
+              weight: 0,
+              reps: templateEx.targetReps,
+              rir: templateEx.targetRIR,
+              isWarmup: true,
+              isDropSet: false,
+              isFailure: false,
+              completed: false,
+              isUserInput: false, // Template defaults also show gray
+              timestamp: new Date(),
+            });
+          }
+
+          // Add working sets
+          for (let j = 0; j < templateEx.targetSets; j++) {
+            sets.push({
+              id: uuidv4(),
+              workoutLogId: '',
+              exerciseId: exercise.id,
+              setNumber: setNumber++,
+              weight: templateEx.targetWeight || 0,
+              reps: templateEx.targetReps,
+              rir: templateEx.targetRIR,
+              isWarmup: false,
+              isDropSet: false,
+              isFailure: false,
+              completed: false,
+              isUserInput: false, // Template defaults also show gray
+              timestamp: new Date(),
+            });
+          }
         }
 
         exercises.push({
@@ -237,7 +276,6 @@ export function WorkoutLogger() {
       }
     }
 
-    console.log('Starting workout with', exercises.length, 'exercises');
     // Start workout with all exercises and sets at once
     startWorkoutWithExercises(template.name, exercises);
   }
@@ -593,50 +631,34 @@ export function WorkoutLogger() {
             </div>
 
             {/* Set Headers */}
-            <div className="grid grid-cols-[auto,auto,1fr,1fr,1fr,auto,auto] gap-2 px-2 pb-2 text-xs text-gray-400 font-medium">
-              <div className="w-10 text-center">Type</div>
-              <div className="w-8 text-center">Set</div>
-              <div className="text-center">Weight ({weightUnit})</div>
+            <div className="grid grid-cols-[minmax(2.5rem,auto),minmax(2rem,auto),minmax(4rem,1fr),minmax(4rem,1fr),minmax(3.5rem,1fr),minmax(2.5rem,auto),minmax(2.5rem,auto)] gap-1.5 sm:gap-2 px-2 pb-2 text-xs text-gray-400 font-medium">
+              <div className="text-center">Type</div>
+              <div className="text-center">Set</div>
+              <div className="text-center">{weightUnit}</div>
               <div className="text-center">Reps</div>
-              <div className="text-center">RIR</div>
+              <div className="text-center text-[10px] sm:text-xs">RIR</div>
               <div></div>
               <div></div>
             </div>
 
-            {/* Previous Workout Sets (if available) */}
-            {previousWorkoutData.has(exercise.exerciseId) && (
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2 px-2">
-                  <div className="h-px bg-gray-700 flex-1"></div>
-                  <span className="text-xs text-gray-500 font-medium">Last Workout</span>
-                  <div className="h-px bg-gray-700 flex-1"></div>
-                </div>
-                <div className="space-y-2 opacity-60">
-                  {previousWorkoutData.get(exercise.exerciseId)!.slice(0, 5).map((prevSet, idx) => (
-                    <SetRow
-                      key={`prev-${idx}`}
-                      set={prevSet}
-                      onUpdate={() => {}}
-                      onDelete={() => {}}
-                      isPreviousSet={true}
-                      weightUnit={weightUnit}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Current Sets */}
+            {/* Current Sets - with previous workout data as placeholders */}
             <div className="space-y-2">
-              {exercise.sets.map((set) => (
-                <SetRow
-                  key={set.id}
-                  set={set}
-                  onUpdate={(updates) => updateSet(exercise.exerciseId, set.id, updates)}
-                  onDelete={() => deleteSet(exercise.exerciseId, set.id)}
-                  weightUnit={weightUnit}
-                />
-              ))}
+              {exercise.sets.map((set, idx) => {
+                // Get corresponding previous set (if available)
+                const previousSets = previousWorkoutData.get(exercise.exerciseId);
+                const previousSet = previousSets && previousSets[idx] ? previousSets[idx] : undefined;
+
+                return (
+                  <SetRow
+                    key={set.id}
+                    set={set}
+                    onUpdate={(updates) => updateSet(exercise.exerciseId, set.id, updates)}
+                    onDelete={() => deleteSet(exercise.exerciseId, set.id)}
+                    weightUnit={weightUnit}
+                    previousSet={previousSet}
+                  />
+                );
+              })}
             </div>
 
             {/* Add Set Button */}

@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Dumbbell, TrendingUp, Library, User } from 'lucide-react';
+import { Home, Dumbbell, Calendar, TrendingUp, Library, User } from 'lucide-react';
 
 export function BottomNav() {
   const navItems = [
     { to: '/', icon: Home, label: 'Home' },
     { to: '/workout', icon: Dumbbell, label: 'Workout' },
+    { to: '/program', icon: Calendar, label: 'Program' },
     { to: '/analytics', icon: TrendingUp, label: 'Progress' },
     { to: '/exercises', icon: Library, label: 'Exercises' },
     { to: '/profile', icon: User, label: 'Profile' },

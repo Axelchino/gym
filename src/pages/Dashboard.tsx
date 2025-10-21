@@ -3,6 +3,8 @@ import { Dumbbell, TrendingUp, Calendar, Award, Edit } from 'lucide-react';
 import { db } from '../services/database';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { WorkoutEditModal } from '../components/WorkoutEditModal';
+import { StreakDisplay } from '../components/StreakDisplay';
+import { calculateStreak } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
 
 interface DashboardStats {
@@ -11,6 +13,7 @@ interface DashboardStats {
   currentStreak: number;
   totalPRs: number;
   recentWorkouts: WorkoutLog[];
+  allWorkouts: WorkoutLog[];
 }
 
 export function Dashboard() {
@@ -21,6 +24,7 @@ export function Dashboard() {
     currentStreak: 0,
     totalPRs: 0,
     recentWorkouts: [],
+    allWorkouts: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [editingWorkoutId, setEditingWorkoutId] = useState<string | null>(null);
@@ -60,44 +64,13 @@ export function Dashboard() {
         currentStreak,
         totalPRs,
         recentWorkouts,
+        allWorkouts,
       });
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
     } finally {
       setIsLoading(false);
     }
-  }
-
-  function calculateStreak(workouts: WorkoutLog[]): number {
-    if (workouts.length === 0) return 0;
-
-    const sortedDates = workouts
-      .map(w => {
-        const date = new Date(w.date);
-        date.setHours(0, 0, 0, 0);
-        return date.getTime();
-      })
-      .sort((a, b) => b - a);
-
-    const uniqueDates = [...new Set(sortedDates)];
-
-    let streak = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let currentDate = today.getTime();
-
-    for (const workoutDate of uniqueDates) {
-      const daysDiff = Math.floor((currentDate - workoutDate) / (1000 * 60 * 60 * 24));
-
-      if (daysDiff === 0 || daysDiff === 1) {
-        streak++;
-        currentDate = workoutDate;
-      } else {
-        break;
-      }
-    }
-
-    return streak;
   }
 
   function formatDate(date: Date): string {
@@ -122,12 +95,17 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Dumbbell className="text-primary-blue" size={32} />
-        <div>
-          <h1 className="text-3xl font-bold">GymTracker Pro</h1>
-          <p className="text-gray-400">Welcome back!</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Dumbbell className="text-primary-blue" size={32} />
+          <div>
+            <h1 className="text-3xl font-bold">GymTracker Pro</h1>
+            <p className="text-gray-400">Welcome back!</p>
+          </div>
         </div>
+        {!isLoading && stats.allWorkouts.length > 0 && (
+          <StreakDisplay workouts={stats.allWorkouts} compact />
+        )}
       </div>
 
       {/* Quick Stats */}

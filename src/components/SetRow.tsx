@@ -7,9 +7,10 @@ interface SetRowProps {
   onDelete: () => void;
   isPreviousSet?: boolean;
   weightUnit?: string;
+  previousSet?: Set; // Previous workout data for this set number
 }
 
-export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightUnit = 'kg' }: SetRowProps) {
+export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightUnit = 'kg', previousSet }: SetRowProps) {
   // Determine set type for display and styling
   const setType = set.isWarmup ? 'W' : set.isFailure ? 'UF' : 'N';
   const borderColor = set.isWarmup
@@ -26,7 +27,7 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
 
   return (
     <div
-      className={`grid grid-cols-[auto,auto,1fr,1fr,1fr,auto,auto] gap-2 items-center p-2 rounded ${borderColor} ${
+      className={`grid grid-cols-[minmax(2.5rem,auto),minmax(2rem,auto),minmax(4rem,1fr),minmax(4rem,1fr),minmax(3.5rem,1fr),minmax(2.5rem,auto),minmax(2.5rem,auto)] gap-1.5 sm:gap-2 items-center p-2 rounded ${borderColor} ${
         set.completed
           ? 'bg-primary-blue/10 border border-primary-blue/30'
           : isPreviousSet
@@ -40,77 +41,101 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
           onClick={() => {
             // Cycle: Warmup -> Normal -> Failure -> Warmup
             if (set.isWarmup) {
-              onUpdate({ isWarmup: false, isFailure: false });
+              onUpdate({ isWarmup: false, isFailure: false, isUserInput: true });
             } else if (!set.isWarmup && !set.isFailure) {
-              onUpdate({ isWarmup: false, isFailure: true });
+              onUpdate({ isWarmup: false, isFailure: true, isUserInput: true });
             } else if (set.isFailure) {
-              onUpdate({ isWarmup: true, isFailure: false });
+              onUpdate({ isWarmup: true, isFailure: false, isUserInput: true });
             }
           }}
-          className={`w-10 h-8 flex items-center justify-center rounded text-xs font-bold ${setTypeColor} hover:opacity-80 transition-opacity cursor-pointer`}
+          className={`w-full h-8 flex items-center justify-center rounded text-xs font-bold ${setTypeColor} hover:opacity-80 transition-opacity cursor-pointer`}
           title={`Set Type: ${set.isWarmup ? 'Warmup' : set.isFailure ? 'Until Failure' : 'Normal'} (click to change)`}
         >
           {setType}
         </button>
       ) : (
-        <div className={`w-10 h-8 flex items-center justify-center rounded text-xs font-bold ${setTypeColor} opacity-50`}>
+        <div className={`w-full h-8 flex items-center justify-center rounded text-xs font-bold ${setTypeColor} opacity-50`}>
           {setType}
         </div>
       )}
 
       {/* Set Number */}
-      <div className="w-8 text-center font-semibold text-gray-400">
+      <div className="w-full text-center font-semibold text-gray-400 text-sm sm:text-base">
         {set.setNumber}
       </div>
 
-      {/* Weight */}
-      <input
-        type="number"
-        value={set.weight || ''}
-        onChange={(e) => onUpdate({ weight: parseFloat(e.target.value) || 0 })}
-        placeholder={weightUnit}
-        disabled={isPreviousSet}
-        className={`bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center ${
-          isPreviousSet ? 'text-gray-500' : 'text-white'
-        } focus:outline-none focus:border-primary-blue`}
-      />
+      {/* Weight - Apple style with previous value */}
+      <div className="relative">
+        <input
+          type="number"
+          value={set.weight || ''}
+          onChange={(e) => onUpdate({ weight: parseFloat(e.target.value) || 0, isUserInput: true })}
+          onFocus={(e) => {
+            e.target.select();
+            if (!set.isUserInput) {
+              onUpdate({ isUserInput: true });
+            }
+          }}
+          placeholder={weightUnit}
+          disabled={isPreviousSet}
+          className={`w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-sm sm:text-base ${
+            isPreviousSet ? 'text-gray-500' : set.isUserInput ? 'text-white' : 'text-gray-500'
+          } focus:outline-none focus:border-primary-blue focus:text-white`}
+        />
+      </div>
 
-      {/* Reps */}
-      <input
-        type="number"
-        value={set.reps || ''}
-        onChange={(e) => onUpdate({ reps: parseInt(e.target.value) || 0 })}
-        placeholder="reps"
-        disabled={isPreviousSet}
-        className={`bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center ${
-          isPreviousSet ? 'text-gray-500' : 'text-white'
-        } focus:outline-none focus:border-primary-blue`}
-      />
+      {/* Reps - Apple style with previous value */}
+      <div className="relative">
+        <input
+          type="number"
+          value={set.reps || ''}
+          onChange={(e) => onUpdate({ reps: parseInt(e.target.value) || 0, isUserInput: true })}
+          onFocus={(e) => {
+            e.target.select();
+            if (!set.isUserInput) {
+              onUpdate({ isUserInput: true });
+            }
+          }}
+          placeholder="reps"
+          disabled={isPreviousSet}
+          className={`w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-sm sm:text-base ${
+            isPreviousSet ? 'text-gray-500' : set.isUserInput ? 'text-white' : 'text-gray-500'
+          } focus:outline-none focus:border-primary-blue focus:text-white`}
+        />
+      </div>
 
-      {/* RIR (Reps in Reserve) */}
-      <input
-        type="number"
-        value={set.rir ?? ''}
-        onChange={(e) => onUpdate({ rir: parseInt(e.target.value) || undefined })}
-        placeholder="RIR"
-        disabled={isPreviousSet}
-        className={`bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-sm ${
-          isPreviousSet ? 'text-gray-500' : 'text-white'
-        } focus:outline-none focus:border-primary-blue`}
-      />
+      {/* RIR - Apple style with previous value */}
+      <div className="relative">
+        <input
+          type="number"
+          value={set.rir ?? ''}
+          onChange={(e) => onUpdate({ rir: parseInt(e.target.value) || undefined, isUserInput: true })}
+          onFocus={(e) => {
+            e.target.select();
+            if (!set.isUserInput) {
+              onUpdate({ isUserInput: true });
+            }
+          }}
+          placeholder="RIR"
+          disabled={isPreviousSet}
+          className={`w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-xs sm:text-sm ${
+            isPreviousSet ? 'text-gray-500' : set.isUserInput ? 'text-white' : 'text-gray-500'
+          } focus:outline-none focus:border-primary-blue focus:text-white`}
+        />
+      </div>
 
       {/* Complete Button */}
       {!isPreviousSet && (
         <button
-          onClick={() => onUpdate({ completed: !set.completed })}
-          className={`p-2 rounded transition-colors ${
+          onClick={() => onUpdate({ completed: !set.completed, isUserInput: true })}
+          className={`w-full h-8 flex items-center justify-center rounded transition-colors ${
             set.completed
               ? 'bg-primary-green text-white'
               : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
           }`}
           title="Mark as complete"
         >
-          <Check size={18} />
+          <Check size={16} className="sm:w-[18px] sm:h-[18px]" />
         </button>
       )}
 
@@ -118,16 +143,16 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
       {!isPreviousSet && (
         <button
           onClick={onDelete}
-          className="p-2 rounded bg-gray-700 text-gray-400 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+          className="w-full h-8 flex items-center justify-center rounded bg-gray-700 text-gray-400 hover:bg-red-900/30 hover:text-red-400 transition-colors"
           title="Delete set"
         >
-          <X size={18} />
+          <X size={16} className="sm:w-[18px] sm:h-[18px]" />
         </button>
       )}
 
       {isPreviousSet && (
         <>
-          <div className="text-xs text-gray-500 text-center">Previous</div>
+          <div className="text-xs text-gray-500 text-center">Prev</div>
           <div></div>
         </>
       )}

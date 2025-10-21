@@ -518,14 +518,20 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Implement "year in review" summary
 
 2. **Training Frequency Calendar & Streaks**
-   - [ ] Build calendar heatmap component
-   - [ ] Mark workout days with color coding
-   - [ ] Implement weekly streak counter (consecutive weeks with ≥1 workout)
-   - [ ] Show "days since last workout" indicator
-   - [ ] Add click-to-view workout details from calendar
-   - [ ] Support retroactive workout logging
-   - [ ] Create streak celebration animations
-   - [ ] Add loss aversion messaging ("Don't break your streak!")
+   - [x] Build calendar heatmap component ✅
+   - [x] Mark workout days with color coding (volume-based intensity) ✅
+   - [x] Implement weekly streak counter (consecutive weeks with ≥1 workout) ✅
+   - [x] Show "days since last workout" indicator ✅
+   - [x] Add click-to-view workout details from calendar ✅
+   - [x] Create workout details modal with full exercise breakdown ✅
+   - [x] Add compact streak display to Dashboard header ✅
+   - [x] Add full streak display to Analytics page ✅
+   - [x] Month navigation in calendar ✅
+   - [x] Color intensity legend ✅
+   - [x] Loss aversion messaging ("Don't break your X week streak!") ✅
+   - [x] Streak milestone tracking (4, 8, 12, 26, 52 weeks) ✅
+   - [ ] Support retroactive workout logging - deferred (already can edit workouts)
+   - [ ] Create streak celebration animations - deferred to Phase 6
 
 3. **Comparative Strength Standards**
    - [ ] Research and implement strength standard formulas

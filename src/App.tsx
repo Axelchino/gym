@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { WorkoutLogger } from './pages/WorkoutLogger';
+import { Program } from './pages/Program';
 import { Analytics } from './pages/Analytics';
 import { ExerciseLibrary } from './pages/ExerciseLibrary';
 import { Profile } from './pages/Profile';
@@ -22,6 +23,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="workout" element={<WorkoutLogger />} />
+          <Route path="program" element={<Program />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="exercises" element={<ExerciseLibrary />} />
           <Route path="profile" element={<Profile />} />

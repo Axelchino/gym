@@ -167,6 +167,7 @@ export function useActiveWorkout() {
             isDropSet: setData?.isDropSet ?? false,
             isFailure: setData?.isFailure ?? false,
             completed: setData?.completed ?? false,
+            isUserInput: setData?.isUserInput ?? (previousSet ? false : undefined), // If copying from previous set, mark as not user input
             notes: setData?.notes,
             timestamp: new Date(),
           };

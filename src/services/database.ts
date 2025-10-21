@@ -3,7 +3,7 @@ import type { Exercise } from '../types/exercise';
 import type { WorkoutTemplate, WorkoutLog, Set, PersonalRecord } from '../types/workout';
 import type { UserProfile, BodyMeasurement, Achievement } from '../types/user';
 import type { Program } from '../types/program';
-import { defaultExercises } from '../data/defaultExercises';
+import { enhancedExercises } from '../data/enhancedExercises';
 import { v4 as uuidv4 } from 'uuid';
 
 export class GymTrackerDatabase extends Dexie {
@@ -74,14 +74,14 @@ export async function initializeDatabase(): Promise<void> {
       await db.users.add(defaultUser);
 
       // Load default exercises
-      const exercisesWithIds: Exercise[] = defaultExercises.map((ex) => ({
+      const exercisesWithIds: Exercise[] = enhancedExercises.map((ex) => ({
         ...ex,
         id: uuidv4(),
         createdAt: new Date(),
         updatedAt: new Date(),
       }));
       await db.exercises.bulkAdd(exercisesWithIds);
-      console.log(`✅ Database initialized with ${defaultExercises.length} exercises`);
+      console.log(`✅ Database initialized with ${enhancedExercises.length} exercises`);
     }
   } catch (error) {
     console.error('❌ Error initializing database:', error);
