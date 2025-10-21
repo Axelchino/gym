@@ -560,7 +560,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ## Phase 4: Programming & Scheduling System
 **Timeline:** Weeks 11-13
-**Status:** Not Started
+**Status:** ✅ COMPLETE
 **Dependencies:** Phase 3.5
 
 ### Objectives
@@ -597,38 +597,44 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    ```
 
 2. **Program Builder Interface**
-   - [ ] Create multi-week program editor
-   - [ ] Build week-by-week workout assignment
-   - [ ] Add drag-and-drop workout scheduling
-   - [ ] Implement program duplication
-   - [ ] Add program templates (Push/Pull/Legs, Upper/Lower, etc.)
-   - [ ] Create deload week support
-   - [ ] Add progressive overload planning (% increases)
+   - [x] Add program templates (Push/Pull/Legs 3-day/6-day, Upper/Lower, Full Body) ✅
+   - [x] Create deload week support ✅
+   - [x] Create custom multi-week program editor ✅
+   - [x] Build week-by-week workout assignment ✅
+   - [x] Assign workout templates to specific days ✅
+   - [x] Week names and notes support ✅
+   - [x] Copy week functionality ✅
+   - [ ] Add drag-and-drop workout scheduling - deferred to future
+   - [ ] Implement program duplication - deferred to future
+   - [ ] Add progressive overload planning (% increases) - deferred to Phase 7
 
 3. **Calendar & Scheduling**
-   - [ ] Build monthly calendar view
-   - [ ] Display scheduled workouts on calendar
-   - [ ] Add workout rescheduling (drag-and-drop)
-   - [ ] Show completed vs planned workouts
-   - [ ] Create workout reminders/notifications
-   - [ ] Handle missed workouts gracefully
-   - [ ] Support rest days in programming
+   - [x] Build monthly calendar view ✅
+   - [x] Display scheduled workouts on calendar ✅
+   - [x] Show completed vs planned workouts (green checkmark for completed) ✅
+   - [x] Support rest days in programming ✅
+   - [x] Handle missed workouts gracefully (adherence % with color coding) ✅
+   - [ ] Add workout rescheduling (drag-and-drop) - deferred
+   - [ ] Create workout reminders/notifications - deferred to Phase 6
 
 4. **Program Templates**
-   - [ ] Create 3+ pre-built programs:
-     - [ ] Push/Pull/Legs (6-day split)
-     - [ ] Upper/Lower (4-day split)
-     - [ ] Full Body (3-day)
-   - [ ] Add program description and goals
-   - [ ] Include exercise selection guidelines
-   - [ ] Provide progression recommendations
+   - [x] Create 4 pre-built programs: ✅
+     - [x] Push/Pull/Legs (3-day split) ✅
+     - [x] Push/Pull/Legs (6-day split) ✅
+     - [x] Upper/Lower (4-day split) ✅
+     - [x] Full Body (3-day) ✅
+   - [x] Add program description and goals ✅
+   - [x] Include exercise selection guidelines (templateName references) ✅
+   - [ ] Provide progression recommendations - deferred to Phase 7
 
 5. **Workout History & Analytics Integration**
-   - [ ] Link completed workouts to program weeks
-   - [ ] Show program completion percentage
-   - [ ] Track adherence (completed vs planned)
-   - [ ] Calculate program effectiveness metrics
-   - [ ] Generate program reports
+   - [x] Link completed workouts to program calendar (adherence tracking) ✅
+   - [x] Show program completion percentage (time-based progress bar) ✅
+   - [x] Track adherence (completed vs planned workouts) ✅
+   - [x] Display adherence percentage with color coding (green/yellow/red) ✅
+   - [x] Show workout completion status on calendar ✅
+   - [ ] Calculate program effectiveness metrics - deferred to Phase 7
+   - [ ] Generate detailed program reports - deferred to Phase 7
 
 ### Deliverables
 - ✅ Multi-week program builder
@@ -1395,8 +1401,8 @@ This is a personal project focused on building an exceptional user experience fo
 ---
 
 _Last Updated: 2025-10-21_
-_Project Status: Phase 3.5 COMPLETED ✅_
-_Current Focus: Phase 3.5 complete! Ready for Phase 4 (Programming System)_
+_Project Status: Phase 4 COMPLETED ✅_
+_Current Focus: Phase 4 complete! Programming & Scheduling System implemented with 4 pre-built templates, calendar view, and adherence tracking. Ready for Phase 5 (Multi-User & Profile System)_
 
 **UI/Design Refresh Planned:**
 - Consider adding dedicated UI/Design phase before public release
@@ -1554,3 +1560,103 @@ _Current Focus: Phase 3.5 complete! Ready for Phase 4 (Programming System)_
 - Compare calculated 1RM (using Brzycki + Epley formulas) vs actual tested 1RM
 - Show both in Analytics: "Estimated: 102kg | Actual: 100kg (+2kg above!)"
 - **Rationale**: Calculated 1RMs are estimates; letting users track actual tested maxes provides validation and more accurate strength standards comparison
+
+### Recent Updates (2025-10-21)
+
+**Phase 4 Complete - Programming & Scheduling System:**
+- ✅ **PROGRAM DATA MODELS** (`src/types/workout.ts`):
+  - Program interface with multi-week structure
+  - ProgramWeek with scheduled workouts
+  - ScheduledWorkout with day-of-week mapping
+  - Program goal types (strength/hypertrophy/endurance/general)
+  - Active program tracking with start dates
+
+- ✅ **PRE-BUILT PROGRAM TEMPLATES** (`src/data/programTemplates.ts`):
+  - Push/Pull/Legs 3-Day (4 weeks, 3 days/week)
+  - Push/Pull/Legs 6-Day (6 weeks, 6 days/week) - high frequency split
+  - Upper/Lower 4-Day (6 weeks, 4 days/week)
+  - Full Body 3-Day (8 weeks, 3 days/week)
+  - Deload week support in week 4
+  - Template factory functions for program generation
+
+- ✅ **PROGRAM PAGE COMPLETE** (`src/pages/Program.tsx`):
+  - Active program card with gradient styling
+  - Program information display (duration, days/week, goal)
+  - Time-based progress bar (days elapsed / total duration)
+  - Adherence tracking with color-coded percentage (green ≥80%, yellow ≥60%, red <60%)
+  - Completed vs scheduled workouts counter
+  - Program activation/deactivation logic
+  - Template browser modal with 4 pre-built programs
+  - "My Programs" list showing all saved programs
+
+- ✅ **CALENDAR & SCHEDULING** (`src/pages/Program.tsx`):
+  - Monthly calendar view with navigation
+  - Automatic workout scheduling based on program weeks
+  - Day-of-week workout assignment (Sunday=0 through Saturday=6)
+  - Week number calculation from program start date
+  - Scheduled workout display on calendar days
+  - Completed workout detection (green background, checkmark icon)
+  - Upcoming workout highlighting (blue background, play icon for today)
+  - Click-to-start workout from calendar
+  - Rest day support (days without scheduled workouts)
+  - Past day visual dimming
+
+- ✅ **ADHERENCE TRACKING SYSTEM**:
+  - Load workout logs to match against scheduled workouts
+  - Date-based completion checking (workout logged on scheduled day)
+  - Adherence percentage calculation (completed / scheduled * 100)
+  - Color-coded adherence display:
+    - Green (≥80%): Excellent adherence
+    - Yellow (≥60%): Good adherence
+    - Red (<60%): Needs improvement
+  - Visual completion indicators on calendar
+  - Missed workout handling (shows as incomplete on calendar)
+
+- ✅ **BUG FIXES**:
+  - Fixed program activation bug (was calling handleActivateTemplate with program ID instead of template ID)
+  - Added separate handleActivateProgram function for re-activating existing programs
+  - Reset start date when re-activating a program
+
+- ✅ **CUSTOM PROGRAM BUILDER** (`src/components/ProgramBuilder.tsx`):
+  - Full-featured modal for creating custom programs from existing templates
+  - Program details form (name, description, duration 1-52 weeks, goal selection)
+  - Week-by-week editor with visual navigation tabs
+  - Day-by-day workout assignment (Sunday through Saturday)
+  - Dropdown template selector for each day
+  - Remove workouts with trash icon
+  - Week names and notes support (e.g., "Deload Week - reduce weight by 20%")
+  - Copy week functionality to duplicate schedules
+  - Validation before saving (name required, at least one workout)
+  - Automatic days-per-week calculation
+  - Two-button system in Program page: "Create Custom" (green) and "From Template" (blue)
+  - Integrates with existing workout templates from database
+  - Saves to programs table and auto-reloads list
+
+**Features Deferred to Later Phases:**
+- Drag-and-drop workout scheduling - deferred to future
+- Workout rescheduling - deferred to future
+- Program duplication - deferred to future
+- Progressive overload planning (% increases) - deferred to Phase 7
+- Program effectiveness metrics - deferred to Phase 7
+- Detailed program reports - deferred to Phase 7
+- Workout reminders/notifications - deferred to Phase 6
+
+**Status:** Phase 4 Complete! Users can now:
+1. Browse and activate pre-built program templates
+2. **Create custom programs using their own workout templates**
+3. View scheduled workouts on a monthly calendar
+4. Track program progress and adherence
+5. See which workouts have been completed (green) vs upcoming (blue)
+6. Start workouts directly from the calendar
+7. Monitor their consistency with color-coded adherence percentages
+
+**Custom Program Builder Features:**
+- Create programs with custom duration (1-52 weeks)
+- Assign existing workout templates to specific days of the week
+- Add week names and notes (e.g., "Deload Week - reduce weight by 20%")
+- Copy week schedules to other weeks
+- Set training goals (strength/hypertrophy/endurance/general)
+- Full week-by-week editor with visual navigation
+- Automatic days-per-week calculation
+
+**Next Steps:** Ready for Phase 5 (Multi-User & Profile System) with authentication, cloud sync, and cross-device support.

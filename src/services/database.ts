@@ -1,8 +1,7 @@
 import Dexie from 'dexie';
 import type { Exercise } from '../types/exercise';
-import type { WorkoutTemplate, WorkoutLog, Set, PersonalRecord } from '../types/workout';
+import type { WorkoutTemplate, WorkoutLog, Set, PersonalRecord, Program } from '../types/workout';
 import type { UserProfile, BodyMeasurement, Achievement } from '../types/user';
-import type { Program } from '../types/program';
 import { enhancedExercises } from '../data/enhancedExercises';
 import { v4 as uuidv4 } from 'uuid';
 

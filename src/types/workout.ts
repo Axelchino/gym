@@ -94,3 +94,38 @@ export interface WorkoutStats {
   longestStreak: number;
   personalRecords: PersonalRecord[];
 }
+
+// Phase 4: Programming & Scheduling
+
+export interface ProgramWeek {
+  weekNumber: number;
+  name?: string; // e.g., "Deload Week", "Peak Week"
+  workouts: ScheduledWorkout[]; // Workouts mapped to days of week
+  notes?: string;
+}
+
+export interface ScheduledWorkout {
+  dayOfWeek: number; // 0-6 (Sun-Sat)
+  templateId: string;
+  templateName: string;
+  isCompleted?: boolean;
+  completedDate?: Date;
+  workoutLogId?: string;
+}
+
+export type ProgramGoal = 'strength' | 'hypertrophy' | 'endurance' | 'general';
+
+export interface Program {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  duration: number; // weeks
+  daysPerWeek: number;
+  weeks: ProgramWeek[];
+  goal: ProgramGoal;
+  isActive: boolean;
+  startDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
