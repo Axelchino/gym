@@ -44,6 +44,7 @@ export function exportTemplatesToCSV(templates: WorkoutTemplate[]): string {
 
 /**
  * Import templates from CSV format
+ * Note: Exercise IDs will need to be remapped when import is called from the component
  */
 export function importTemplatesFromCSV(csv: string): WorkoutTemplate[] {
   const lines = csv.split('\n').filter(line => line.trim());
@@ -60,7 +61,7 @@ export function importTemplatesFromCSV(csv: string): WorkoutTemplate[] {
 
     const templateId = values[0];
     const templateName = values[1];
-    const exerciseId = values[2];
+    const exerciseId = values[2]; // This ID needs remapping!
     const exerciseName = values[3];
     const orderIndex = parseInt(values[4]) || 0;
     const targetSets = parseInt(values[5]) || 3;
@@ -85,8 +86,8 @@ export function importTemplatesFromCSV(csv: string): WorkoutTemplate[] {
 
     const template = templatesMap.get(templateId)!;
     template.exercises.push({
-      exerciseId,
-      exerciseName,
+      exerciseId, // Keep old ID temporarily - will be remapped in WorkoutLogger
+      exerciseName, // This is what we'll use to find the correct exercise
       orderIndex,
       targetSets,
       targetReps,

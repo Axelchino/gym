@@ -41,11 +41,11 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
           onClick={() => {
             // Cycle: Warmup -> Normal -> Failure -> Warmup
             if (set.isWarmup) {
-              onUpdate({ isWarmup: false, isFailure: false, isUserInput: true });
+              onUpdate({ isWarmup: false, isFailure: false, isUserInput: true, completed: true });
             } else if (!set.isWarmup && !set.isFailure) {
-              onUpdate({ isWarmup: false, isFailure: true, isUserInput: true });
+              onUpdate({ isWarmup: false, isFailure: true, isUserInput: true, completed: true });
             } else if (set.isFailure) {
-              onUpdate({ isWarmup: true, isFailure: false, isUserInput: true });
+              onUpdate({ isWarmup: true, isFailure: false, isUserInput: true, completed: true });
             }
           }}
           className={`w-full h-8 flex items-center justify-center rounded text-xs font-bold ${setTypeColor} hover:opacity-80 transition-opacity cursor-pointer`}
@@ -69,11 +69,18 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
         <input
           type="number"
           value={set.weight || ''}
-          onChange={(e) => onUpdate({ weight: parseFloat(e.target.value) || 0, isUserInput: true })}
+          onChange={(e) => {
+            const newWeight = parseFloat(e.target.value) || 0;
+            // Auto-check if both weight and reps will be filled
+            const shouldComplete = newWeight > 0 && set.reps > 0;
+            onUpdate({ weight: newWeight, isUserInput: true, completed: shouldComplete });
+          }}
           onFocus={(e) => {
             e.target.select();
-            if (!set.isUserInput) {
-              onUpdate({ isUserInput: true });
+            // Only auto-complete if this is pre-filled data (isUserInput === false)
+            // Don't auto-complete for brand new sets (isUserInput === undefined)
+            if (set.isUserInput === false) {
+              onUpdate({ isUserInput: true, completed: true });
             }
           }}
           placeholder={weightUnit}
@@ -89,11 +96,18 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
         <input
           type="number"
           value={set.reps || ''}
-          onChange={(e) => onUpdate({ reps: parseInt(e.target.value) || 0, isUserInput: true })}
+          onChange={(e) => {
+            const newReps = parseInt(e.target.value) || 0;
+            // Auto-check if both weight and reps will be filled
+            const shouldComplete = set.weight > 0 && newReps > 0;
+            onUpdate({ reps: newReps, isUserInput: true, completed: shouldComplete });
+          }}
           onFocus={(e) => {
             e.target.select();
-            if (!set.isUserInput) {
-              onUpdate({ isUserInput: true });
+            // Only auto-complete if this is pre-filled data (isUserInput === false)
+            // Don't auto-complete for brand new sets (isUserInput === undefined)
+            if (set.isUserInput === false) {
+              onUpdate({ isUserInput: true, completed: true });
             }
           }}
           placeholder="reps"
@@ -109,11 +123,11 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
         <input
           type="number"
           value={set.rir ?? ''}
-          onChange={(e) => onUpdate({ rir: parseInt(e.target.value) || undefined, isUserInput: true })}
+          onChange={(e) => onUpdate({ rir: parseInt(e.target.value) || undefined, isUserInput: true, completed: true })}
           onFocus={(e) => {
             e.target.select();
             if (!set.isUserInput) {
-              onUpdate({ isUserInput: true });
+              onUpdate({ isUserInput: true, completed: true });
             }
           }}
           placeholder="RIR"

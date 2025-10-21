@@ -310,7 +310,15 @@ export function WorkoutLogger() {
       const csvContent = await readCSVFile(file);
       const importedTemplates = importTemplatesFromCSV(csvContent);
 
-      // Add imported templates to database
+      // Get all exercises from local database to remap IDs
+      const allExercises = await db.exercises.toArray();
+      const exercisesByName = new Map(
+        allExercises.map(ex => [ex.name.toLowerCase(), ex])
+      );
+
+      let skippedExercises = 0;
+
+      // Add imported templates to database with remapped exercise IDs
       for (const template of importedTemplates) {
         // Check if template with same ID already exists
         const existing = await db.workoutTemplates.get(template.id);
@@ -318,11 +326,42 @@ export function WorkoutLogger() {
           // Update ID to avoid conflicts
           template.id = uuidv4();
         }
-        await db.workoutTemplates.add(template);
+
+        // Remap exercise IDs by looking up exercises by name
+        const remappedExercises = [];
+        for (const exercise of template.exercises) {
+          const localExercise = exercisesByName.get(exercise.exerciseName.toLowerCase());
+
+          if (localExercise) {
+            // Found matching exercise - use local database ID
+            remappedExercises.push({
+              ...exercise,
+              exerciseId: localExercise.id,
+            });
+          } else {
+            // Exercise not found in local database
+            console.warn(`Exercise "${exercise.exerciseName}" not found in database`);
+            skippedExercises++;
+          }
+        }
+
+        // Only add template if it has at least one valid exercise
+        if (remappedExercises.length > 0) {
+          template.exercises = remappedExercises;
+          await db.workoutTemplates.add(template);
+        }
       }
 
       await loadTemplates();
-      alert(`Successfully imported ${importedTemplates.length} template(s)!`);
+
+      if (skippedExercises > 0) {
+        alert(
+          `Successfully imported ${importedTemplates.length} template(s)!\n\n` +
+          `Note: ${skippedExercises} exercise(s) were skipped because they don't exist in your exercise library.`
+        );
+      } else {
+        alert(`Successfully imported ${importedTemplates.length} template(s)!`);
+      }
     } catch (error) {
       console.error('Import error:', error);
       alert('Failed to import templates. Please check the file format.');

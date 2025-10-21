@@ -9,6 +9,8 @@ import { useUserSettings } from '../hooks/useUserSettings';
 import { exportWorkoutLogsToCSV, downloadCSV } from '../utils/csvExport';
 import { CalendarHeatmap } from '../components/CalendarHeatmap';
 import { StreakDisplay } from '../components/StreakDisplay';
+import { ProgressReports } from '../components/ProgressReports';
+import { StrengthStandards } from '../components/StrengthStandards';
 
 export function Analytics() {
   const { weightUnit } = useUserSettings();
@@ -198,6 +200,9 @@ export function Analytics() {
           <p className="text-sm text-gray-400">Day{streak !== 1 ? 's' : ''}</p>
         </div>
       </div>
+
+      {/* Progress Reports */}
+      <ProgressReports workouts={workouts} allPRs={allPRs} />
 
       {/* Time Filter */}
       <div className="flex items-center gap-2">
@@ -431,6 +436,9 @@ export function Analytics() {
           </div>
         </div>
       </div>
+
+      {/* Strength Standards */}
+      <StrengthStandards workouts={workouts} />
 
       {/* Calendar & Streak Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

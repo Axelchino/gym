@@ -160,14 +160,14 @@ export function useActiveWorkout() {
             exerciseId,
             setNumber,
             weight: setData?.weight ?? previousSet?.weight ?? 0,
-            reps: setData?.reps ?? previousSet?.reps ?? 0,
+            reps: setData?.reps ?? 0, // Don't copy reps - user must input
             rpe: setData?.rpe ?? previousSet?.rpe,
             rir: setData?.rir ?? previousSet?.rir,
             isWarmup: setData?.isWarmup ?? false,
             isDropSet: setData?.isDropSet ?? false,
             isFailure: setData?.isFailure ?? false,
             completed: setData?.completed ?? false,
-            isUserInput: setData?.isUserInput ?? (previousSet ? false : undefined), // If copying from previous set, mark as not user input
+            isUserInput: setData?.isUserInput ?? undefined, // New sets are fresh, not pre-filled
             notes: setData?.notes,
             timestamp: new Date(),
           };
