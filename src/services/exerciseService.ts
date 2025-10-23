@@ -69,7 +69,7 @@ export class ExerciseService {
       updatedAt: new Date(),
     };
 
-    await db.exercises.update(id, updatedExercise);
+    await db.exercises.update(id, { ...updates, updatedAt: new Date() });
     return updatedExercise;
   }
 

@@ -207,7 +207,7 @@ export function WorkoutLogger() {
     setEditingTemplate(null);
   }
 
-  async function handleStartFromTemplate(template: WorkoutTemplate) {
+  async function handleStartFromTemplate(template: Pick<WorkoutTemplate, 'id' | 'exercises'>) {
     // Build the complete workout structure with all exercises and sets
     const exercises = [];
 
@@ -377,7 +377,8 @@ export function WorkoutLogger() {
         // Remap exercise IDs by looking up exercises by name
         const remappedExercises = [];
         for (const exercise of template.exercises) {
-          const localExercise = exercisesByName.get(exercise.exerciseName.toLowerCase());
+          const exerciseName = (exercise as any).exerciseName;
+          const localExercise = exercisesByName.get(exerciseName.toLowerCase());
 
           if (localExercise) {
             // Found matching exercise - use local database ID
@@ -387,7 +388,7 @@ export function WorkoutLogger() {
             });
           } else {
             // Exercise not found in local database
-            console.warn(`Exercise "${exercise.exerciseName}" not found in database`);
+            console.warn(`Exercise "${exerciseName}" not found in database`);
             skippedExercises++;
           }
         }
@@ -976,20 +977,21 @@ export function WorkoutLogger() {
             {/* PR List */}
             <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
               {detectedPRs.map((pr, index) => {
-                const prIcon = {
+                const prIconMap: Record<string, any> = {
                   weight: TrendingUp,
                   reps: Zap,
                   volume: Dumbbell,
                   '1rm': Trophy,
-                }[pr.type];
-                const Icon = prIcon || Trophy;
+                };
+                const Icon = prIconMap[pr.type] || Trophy;
 
-                const prTypeLabel = {
+                const prTypeLabelMap: Record<string, string> = {
                   weight: 'Weight PR',
                   reps: 'Rep PR',
                   volume: 'Volume PR',
                   '1rm': '1RM PR',
-                }[pr.type];
+                };
+                const prTypeLabel = prTypeLabelMap[pr.type];
 
                 return (
                   <div

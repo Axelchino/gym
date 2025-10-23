@@ -303,7 +303,8 @@ export function useActiveWorkout() {
             exercise.exerciseId,
             exercise.exerciseName,
             workoutLog.id,
-            historicalSets
+            historicalSets,
+            workoutLog.userId
           );
           allPRs.push(...prs);
         }

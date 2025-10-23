@@ -86,19 +86,9 @@ export const migrationService = {
       }
       console.log(`✅ Migrated ${programs.length} programs`);
 
-      // 6. Migrate custom exercises (if any)
-      const customExercises = await db.exercises
-        .where('userId')
-        .equals('default-user')
-        .toArray();
-
-      for (const exercise of customExercises) {
-        await db.exercises.update(exercise.id, {
-          userId: newUserId,
-          updatedAt: new Date(),
-        });
-      }
-      console.log(`✅ Migrated ${customExercises.length} custom exercises`);
+      // 6. Custom exercises are shared globally (no userId field)
+      // They are identified by isCustom=true and don't need migration
+      console.log('✅ Custom exercises are shared globally (no migration needed)');
 
       // 7. Migrate body measurements (if any)
       const measurements = await db.bodyMeasurements

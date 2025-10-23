@@ -35,6 +35,7 @@ export function calculate1RMEpley(weight: number, reps: number): number {
  */
 export interface PersonalRecord {
   id: string;
+  userId: string;
   exerciseId: string;
   exerciseName: string;
   type: 'weight' | 'reps' | 'volume' | '1rm';
@@ -55,7 +56,8 @@ export function detectPR(
   exerciseId: string,
   exerciseName: string,
   workoutLogId: string,
-  history: Set[]
+  history: Set[],
+  userId: string
 ): PersonalRecord[] {
   const prs: PersonalRecord[] = [];
   const workingSets = history.filter(s => !s.isWarmup && s.completed);
@@ -70,6 +72,7 @@ export function detectPR(
     const previousBest = Math.max(...workingSets.map(s => s.weight));
     prs.push({
       id: `pr-weight-${exerciseId}-${Date.now()}`,
+      userId,
       exerciseId,
       exerciseName,
       type: 'weight',
@@ -91,6 +94,7 @@ export function detectPR(
       const previousBest = Math.max(...sameWeightSets.map(s => s.reps));
       prs.push({
         id: `pr-reps-${exerciseId}-${Date.now()}`,
+        userId,
         exerciseId,
         exerciseName,
         type: 'reps',
@@ -113,6 +117,7 @@ export function detectPR(
     const previousBest = Math.max(...workingSets.map(s => s.weight * s.reps));
     prs.push({
       id: `pr-volume-${exerciseId}-${Date.now()}`,
+      userId,
       exerciseId,
       exerciseName,
       type: 'volume',
@@ -133,6 +138,7 @@ export function detectPR(
     if (current1RM > previous1RM) {
       prs.push({
         id: `pr-1rm-${exerciseId}-${Date.now()}`,
+        userId,
         exerciseId,
         exerciseName,
         type: '1rm',

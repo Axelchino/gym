@@ -24,14 +24,14 @@ export function exportTemplatesToCSV(templates: WorkoutTemplate[]): string {
       template.id,
       template.name,
       exercise.exerciseId,
-      exercise.exerciseName || '',
+      (exercise as any).exerciseName || '',
       exercise.orderIndex.toString(),
       exercise.targetSets.toString(),
       exercise.targetReps.toString(),
       exercise.targetWeight?.toString() || '',
       exercise.warmupSets?.toString() || '0',
       exercise.targetRIR?.toString() || '',
-      exercise.restTime?.toString() || '',
+      exercise.restSeconds?.toString() || '',
       exercise.notes || ''
     ])
   );
@@ -85,7 +85,7 @@ export function importTemplatesFromCSV(csv: string): WorkoutTemplate[] {
     }
 
     const template = templatesMap.get(templateId)!;
-    template.exercises.push({
+    (template.exercises as any[]).push({
       exerciseId, // Keep old ID temporarily - will be remapped in WorkoutLogger
       exerciseName, // This is what we'll use to find the correct exercise
       orderIndex,
