@@ -334,13 +334,13 @@ export function WorkoutLogger() {
     }
   }
 
-  function handleExportTemplates() {
+  async function handleExportTemplates() {
     if (templates.length === 0) {
       alert('No templates to export');
       return;
     }
 
-    const csv = exportTemplatesToCSV(templates);
+    const csv = await exportTemplatesToCSV(templates);
     const filename = `gym-templates-${new Date().toISOString().split('T')[0]}.csv`;
     downloadCSV(csv, filename);
   }

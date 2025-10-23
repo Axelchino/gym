@@ -1,9 +1,10 @@
 import type { WorkoutTemplate, WorkoutLog } from '../types/workout';
+import { db } from '../services/database';
 
 /**
  * Export templates to CSV format
  */
-export function exportTemplatesToCSV(templates: WorkoutTemplate[]): string {
+export async function exportTemplatesToCSV(templates: WorkoutTemplate[]): Promise<string> {
   const headers = [
     'Template ID',
     'Template Name',
@@ -19,12 +20,16 @@ export function exportTemplatesToCSV(templates: WorkoutTemplate[]): string {
     'Notes'
   ];
 
+  // Get all exercises from database to look up names
+  const exercises = await db.exercises.toArray();
+  const exerciseMap = new Map(exercises.map(ex => [ex.id, ex.name]));
+
   const rows = templates.flatMap(template =>
     template.exercises.map(exercise => [
       template.id,
       template.name,
       exercise.exerciseId,
-      (exercise as any).exerciseName || '',
+      exerciseMap.get(exercise.exerciseId) || '',
       exercise.orderIndex.toString(),
       exercise.targetSets.toString(),
       exercise.targetReps.toString(),
