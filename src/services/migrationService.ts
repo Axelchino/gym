@@ -112,7 +112,6 @@ export const migrationService = {
         logs: logs.length,
         prs: prs.length,
         programs: programs.length,
-        customExercises: customExercises.length,
         measurements: measurements.length,
       });
     } catch (error) {

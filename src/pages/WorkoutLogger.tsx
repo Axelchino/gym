@@ -207,7 +207,7 @@ export function WorkoutLogger() {
     setEditingTemplate(null);
   }
 
-  async function handleStartFromTemplate(template: Pick<WorkoutTemplate, 'id' | 'exercises'>) {
+  async function handleStartFromTemplate(template: Pick<WorkoutTemplate, 'id' | 'name' | 'exercises'>) {
     // Build the complete workout structure with all exercises and sets
     const exercises = [];
 
