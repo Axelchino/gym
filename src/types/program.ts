@@ -1,4 +1,4 @@
-Okimport type { WorkoutTemplate } from './workout';
+import type { WorkoutTemplate } from './workout';
 import type { TrainingGoal } from './user';
 
 export interface ProgramWeek {
