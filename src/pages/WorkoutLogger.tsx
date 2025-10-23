@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Plus, Save, X, Trash2, Clock, Timer, Edit, Dumbbell, Trophy, TrendingUp, Zap, Download, Upload } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useActiveWorkout } from '../hooks/useActiveWorkout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useRestTimer } from '../hooks/useRestTimer';
@@ -11,8 +12,11 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Exercise } from '../types/exercise';
 import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
 import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile } from '../utils/csvExport';
+import { BUILTIN_WORKOUT_TEMPLATES, isBuiltinTemplate } from '../data/workoutTemplates';
 
 export function WorkoutLogger() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const {
     activeWorkout,
     isWorkoutActive,
@@ -49,6 +53,7 @@ export function WorkoutLogger() {
   const [previousWorkoutData, setPreviousWorkoutData] = useState<Map<string, any[]>>(new Map());
   const [showPRCelebration, setShowPRCelebration] = useState(false);
   const [detectedPRs, setDetectedPRs] = useState<any[]>([]);
+  const [hasLoadedFromUrl, setHasLoadedFromUrl] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +70,23 @@ export function WorkoutLogger() {
       loadPreviousWorkoutData();
     }
   }, [activeWorkout?.exercises.length]);
+
+  // Auto-load template from URL parameter
+  useEffect(() => {
+    const templateId = searchParams.get('templateId');
+    if (templateId && !hasLoadedFromUrl && !isWorkoutActive && templates.length > 0) {
+      setHasLoadedFromUrl(true);
+      // Remove the parameter from URL
+      searchParams.delete('templateId');
+      setSearchParams(searchParams);
+
+      // Find and load the template
+      const template = [...templates, ...BUILTIN_WORKOUT_TEMPLATES].find(t => t.id === templateId);
+      if (template) {
+        handleStartFromTemplate(template);
+      }
+    }
+  }, [searchParams, hasLoadedFromUrl, isWorkoutActive, templates]);
 
   async function loadPreviousWorkoutData() {
     if (!activeWorkout) return;
@@ -147,8 +169,20 @@ export function WorkoutLogger() {
   }
 
   async function handleSaveTemplate(name: string, exercises: WorkoutExercise[], templateId?: string) {
-    if (templateId) {
-      // Update existing template
+    if (templateId && isBuiltinTemplate(templateId)) {
+      // Copy-on-modify: Create new user template instead of modifying built-in
+      const template: WorkoutTemplate = {
+        id: uuidv4(),
+        userId: 'default-user',
+        name,
+        exercises,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      await db.workoutTemplates.add(template);
+    } else if (templateId) {
+      // Update existing user template
       await db.workoutTemplates.update(templateId, {
         name,
         exercises,
@@ -185,7 +219,20 @@ export function WorkoutLogger() {
 
     for (let i = 0; i < template.exercises.length; i++) {
       const templateEx = template.exercises[i];
-      const exercise = await db.exercises.get(templateEx.exerciseId);
+
+      // For built-in templates, exerciseId is actually the exercise name
+      // We need to look it up by name
+      let exercise;
+      if (isBuiltinTemplate(template.id)) {
+        const allExercises = await db.exercises.toArray();
+        exercise = allExercises.find(ex => ex.name === templateEx.exerciseId);
+        if (!exercise) {
+          console.warn(`Built-in template exercise "${templateEx.exerciseId}" not found in database`);
+          continue; // Skip this exercise
+        }
+      } else {
+        exercise = await db.exercises.get(templateEx.exerciseId);
+      }
 
       if (exercise) {
         // Find previous workout data for this exercise
@@ -445,77 +492,163 @@ export function WorkoutLogger() {
             className="hidden"
           />
 
-          {templates.length === 0 ? (
+          {templates.length === 0 && BUILTIN_WORKOUT_TEMPLATES.length === 0 ? (
             <div className="card text-center py-12 text-gray-400">
               <p>No templates yet</p>
               <p className="text-sm mt-2">Create your first workout template to get started faster</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {templates.map((template) => (
-                <div key={template.id} className="card-elevated">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{template.name}</h3>
-                      <p className="text-sm text-gray-400 mt-1">
-                        {template.exercises.length} exercises
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingTemplate(template);
-                          setShowTemplateBuilder(true);
-                        }}
-                        className="text-gray-400 hover:text-primary-blue transition-colors"
-                        title="Edit template"
-                      >
-                        <Edit size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteTemplate(template.id)}
-                        className="text-gray-400 hover:text-red-400 transition-colors"
-                        title="Delete template"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Exercise Preview */}
-                  <div className="space-y-1 mb-4">
-                    {template.exercises.slice(0, 3).map((ex, idx) => {
-                      const exerciseName = templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...';
-                      return (
-                        <div key={idx} className="text-xs text-gray-400 flex items-center gap-2">
-                          <Dumbbell size={12} className="flex-shrink-0" />
-                          <span className="truncate">
-                            {exerciseName} - {ex.targetSets}x{ex.targetReps}
-                          </span>
+            <div className="space-y-6">
+              {/* User Templates */}
+              {templates.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">Your Templates</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {templates.map((template) => (
+                      <div key={template.id} className="card-elevated">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{template.name}</h3>
+                            <p className="text-sm text-gray-400 mt-1">
+                              {template.exercises.length} exercises
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingTemplate(template);
+                                setShowTemplateBuilder(true);
+                              }}
+                              className="text-gray-400 hover:text-primary-blue transition-colors"
+                              title="Edit template"
+                            >
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTemplate(template.id)}
+                              className="text-gray-400 hover:text-red-400 transition-colors"
+                              title="Delete template"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
                         </div>
-                      );
-                    })}
-                    {template.exercises.length > 3 && (
-                      <div
-                        className="text-xs text-gray-500 hover:text-gray-300 cursor-help transition-colors"
-                        title={template.exercises.slice(3).map(ex =>
-                          templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...'
-                        ).join(', ')}
-                      >
-                        +{template.exercises.length - 3} more (hover to see)
-                      </div>
-                    )}
-                  </div>
 
-                  <button
-                    onClick={() => handleStartFromTemplate(template)}
-                    className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2"
-                  >
-                    <Play size={16} />
-                    Start Workout
-                  </button>
+                        {/* Exercise Preview */}
+                        <div className="space-y-1 mb-4">
+                          {template.exercises.slice(0, 3).map((ex, idx) => {
+                            const exerciseName = templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...';
+                            return (
+                              <div key={idx} className="text-xs text-gray-400 flex items-center gap-2">
+                                <Dumbbell size={12} className="flex-shrink-0" />
+                                <span className="truncate">
+                                  {exerciseName} - {ex.targetSets}x{ex.targetReps}
+                                </span>
+                              </div>
+                            );
+                          })}
+                          {template.exercises.length > 3 && (
+                            <div
+                              className="text-xs text-gray-500 hover:text-gray-300 cursor-help transition-colors"
+                              title={template.exercises.slice(3).map(ex =>
+                                templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...'
+                              ).join(', ')}
+                            >
+                              +{template.exercises.length - 3} more (hover to see)
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handleStartFromTemplate(template)}
+                          className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2"
+                        >
+                          <Play size={16} />
+                          Start Workout
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* Divider */}
+              {templates.length > 0 && BUILTIN_WORKOUT_TEMPLATES.length > 0 && (
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-800"></div>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-dark-bg px-4 text-xs text-gray-500 uppercase tracking-wide">
+                      Built-in Templates
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Built-in Templates */}
+              {BUILTIN_WORKOUT_TEMPLATES.length > 0 && (
+                <div>
+                  {templates.length === 0 && (
+                    <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">Built-in Templates</h3>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {BUILTIN_WORKOUT_TEMPLATES.map((template) => (
+                      <div key={template.id} className="card-elevated border-gray-800/50">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold text-lg">{template.name}</h3>
+                              <span className="text-[10px] bg-primary-blue/20 text-primary-blue px-2 py-0.5 rounded uppercase tracking-wide">
+                                Built-in
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-400 mt-1">{template.description}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {template.exercises.length} exercises
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setEditingTemplate(template as any);
+                              setShowTemplateBuilder(true);
+                            }}
+                            className="text-gray-400 hover:text-primary-blue transition-colors"
+                            title="Copy & modify template"
+                          >
+                            <Edit size={18} />
+                          </button>
+                        </div>
+
+                        {/* Exercise Preview */}
+                        <div className="space-y-1 mb-4">
+                          {template.exercises.slice(0, 3).map((ex, idx) => (
+                            <div key={idx} className="text-xs text-gray-400 flex items-center gap-2">
+                              <Dumbbell size={12} className="flex-shrink-0" />
+                              <span className="truncate">
+                                {ex.exerciseId} - {ex.targetSets}x{ex.targetReps}
+                              </span>
+                            </div>
+                          ))}
+                          {template.exercises.length > 3 && (
+                            <div className="text-xs text-gray-500">
+                              +{template.exercises.length - 3} more
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handleStartFromTemplate(template as any)}
+                          className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2"
+                        >
+                          <Play size={16} />
+                          Start Workout
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

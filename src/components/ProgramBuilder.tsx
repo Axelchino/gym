@@ -3,6 +3,7 @@ import { X, Plus, Trash2, Calendar, Save, Copy } from 'lucide-react';
 import { db } from '../services/database';
 import type { Program, ProgramWeek, ScheduledWorkout, WorkoutTemplate, ProgramGoal } from '../types/workout';
 import { v4 as uuidv4 } from 'uuid';
+import { BUILTIN_WORKOUT_TEMPLATES } from '../data/workoutTemplates';
 
 interface ProgramBuilderProps {
   onClose: () => void;
@@ -28,7 +29,9 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
   }, []);
 
   async function loadTemplates() {
-    const allTemplates = await db.workoutTemplates.toArray();
+    const userTemplates = await db.workoutTemplates.toArray();
+    // Merge user templates with built-in templates
+    const allTemplates = [...userTemplates, ...BUILTIN_WORKOUT_TEMPLATES as any[]];
     setTemplates(allTemplates);
   }
 
@@ -354,11 +357,33 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                             className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-primary-blue"
                           >
                             <option value="">+ Add Workout</option>
-                            {templates.map(template => (
-                              <option key={template.id} value={template.id}>
-                                {template.name}
-                              </option>
-                            ))}
+                            {(() => {
+                              const userTemplates = templates.filter(t => !t.id.startsWith('builtin-'));
+                              const builtinTemplates = templates.filter(t => t.id.startsWith('builtin-'));
+
+                              return (
+                                <>
+                                  {userTemplates.length > 0 && (
+                                    <optgroup label="Your Templates">
+                                      {userTemplates.map(template => (
+                                        <option key={template.id} value={template.id}>
+                                          {template.name}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                  )}
+                                  {builtinTemplates.length > 0 && (
+                                    <optgroup label="Built-in Templates">
+                                      {builtinTemplates.map(template => (
+                                        <option key={template.id} value={template.id}>
+                                          {template.name}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </select>
                         </div>
                       )}

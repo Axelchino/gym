@@ -1660,3 +1660,34 @@ _Current Focus: Phase 4 complete! Programming & Scheduling System implemented wi
 - Automatic days-per-week calculation
 
 **Next Steps:** Ready for Phase 5 (Multi-User & Profile System) with authentication, cloud sync, and cross-device support.
+
+### Recent Updates (2025-10-22)
+
+**Phase 4 Bug Fixes & Enhancements:**
+- ✅ **CRITICAL BUG FIX: Program Calendar Date Logic:**
+  - Fixed `Math.abs()` bug causing workouts to show on dates BEFORE program start
+  - Removed absolute value calculation from date difference
+  - Added check to prevent scheduling workouts before program start date
+  - Fixed date comparison to use `setHours(0,0,0,0)` for accurate day comparison
+  - Changed `Math.ceil()` to `Math.floor()` for more accurate day counting
+  - **Impact:** Programs now correctly start from current week, not showing workouts from past months
+  - **Example Fix:** StrongLifts 5x5 now starts from Oct 19, 2025 (current week), not July 28, 2025
+
+- ✅ **PROGRAM DELETION FEATURE:**
+  - Added delete button (trash icon) for all programs in the program list
+  - Confirmation dialog before deletion to prevent accidents
+  - Works for both active and inactive programs
+  - Updates program list automatically after deletion
+  - Red hover effect for visual feedback
+
+- ✅ **DEV SERVER PORT CONFIGURATION:**
+  - Updated `vite.config.ts` to use port 5175 by default
+  - Consistent port usage across development sessions
+  - Per CLAUDE.md requirement to "Always use port 5175 for hosting"
+
+- ✅ **TEMPLATE WORKOUT LOADING:**
+  - Fixed calendar day click to pass templateId via URL parameter
+  - WorkoutLogger now reads `?templateId=` query parameter
+  - Auto-loads selected template when navigating from calendar
+  - Seamless workflow: click calendar day → workout loads with correct template
+  - Uses React Router's `useSearchParams` for clean URL handling

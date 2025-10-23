@@ -1,4 +1,6 @@
 import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
+import { BUILTIN_STRENGTH_WORKOUT_TEMPLATES } from './builtin_strength_programs';
+import { BUILTIN_HYPERTROPHY_WORKOUT_TEMPLATES } from './builtin_hypertrophy_programs';
 
 /**
  * Built-in workout templates that users can use as-is or copy/modify
@@ -251,6 +253,12 @@ export const BUILTIN_WORKOUT_TEMPLATES = [
   ACTIVE_RECOVERY_WALK,
   YOGA_STRETCHING,
   LIGHT_CARDIO,
+
+  // Elite Strength Programs (19 templates)
+  ...BUILTIN_STRENGTH_WORKOUT_TEMPLATES,
+
+  // Elite Hypertrophy Programs (25 templates)
+  ...BUILTIN_HYPERTROPHY_WORKOUT_TEMPLATES,
 ];
 
 export function isBuiltinTemplate(templateId: string): boolean {

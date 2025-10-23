@@ -1,5 +1,7 @@
 import type { Program, ProgramWeek, ScheduledWorkout } from '../types/workout';
 import { v4 as uuidv4 } from 'uuid';
+import { BUILTIN_STRENGTH_PROGRAM_TEMPLATES } from './builtin_strength_programs';
+import { BUILTIN_HYPERTROPHY_PROGRAM_TEMPLATES } from './builtin_hypertrophy_programs';
 
 /**
  * Pre-built program templates for common training splits
@@ -19,18 +21,18 @@ export function createPushPullLegsProgram(userId: string): Program {
     const workouts: ScheduledWorkout[] = [
       {
         dayOfWeek: 1, // Monday
-        templateId: 'push-a',
-        templateName: 'Push Day A',
+        templateId: 'builtin-push-a',
+        templateName: 'Push Day A - Chest Focus',
       },
       {
         dayOfWeek: 3, // Wednesday
-        templateId: 'pull-a',
-        templateName: 'Pull Day A',
+        templateId: 'builtin-pull-a',
+        templateName: 'Pull Day A - Back Width',
       },
       {
         dayOfWeek: 5, // Friday
-        templateId: 'legs-a',
-        templateName: 'Leg Day A',
+        templateId: 'builtin-leg-a',
+        templateName: 'Leg Day A - Quad Focus',
       },
     ];
 
@@ -65,23 +67,23 @@ export function createUpperLowerProgram(userId: string): Program {
     const workouts: ScheduledWorkout[] = [
       {
         dayOfWeek: 1, // Monday
-        templateId: 'upper-a',
+        templateId: 'builtin-upper-a',
         templateName: 'Upper Body A',
       },
       {
         dayOfWeek: 2, // Tuesday
-        templateId: 'lower-a',
-        templateName: 'Lower Body A',
+        templateId: 'builtin-leg-a',
+        templateName: 'Leg Day A - Quad Focus',
       },
       {
         dayOfWeek: 4, // Thursday
-        templateId: 'upper-b',
+        templateId: 'builtin-upper-b',
         templateName: 'Upper Body B',
       },
       {
         dayOfWeek: 5, // Friday
-        templateId: 'lower-b',
-        templateName: 'Lower Body B',
+        templateId: 'builtin-leg-b',
+        templateName: 'Leg Day B - Hamstring/Glute Focus',
       },
     ];
 
@@ -116,17 +118,17 @@ export function createFullBodyProgram(userId: string): Program {
     const workouts: ScheduledWorkout[] = [
       {
         dayOfWeek: 1, // Monday
-        templateId: 'full-body-a',
+        templateId: 'builtin-full-body-a',
         templateName: 'Full Body A',
       },
       {
         dayOfWeek: 3, // Wednesday
-        templateId: 'full-body-b',
+        templateId: 'builtin-full-body-b',
         templateName: 'Full Body B',
       },
       {
         dayOfWeek: 5, // Friday
-        templateId: 'full-body-c',
+        templateId: 'builtin-full-body-c',
         templateName: 'Full Body C',
       },
     ];
@@ -162,33 +164,33 @@ export function createPPL6DayProgram(userId: string): Program {
     const workouts: ScheduledWorkout[] = [
       {
         dayOfWeek: 0, // Sunday
-        templateId: 'push-a',
-        templateName: 'Push Day A',
+        templateId: 'builtin-push-a',
+        templateName: 'Push Day A - Chest Focus',
       },
       {
         dayOfWeek: 1, // Monday
-        templateId: 'pull-a',
-        templateName: 'Pull Day A',
+        templateId: 'builtin-pull-a',
+        templateName: 'Pull Day A - Back Width',
       },
       {
         dayOfWeek: 2, // Tuesday
-        templateId: 'legs-a',
-        templateName: 'Leg Day A',
+        templateId: 'builtin-leg-a',
+        templateName: 'Leg Day A - Quad Focus',
       },
       {
         dayOfWeek: 4, // Thursday
-        templateId: 'push-b',
-        templateName: 'Push Day B',
+        templateId: 'builtin-push-b',
+        templateName: 'Push Day B - Shoulder Focus',
       },
       {
         dayOfWeek: 5, // Friday
-        templateId: 'pull-b',
-        templateName: 'Pull Day B',
+        templateId: 'builtin-pull-b',
+        templateName: 'Pull Day B - Back Thickness',
       },
       {
         dayOfWeek: 6, // Saturday
-        templateId: 'legs-b',
-        templateName: 'Leg Day B',
+        templateId: 'builtin-leg-b',
+        templateName: 'Leg Day B - Hamstring/Glute Focus',
       },
     ];
 
@@ -216,8 +218,15 @@ export function createPPL6DayProgram(userId: string): Program {
 }
 
 export const PROGRAM_TEMPLATES = [
+  // Original programs
   { id: 'ppl-3day', name: 'Push/Pull/Legs (3-Day)', factory: createPushPullLegsProgram },
   { id: 'upper-lower', name: 'Upper/Lower (4-Day)', factory: createUpperLowerProgram },
   { id: 'full-body', name: 'Full Body (3-Day)', factory: createFullBodyProgram },
   { id: 'ppl-6day', name: 'Push/Pull/Legs (6-Day)', factory: createPPL6DayProgram },
+
+  // Elite strength programs (5 programs)
+  ...BUILTIN_STRENGTH_PROGRAM_TEMPLATES,
+
+  // Elite hypertrophy programs (7 programs)
+  ...BUILTIN_HYPERTROPHY_PROGRAM_TEMPLATES,
 ];

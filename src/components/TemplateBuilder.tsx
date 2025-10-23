@@ -4,6 +4,7 @@ import { ExerciseSelector } from './ExerciseSelector';
 import { db } from '../services/database';
 import type { Exercise } from '../types/exercise';
 import type { WorkoutExercise } from '../types/workout';
+import { isBuiltinTemplate } from '../data/workoutTemplates';
 
 interface TemplateBuilderProps {
   onSave: (name: string, exercises: WorkoutExercise[], templateId?: string) => void;
@@ -24,6 +25,35 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
   const [exerciseDetails, setExerciseDetails] = useState<Map<string, Exercise>>(new Map());
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const isEditing = !!templateId;
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize built-in template exercises by resolving names to IDs
+  useEffect(() => {
+    async function initializeBuiltinTemplate() {
+      if (templateId && isBuiltinTemplate(templateId) && !isInitialized) {
+        const allExercises = await db.exercises.toArray();
+        const resolvedExercises: WorkoutExercise[] = [];
+
+        for (const ex of initialExercises) {
+          // exerciseId is actually the exercise name for built-in templates
+          const exercise = allExercises.find(dbEx => dbEx.name === ex.exerciseId);
+          if (exercise) {
+            resolvedExercises.push({
+              ...ex,
+              exerciseId: exercise.id, // Replace name with actual ID
+            });
+          }
+        }
+
+        setExercises(resolvedExercises);
+        setIsInitialized(true);
+      } else if (!isInitialized) {
+        setIsInitialized(true);
+      }
+    }
+
+    initializeBuiltinTemplate();
+  }, [templateId, initialExercises, isInitialized]);
 
   useEffect(() => {
     loadExerciseDetails();

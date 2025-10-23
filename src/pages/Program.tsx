@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Plus, ChevronLeft, ChevronRight, Play, X, Check, TrendingUp, CheckCircle2, Wrench } from 'lucide-react';
+import { Calendar, Plus, ChevronLeft, ChevronRight, Play, X, Check, TrendingUp, CheckCircle2, Wrench, Trash2 } from 'lucide-react';
 import { db } from '../services/database';
 import type { Program, WorkoutTemplate, WorkoutLog } from '../types/workout';
 import { PROGRAM_TEMPLATES } from '../data/programTemplates';
@@ -54,7 +54,14 @@ export function Program() {
     // Create new program from template
     const newProgram = template.factory('default-user');
     newProgram.isActive = true;
-    newProgram.startDate = new Date();
+
+    // Set start date to the beginning of current week (Sunday)
+    // This ensures the program starts from the current week, not from today
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Go back to Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+    newProgram.startDate = startOfWeek;
 
     await db.programs.add(newProgram);
     await loadPrograms();
@@ -69,10 +76,16 @@ export function Program() {
       await db.programs.update(prog.id, { isActive: false });
     }
 
+    // Set start date to the beginning of current week (Sunday)
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Go back to Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+
     // Activate the selected program
     await db.programs.update(programId, {
       isActive: true,
-      startDate: new Date() // Reset start date when reactivating
+      startDate: startOfWeek // Reset start date when reactivating
     });
     await loadPrograms();
   }
@@ -80,6 +93,13 @@ export function Program() {
   async function handleDeactivateProgram(programId: string) {
     await db.programs.update(programId, { isActive: false });
     await loadPrograms();
+  }
+
+  async function handleDeleteProgram(programId: string) {
+    if (confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
+      await db.programs.delete(programId);
+      await loadPrograms();
+    }
   }
 
   // Calendar helpers
@@ -103,12 +123,18 @@ export function Program() {
     if (!activeProgram || !activeProgram.startDate) return null;
 
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    date.setHours(0, 0, 0, 0);
     const dayOfWeek = date.getDay();
 
     // Calculate which week of the program we're in
     const startDate = new Date(activeProgram.startDate);
-    const diffTime = Math.abs(date.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    startDate.setHours(0, 0, 0, 0);
+
+    // Don't show workouts for dates before the program start
+    if (date < startDate) return null;
+
+    const diffTime = date.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const weekNumber = Math.floor(diffDays / 7) + 1;
 
     if (weekNumber > activeProgram.duration) return null; // Program finished
@@ -156,10 +182,9 @@ export function Program() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   }
 
-  function handleStartWorkout(templateName: string) {
-    // Navigate to workout logger
-    // In a full implementation, we'd pass template info to pre-populate
-    navigate('/workout');
+  function handleStartWorkout(templateId: string, templateName: string) {
+    // Navigate to workout logger with template ID
+    navigate(`/workout?templateId=${templateId}`);
   }
 
   // Calculate program progress
@@ -381,7 +406,7 @@ export function Program() {
                   ${today ? 'ring-2 ring-primary-yellow' : ''}
                   ${past && !scheduledWorkout ? 'opacity-50' : ''}
                 `}
-                onClick={() => scheduledWorkout && handleStartWorkout(scheduledWorkout.templateName)}
+                onClick={() => scheduledWorkout && handleStartWorkout(scheduledWorkout.templateId, scheduledWorkout.templateName)}
               >
                 <span className={`text-xs ${scheduledWorkout ? 'font-bold text-primary-blue' : 'text-gray-400'}`}>
                   {day}
@@ -468,14 +493,23 @@ export function Program() {
                     </div>
                   </div>
 
-                  {!program.isActive && (
+                  <div className="flex items-center gap-2">
+                    {!program.isActive && (
+                      <button
+                        onClick={() => handleActivateProgram(program.id)}
+                        className="text-xs btn-secondary px-3 py-1"
+                      >
+                        Activate
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleActivateProgram(program.id)}
-                      className="text-xs btn-secondary px-3 py-1"
+                      onClick={() => handleDeleteProgram(program.id)}
+                      className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-red-400 hover:text-red-300"
+                      title="Delete program"
                     >
-                      Activate
+                      <Trash2 size={16} />
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
             ))}
