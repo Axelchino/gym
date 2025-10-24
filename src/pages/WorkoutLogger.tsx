@@ -13,6 +13,12 @@ import type { Exercise } from '../types/exercise';
 import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
 import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile } from '../utils/csvExport';
 import { BUILTIN_WORKOUT_TEMPLATES, isBuiltinTemplate } from '../data/workoutTemplates';
+import {
+  getWorkoutTemplates,
+  createWorkoutTemplate,
+  updateWorkoutTemplate,
+  deleteWorkoutTemplate
+} from '../services/supabaseDataService';
 
 export function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -132,11 +138,14 @@ export function WorkoutLogger() {
   }
 
   async function loadTemplates() {
-    const allTemplates = await db.workoutTemplates
-      .where('userId')
-      .equals('default-user')
-      .toArray();
-    setTemplates(allTemplates);
+    try {
+      const allTemplates = await getWorkoutTemplates();
+      setTemplates(allTemplates);
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      // Fallback to empty array if error
+      setTemplates([]);
+    }
   }
 
   function handleStartWorkout() {
@@ -169,42 +178,36 @@ export function WorkoutLogger() {
   }
 
   async function handleSaveTemplate(name: string, exercises: WorkoutExercise[], templateId?: string) {
-    if (templateId && isBuiltinTemplate(templateId)) {
-      // Copy-on-modify: Create new user template instead of modifying built-in
-      const template: WorkoutTemplate = {
-        id: uuidv4(),
-        userId: 'default-user',
-        name,
-        exercises,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await db.workoutTemplates.add(template);
-    } else if (templateId) {
-      // Update existing user template
-      await db.workoutTemplates.update(templateId, {
-        name,
-        exercises,
-        updatedAt: new Date(),
-      });
-    } else {
-      // Create new template
-      const template: WorkoutTemplate = {
-        id: uuidv4(),
-        userId: 'default-user',
-        name,
-        exercises,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await db.workoutTemplates.add(template);
-    }
+    try {
+      if (templateId && isBuiltinTemplate(templateId)) {
+        // Copy-on-modify: Create new user template instead of modifying built-in
+        await createWorkoutTemplate({
+          name,
+          exercises,
+          isActive: true,
+        });
+      } else if (templateId) {
+        // Update existing user template
+        await updateWorkoutTemplate(templateId, {
+          name,
+          exercises,
+        });
+      } else {
+        // Create new template
+        await createWorkoutTemplate({
+          name,
+          exercises,
+          isActive: true,
+        });
+      }
 
-    await loadTemplates();
-    setShowTemplateBuilder(false);
-    setEditingTemplate(null);
+      await loadTemplates();
+      setShowTemplateBuilder(false);
+      setEditingTemplate(null);
+    } catch (error) {
+      console.error('Error saving template:', error);
+      alert('Failed to save template. Please try again.');
+    }
   }
 
   async function handleStartFromTemplate(template: Pick<WorkoutTemplate, 'id' | 'name' | 'exercises'>) {
@@ -329,8 +332,13 @@ export function WorkoutLogger() {
 
   async function handleDeleteTemplate(templateId: string) {
     if (confirm('Are you sure you want to delete this template?')) {
-      await db.workoutTemplates.delete(templateId);
-      await loadTemplates();
+      try {
+        await deleteWorkoutTemplate(templateId);
+        await loadTemplates();
+      } catch (error) {
+        console.error('Error deleting template:', error);
+        alert('Failed to delete template. Please try again.');
+      }
     }
   }
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { db } from '../services/database';
 import type { UserProfile, UnitSystem } from '../types/user';
+import { getWorkoutLogs, getPersonalRecords } from '../services/supabaseDataService';
 
 export function Profile() {
   const { user, signOut } = useAuth();
@@ -85,39 +86,40 @@ export function Profile() {
   const loadStats = async () => {
     if (!user) return;
 
-    // Load total workouts
-    const totalWorkouts = await db.workoutLogs.where('userId').equals(user.id).count();
+    try {
+      // Load workout logs from Supabase
+      const logs = await getWorkoutLogs();
+      const totalWorkouts = logs.length;
 
-    // Load personal records
-    const personalRecords = await db.personalRecords.where('userId').equals(user.id).count();
+      // Load personal records from Supabase
+      const prs = await getPersonalRecords();
+      const personalRecords = prs.length;
 
-    // Calculate total volume
-    const logs = await db.workoutLogs.where('userId').equals(user.id).toArray();
-    const totalVolume = logs.reduce((sum, log) => {
-      const logVolume = log.exercises.reduce((exerciseSum, exercise) => {
-        const setVolume = exercise.sets.reduce((setSum, set) => {
-          return setSum + (set.weight || 0) * (set.reps || 0);
+      // Calculate total volume
+      const totalVolume = logs.reduce((sum, log) => {
+        const logVolume = log.exercises.reduce((exerciseSum, exercise) => {
+          const setVolume = exercise.sets.reduce((setSum, set) => {
+            return setSum + (set.weight || 0) * (set.reps || 0);
+          }, 0);
+          return exerciseSum + setVolume;
         }, 0);
-        return exerciseSum + setVolume;
+        return sum + logVolume;
       }, 0);
-      return sum + logVolume;
-    }, 0);
 
-    // Calculate streak (simplified - count workouts in last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentWorkouts = await db.workoutLogs
-      .where('userId')
-      .equals(user.id)
-      .and(log => new Date(log.date) >= sevenDaysAgo)
-      .count();
+      // Calculate streak (simplified - count workouts in last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const recentWorkouts = logs.filter(log => new Date(log.date) >= sevenDaysAgo).length;
 
-    setStats({
-      totalWorkouts,
-      personalRecords,
-      dayStreak: recentWorkouts,
-      totalVolume: Math.round(totalVolume),
-    });
+      setStats({
+        totalWorkouts,
+        personalRecords,
+        dayStreak: recentWorkouts,
+        totalVolume: Math.round(totalVolume),
+      });
+    } catch (error) {
+      console.error('Error loading profile stats:', error);
+    }
   };
 
   const handleSignOut = async () => {

@@ -6,6 +6,7 @@ import { WorkoutEditModal } from '../components/WorkoutEditModal';
 import { StreakDisplay } from '../components/StreakDisplay';
 import { calculateStreak } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
+import { getWorkoutLogs, getPersonalRecords } from '../services/supabaseDataService';
 
 interface DashboardStats {
   workoutsThisWeek: number;
@@ -37,8 +38,8 @@ export function Dashboard() {
     setIsLoading(true);
 
     try {
-      // Get all workouts
-      const allWorkouts = await db.workoutLogs.orderBy('date').reverse().toArray();
+      // Get all workouts from Supabase
+      const allWorkouts = await getWorkoutLogs();
 
       // Calculate this week's stats
       const today = new Date();
@@ -52,8 +53,9 @@ export function Dashboard() {
       // Calculate current streak
       const currentStreak = calculateStreak(allWorkouts);
 
-      // Get total PRs
-      const totalPRs = await db.personalRecords.count();
+      // Get total PRs from Supabase
+      const allPRs = await getPersonalRecords();
+      const totalPRs = allPRs.length;
 
       // Get recent workouts (last 5)
       const recentWorkouts = allWorkouts.slice(0, 5);

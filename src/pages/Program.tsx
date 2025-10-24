@@ -5,6 +5,14 @@ import type { Program, WorkoutTemplate, WorkoutLog } from '../types/workout';
 import { PROGRAM_TEMPLATES } from '../data/programTemplates';
 import { useNavigate } from 'react-router-dom';
 import { ProgramBuilder } from '../components/ProgramBuilder';
+import {
+  getPrograms,
+  createProgram,
+  updateProgram,
+  deleteProgram,
+  getWorkoutTemplates,
+  getWorkoutLogs,
+} from '../services/supabaseDataService';
 
 export function Program() {
   const navigate = useNavigate();
@@ -24,81 +32,115 @@ export function Program() {
   }, []);
 
   async function loadPrograms() {
-    const allPrograms = await db.programs.toArray();
-    setPrograms(allPrograms);
+    try {
+      const allPrograms = await getPrograms();
+      setPrograms(allPrograms);
 
-    const active = allPrograms.find(p => p.isActive);
-    setActiveProgram(active || null);
+      const active = allPrograms.find(p => p.isActive);
+      setActiveProgram(active || null);
+    } catch (error) {
+      console.error('Error loading programs:', error);
+      setPrograms([]);
+    }
   }
 
   async function loadTemplates() {
-    const allTemplates = await db.workoutTemplates.toArray();
-    setTemplates(allTemplates);
+    try {
+      const allTemplates = await getWorkoutTemplates();
+      setTemplates(allTemplates);
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      setTemplates([]);
+    }
   }
 
   async function loadWorkoutLogs() {
-    const logs = await db.workoutLogs.toArray();
-    setWorkoutLogs(logs);
+    try {
+      const logs = await getWorkoutLogs();
+      setWorkoutLogs(logs);
+    } catch (error) {
+      console.error('Error loading workout logs:', error);
+      setWorkoutLogs([]);
+    }
   }
 
   async function handleActivateTemplate(templateId: string) {
     const template = PROGRAM_TEMPLATES.find(t => t.id === templateId);
     if (!template) return;
 
-    // Deactivate any active programs
-    const activePrograms = programs.filter(p => p.isActive);
-    for (const prog of activePrograms) {
-      await db.programs.update(prog.id, { isActive: false });
+    try {
+      // Deactivate any active programs
+      const activePrograms = programs.filter(p => p.isActive);
+      for (const prog of activePrograms) {
+        await updateProgram(prog.id, { isActive: false });
+      }
+
+      // Create new program from template (factory no longer needs userId)
+      const newProgram = template.factory('temp-user-id'); // userId will be set by createProgram
+      newProgram.isActive = true;
+
+      // Set start date to the beginning of current week (Sunday)
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      newProgram.startDate = startOfWeek;
+
+      await createProgram(newProgram);
+      await loadPrograms();
+      setShowTemplateBrowser(false);
+      setSelectedTemplate(null);
+    } catch (error) {
+      console.error('Error activating template:', error);
+      alert('Failed to activate program. Please try again.');
     }
-
-    // Create new program from template
-    const newProgram = template.factory('default-user');
-    newProgram.isActive = true;
-
-    // Set start date to the beginning of current week (Sunday)
-    // This ensures the program starts from the current week, not from today
-    const today = new Date();
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay()); // Go back to Sunday
-    startOfWeek.setHours(0, 0, 0, 0);
-    newProgram.startDate = startOfWeek;
-
-    await db.programs.add(newProgram);
-    await loadPrograms();
-    setShowTemplateBrowser(false);
-    setSelectedTemplate(null);
   }
 
   async function handleActivateProgram(programId: string) {
-    // Deactivate any active programs
-    const activePrograms = programs.filter(p => p.isActive);
-    for (const prog of activePrograms) {
-      await db.programs.update(prog.id, { isActive: false });
+    try {
+      // Deactivate any active programs
+      const activePrograms = programs.filter(p => p.isActive);
+      for (const prog of activePrograms) {
+        await updateProgram(prog.id, { isActive: false });
+      }
+
+      // Set start date to the beginning of current week (Sunday)
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      // Activate the selected program
+      await updateProgram(programId, {
+        isActive: true,
+        startDate: startOfWeek
+      });
+      await loadPrograms();
+    } catch (error) {
+      console.error('Error activating program:', error);
+      alert('Failed to activate program. Please try again.');
     }
-
-    // Set start date to the beginning of current week (Sunday)
-    const today = new Date();
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay()); // Go back to Sunday
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // Activate the selected program
-    await db.programs.update(programId, {
-      isActive: true,
-      startDate: startOfWeek // Reset start date when reactivating
-    });
-    await loadPrograms();
   }
 
   async function handleDeactivateProgram(programId: string) {
-    await db.programs.update(programId, { isActive: false });
-    await loadPrograms();
+    try {
+      await updateProgram(programId, { isActive: false });
+      await loadPrograms();
+    } catch (error) {
+      console.error('Error deactivating program:', error);
+      alert('Failed to deactivate program. Please try again.');
+    }
   }
 
   async function handleDeleteProgram(programId: string) {
     if (confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
-      await db.programs.delete(programId);
-      await loadPrograms();
+      try {
+        await deleteProgram(programId);
+        await loadPrograms();
+      } catch (error) {
+        console.error('Error deleting program:', error);
+        alert('Failed to delete program. Please try again.');
+      }
     }
   }
 

@@ -4,6 +4,11 @@ import type { WorkoutLog, LoggedExercise, Set } from '../types/workout';
 import type { Exercise } from '../types/exercise';
 import { db } from '../services/database';
 import { detectPR } from '../utils/analytics';
+import {
+  getWorkoutLogs,
+  createWorkoutLog,
+  createPersonalRecord,
+} from '../services/supabaseDataService';
 
 const ACTIVE_WORKOUT_KEY = 'gym-tracker-active-workout';
 
@@ -248,79 +253,74 @@ export function useActiveWorkout() {
   const saveWorkout = useCallback(async () => {
     if (!activeWorkout) return;
 
-    const workoutLog: WorkoutLog = {
-      id: uuidv4(),
-      userId: 'default-user',
-      name: activeWorkout.name,
-      date: new Date(),
-      startTime: activeWorkout.startTime,
-      endTime: new Date(),
-      duration: Math.round((new Date().getTime() - activeWorkout.startTime.getTime()) / 60000),
-      totalVolume: activeWorkout.exercises.reduce((sum, ex) => sum + ex.totalVolume, 0),
-      exercises: activeWorkout.exercises,
-      synced: false,
-      createdAt: new Date(),
-    };
+    try {
+      // Create workout log in Supabase (user ID handled by service)
+      const savedWorkout = await createWorkoutLog({
+        name: activeWorkout.name,
+        date: new Date(),
+        startTime: activeWorkout.startTime,
+        endTime: new Date(),
+        duration: Math.round((new Date().getTime() - activeWorkout.startTime.getTime()) / 60000),
+        totalVolume: activeWorkout.exercises.reduce((sum, ex) => sum + ex.totalVolume, 0),
+        exercises: activeWorkout.exercises,
+      });
 
-    // Save workout log
-    await db.workoutLogs.add(workoutLog);
+      // Detect and save Personal Records
+      const allPRs = [];
+      for (const exercise of activeWorkout.exercises) {
+        // Get historical sets for this exercise (excluding current workout)
+        const historicalWorkouts = await getWorkoutLogs();
 
-    // Save all sets
-    const allSets = activeWorkout.exercises.flatMap(exercise =>
-      exercise.sets.map(set => ({
-        ...set,
-        workoutLogId: workoutLog.id,
-      }))
-    );
+        const historicalSets: Set[] = [];
+        for (const workout of historicalWorkouts) {
+          if (workout.id === savedWorkout.id) continue; // Skip current workout
+          const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.exerciseId);
+          if (exerciseData) {
+            historicalSets.push(...exerciseData.sets);
+          }
+        }
 
-    if (allSets.length > 0) {
-      await db.sets.bulkAdd(allSets);
-    }
+        // Check each completed working set for PRs
+        for (const set of exercise.sets) {
+          if (!set.isWarmup && set.completed) {
+            const prs = detectPR(
+              set,
+              exercise.exerciseId,
+              exercise.exerciseName,
+              savedWorkout.id,
+              historicalSets,
+              savedWorkout.userId
+            );
 
-    // Detect and save Personal Records
-    const allPRs = [];
-    for (const exercise of activeWorkout.exercises) {
-      // Get historical sets for this exercise (excluding current workout)
-      const historicalWorkouts = await db.workoutLogs
-        .orderBy('date')
-        .reverse()
-        .toArray();
+            // Save each PR individually to Supabase
+            for (const pr of prs) {
+              await createPersonalRecord({
+                exerciseId: pr.exerciseId,
+                exerciseName: pr.exerciseName,
+                type: pr.type,
+                value: pr.value,
+                reps: pr.reps,
+                date: pr.date,
+                workoutLogId: pr.workoutLogId,
+                previousRecord: pr.previousRecord,
+              });
+            }
 
-      const historicalSets: Set[] = [];
-      for (const workout of historicalWorkouts) {
-        if (workout.id === workoutLog.id) continue; // Skip current workout
-        const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.exerciseId);
-        if (exerciseData) {
-          historicalSets.push(...exerciseData.sets);
+            allPRs.push(...prs);
+          }
         }
       }
 
-      // Check each completed working set for PRs
-      for (const set of exercise.sets) {
-        if (!set.isWarmup && set.completed) {
-          const prs = detectPR(
-            set,
-            exercise.exerciseId,
-            exercise.exerciseName,
-            workoutLog.id,
-            historicalSets,
-            workoutLog.userId
-          );
-          allPRs.push(...prs);
-        }
-      }
+      // Clear active workout
+      setActiveWorkout(null);
+      setIsWorkoutActive(false);
+
+      return { workoutId: savedWorkout.id, prs: allPRs };
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      alert('Failed to save workout. Please try again.');
+      throw error;
     }
-
-    // Save all PRs to database
-    if (allPRs.length > 0) {
-      await db.personalRecords.bulkAdd(allPRs);
-    }
-
-    // Clear active workout
-    setActiveWorkout(null);
-    setIsWorkoutActive(false);
-
-    return { workoutId: workoutLog.id, prs: allPRs };
   }, [activeWorkout, calculateVolume]);
 
   // Cancel workout (with confirmation)
