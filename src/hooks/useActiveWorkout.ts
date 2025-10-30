@@ -4,6 +4,7 @@ import type { WorkoutLog, LoggedExercise, Set } from '../types/workout';
 import type { Exercise } from '../types/exercise';
 import { db } from '../services/database';
 import { detectPR } from '../utils/analytics';
+import { supabase } from '../services/supabase';
 import {
   getWorkoutLogs,
   createWorkoutLog,
@@ -52,6 +53,7 @@ export function useActiveWorkout() {
     const stored = loadWorkoutFromStorage();
     return stored !== null;
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   // Helper function to calculate volume (handles dumbbell 2x multiplier)
   const calculateVolume = useCallback((sets: Set[], equipment: string) => {
@@ -253,8 +255,25 @@ export function useActiveWorkout() {
   const saveWorkout = useCallback(async () => {
     if (!activeWorkout) return;
 
+    // Prevent multiple simultaneous saves
+    if (isSaving) {
+      console.warn('Save already in progress, ignoring duplicate request');
+      return;
+    }
+
+    setIsSaving(true);
+
     try {
-      // Create workout log in Supabase (user ID handled by service)
+      // STEP 1: Verify user is authenticated BEFORE attempting save
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error('You must be logged in to save workouts. Please sign in and try again.');
+      }
+
+      console.log('✅ User authenticated, proceeding with save...');
+
+      // STEP 2: Create workout log in Supabase
       const savedWorkout = await createWorkoutLog({
         name: activeWorkout.name,
         date: new Date(),
@@ -265,7 +284,13 @@ export function useActiveWorkout() {
         exercises: activeWorkout.exercises,
       });
 
-      // Detect and save Personal Records
+      console.log('✅ Workout saved to Supabase:', savedWorkout.id);
+
+      // STEP 3: Save to IndexedDB for offline access and edit functionality
+      await db.workoutLogs.put(savedWorkout);
+      console.log('✅ Workout saved to IndexedDB');
+
+      // STEP 4: Detect and save Personal Records
       const allPRs = [];
       for (const exercise of activeWorkout.exercises) {
         // Get historical sets for this exercise (excluding current workout)
@@ -311,17 +336,39 @@ export function useActiveWorkout() {
         }
       }
 
-      // Clear active workout
+      console.log('✅ Personal records saved:', allPRs.length);
+
+      // STEP 5: Only clear workout AFTER successful save
       setActiveWorkout(null);
       setIsWorkoutActive(false);
+      setIsSaving(false);
+
+      console.log('✅ Workout save complete!');
 
       return { workoutId: savedWorkout.id, prs: allPRs };
     } catch (error) {
-      console.error('Error saving workout:', error);
-      alert('Failed to save workout. Please try again.');
+      setIsSaving(false);
+
+      console.error('❌ Error saving workout:', error);
+
+      // CRITICAL: Keep workout in localStorage so user doesn't lose data
+      // Don't clear activeWorkout - user can retry
+
+      // Provide user-friendly error messages based on error type
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
+      if (errorMessage.includes('logged in') || errorMessage.includes('authenticated')) {
+        alert('⚠️ You must be signed in to save workouts.\n\nYour workout is still saved locally. Please sign in and try saving again.');
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+        alert('⚠️ Network connection issue.\n\nYour workout is saved locally and will be uploaded when you have internet connection. You can keep working out offline.');
+        // TODO: Add to offline queue for later sync
+      } else {
+        alert(`⚠️ Failed to save workout: ${errorMessage}\n\nYour workout is still saved locally. Please try again or contact support if the issue persists.`);
+      }
+
       throw error;
     }
-  }, [activeWorkout, calculateVolume]);
+  }, [activeWorkout, calculateVolume, isSaving]);
 
   // Cancel workout (with confirmation)
   const cancelWorkout = useCallback(() => {
@@ -361,6 +408,7 @@ export function useActiveWorkout() {
   return {
     activeWorkout,
     isWorkoutActive,
+    isSaving,
     startWorkout,
     startWorkoutWithExercises,
     addExercise,

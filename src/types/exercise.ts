@@ -53,6 +53,7 @@ export interface Exercise {
   secondaryMuscles: (MuscleGroup | string)[]; // Allow string for flexibility
   muscleMap: Record<string, MuscleInvolvement>;
   instructions: string;
+  searchAliases?: string; // Comma-separated alternate search terms
   videoUrl?: string;
   imageUrl?: string;
   isCustom: boolean;

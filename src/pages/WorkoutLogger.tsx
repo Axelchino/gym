@@ -26,6 +26,7 @@ export function WorkoutLogger() {
   const {
     activeWorkout,
     isWorkoutActive,
+    isSaving,
     startWorkout,
     startWorkoutWithExercises,
     addExercise,
@@ -720,10 +721,10 @@ export function WorkoutLogger() {
             <button
               onClick={() => setShowSaveConfirm(true)}
               className="btn-primary px-4 py-2 text-sm"
-              disabled={stats.completedSets === 0}
+              disabled={stats.completedSets === 0 || isSaving}
             >
               <Save size={16} className="inline mr-1" />
-              Finish
+              {isSaving ? 'Saving...' : 'Finish'}
             </button>
           </div>
         </div>
@@ -921,14 +922,16 @@ export function WorkoutLogger() {
                 <button
                   onClick={() => setShowSaveConfirm(false)}
                   className="flex-1 btn-secondary"
+                  disabled={isSaving}
                 >
                   Keep Working
                 </button>
                 <button
                   onClick={handleSaveWorkout}
                   className="flex-1 btn-primary"
+                  disabled={isSaving}
                 >
-                  Save & Finish
+                  {isSaving ? 'Saving...' : 'Save & Finish'}
                 </button>
               </div>
             </div>

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, X, Dumbbell } from 'lucide-react';
 import type { Exercise } from '../types/exercise';
 import { db } from '../services/database';
+import { searchExercises } from '../utils/searchEngine';
 
 interface ExerciseSelectorProps {
   onSelect: (exercise: Exercise) => void;
@@ -11,131 +12,29 @@ interface ExerciseSelectorProps {
 export function ExerciseSelector({ onSelect, onClose }: ExerciseSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadExercises();
   }, []);
 
-  useEffect(() => {
-    filterExercises();
-  }, [searchQuery, exercises]);
-
   async function loadExercises() {
     setIsLoading(true);
-    const allExercises = await db.exercises.orderBy('popularityRank').reverse().toArray();
+    const allExercises = await db.exercises.toArray();
     setExercises(allExercises);
-    setFilteredExercises(allExercises.slice(0, 50)); // Show top 50 initially
     setIsLoading(false);
   }
 
-  function filterExercises() {
-    if (!searchQuery.trim()) {
-      setFilteredExercises(exercises.slice(0, 50));
-      return;
-    }
+  // Use unified search engine with memoization for performance
+  const searchResults = useMemo(
+    () => searchExercises(exercises, searchQuery),
+    [exercises, searchQuery]
+  );
 
-    const query = searchQuery.toLowerCase();
-    const keywords = query.split(' ').filter(k => k.length > 0);
-
-    // Comprehensive muscle group and term mappings
-    const muscle_aliases: Record<string, string[]> = {
-      // Plural forms and common terms
-      'legs': ['quadriceps', 'hamstrings', 'glutes', 'calves', 'leg', 'lower body'],
-      'leg': ['quadriceps', 'hamstrings', 'glutes', 'calves', 'lower body'],
-      'arms': ['biceps', 'triceps', 'forearms', 'arm', 'upper arm'],
-      'arm': ['biceps', 'triceps', 'forearms', 'upper arm'],
-      'shoulders': ['deltoids', 'delts', 'shoulder'],
-      'shoulder': ['deltoids', 'delts'],
-
-      // Muscle group nicknames
-      'traps': ['trapezius', 'trap'],
-      'trap': ['trapezius'],
-      'delts': ['deltoids', 'shoulders'],
-      'delt': ['deltoids', 'shoulders'],
-      'lats': ['latissimus dorsi', 'back', 'lat'],
-      'lat': ['latissimus dorsi', 'back'],
-      'pecs': ['pectorals', 'chest', 'pec'],
-      'pec': ['pectorals', 'chest'],
-      'abs': ['abdominals', 'core', 'ab'],
-      'ab': ['abdominals', 'core'],
-      'quads': ['quadriceps', 'quad', 'thigh'],
-      'quad': ['quadriceps', 'thigh'],
-      'hams': ['hamstrings', 'ham'],
-      'ham': ['hamstrings'],
-      'bis': ['biceps', 'bicep'],
-      'bi': ['biceps', 'bicep'],
-      'tris': ['triceps', 'tricep'],
-      'tri': ['triceps', 'tricep'],
-      'glutes': ['gluteus', 'glute', 'butt'],
-      'glute': ['gluteus', 'butt'],
-      'calves': ['calf'],
-      'calf': ['calves'],
-
-      // Back variations
-      'back': ['latissimus dorsi', 'trapezius', 'rhomboids', 'erector spinae'],
-
-      // Chest variations
-      'chest': ['pectorals', 'pecs'],
-
-      // Core variations
-      'core': ['abdominals', 'obliques', 'abs'],
-    };
-
-    const expandedKeywords = keywords.flatMap(kw => {
-      const expansions = [kw];
-
-      // Add alias expansions
-      if (muscle_aliases[kw]) {
-        expansions.push(...muscle_aliases[kw]);
-      }
-
-      // Handle common plurals - try removing 's' and 'es'
-      if (kw.endsWith('s') && kw.length > 2) {
-        const singular = kw.slice(0, -1);
-        expansions.push(singular);
-        if (muscle_aliases[singular]) {
-          expansions.push(...muscle_aliases[singular]);
-        }
-      }
-
-      if (kw.endsWith('es') && kw.length > 3) {
-        const singular = kw.slice(0, -2);
-        expansions.push(singular);
-        if (muscle_aliases[singular]) {
-          expansions.push(...muscle_aliases[singular]);
-        }
-      }
-
-      return expansions;
-    });
-
-    const filtered = exercises
-      .filter(ex => {
-        const searchText = [
-          ex.name,
-          ex.category,
-          ex.equipment,
-          ...ex.primaryMuscles,
-          ...ex.secondaryMuscles,
-        ].join(' ').toLowerCase();
-
-        return expandedKeywords.every(keyword => searchText.includes(keyword));
-      })
-      .sort((a, b) => {
-        // Prioritize exact name matches
-        const aExact = a.name.toLowerCase().includes(query) ? 1 : 0;
-        const bExact = b.name.toLowerCase().includes(query) ? 1 : 0;
-        if (aExact !== bExact) return bExact - aExact;
-
-        // Then by popularity
-        return b.popularityRank - a.popularityRank;
-      })
-      .slice(0, 100);
-
-    setFilteredExercises(filtered);
-  }
+  // Limit results: 50 for idle, 100 for searches
+  const filteredExercises = searchQuery.trim()
+    ? searchResults.slice(0, 100).map(r => r.exercise)
+    : searchResults.slice(0, 50).map(r => r.exercise);
 
   function handleSelect(exercise: Exercise) {
     onSelect(exercise);
