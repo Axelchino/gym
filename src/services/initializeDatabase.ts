@@ -11,7 +11,7 @@ import type { Exercise } from '../types/exercise';
 
 const INIT_FLAG_KEY = 'gym-tracker-db-initialized';
 const DB_VERSION_KEY = 'gym-tracker-db-version';
-const CURRENT_DB_VERSION = '1.0.0';
+const CURRENT_DB_VERSION = '2.0.0'; // Updated for manually curated MASTER_EXERCISES_CLEANED.csv
 
 /**
  * Initialize the exercise database if not already done
@@ -26,14 +26,21 @@ export async function initializeDatabase(): Promise<void> {
 
     if (isInitialized === 'true' && dbVersion === CURRENT_DB_VERSION) {
       const count = await db.exercises.count();
-      console.log(`✓ Database already initialized with ${count} exercises`);
+      console.log(`✓ Database already initialized with ${count} exercises (v${CURRENT_DB_VERSION})`);
       return;
+    }
+
+    // If version mismatch, clear old data
+    if (dbVersion && dbVersion !== CURRENT_DB_VERSION) {
+      console.log(`🔄 Database version upgrade: ${dbVersion} → ${CURRENT_DB_VERSION}`);
+      console.log('   Clearing old exercise data...');
+      await db.exercises.clear();
     }
 
     // Check if database has exercises (might have been initialized previously)
     const existingCount = await db.exercises.count();
 
-    if (existingCount > 0) {
+    if (existingCount > 0 && dbVersion === CURRENT_DB_VERSION) {
       console.log(`⚠️  Database has ${existingCount} exercises but flag not set`);
       console.log('   Marking as initialized...');
       localStorage.setItem(INIT_FLAG_KEY, 'true');
