@@ -105,17 +105,17 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
   // Compact mode for navbar or small spaces
   if (compact) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-lg">
         <Flame
           size={18}
           className={
             streakStatus === 'active' ? 'text-primary-yellow' :
             streakStatus === 'warning' ? 'text-orange-400' :
             streakStatus === 'danger' ? 'text-red-400' :
-            'text-gray-500'
+            'text-muted'
           }
         />
-        <span className="text-sm font-semibold">
+        <span className="text-sm font-semibold text-primary">
           {weeklyStreak} week{weeklyStreak !== 1 ? 's' : ''}
         </span>
       </div>
@@ -124,22 +124,22 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
 
   // Full display mode
   return (
-    <div className="card-elevated">
+    <div className="card">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-xl font-semibold flex items-center gap-2 mb-1">
+          <h2 className="text-xl font-semibold text-primary flex items-center gap-2 mb-1">
             <Flame
               size={24}
               className={
                 streakStatus === 'active' ? 'text-primary-yellow' :
                 streakStatus === 'warning' ? 'text-orange-400' :
                 streakStatus === 'danger' ? 'text-red-400' :
-                'text-gray-500'
+                'text-muted'
               }
             />
             Weekly Streak
           </h2>
-          <p className="text-sm text-gray-400">Consecutive weeks with ≥1 workout</p>
+          <p className="text-sm text-secondary">Consecutive weeks with ≥1 workout</p>
         </div>
 
         {/* Streak number - big and prominent */}
@@ -147,7 +147,7 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
           <div className="text-5xl font-bold text-primary-yellow">
             {weeklyStreak}
           </div>
-          <div className="text-sm text-gray-400 mt-1">
+          <div className="text-sm text-secondary mt-1">
             week{weeklyStreak !== 1 ? 's' : ''}
           </div>
         </div>
@@ -160,21 +160,21 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
           ${streakStatus === 'danger' ? 'bg-red-500/10 border border-red-500/30' :
             streakStatus === 'warning' ? 'bg-orange-500/10 border border-orange-500/30' :
             streakStatus === 'active' ? 'bg-primary-blue/10 border border-primary-blue/30' :
-            'bg-gray-800 border border-gray-700'
+            'bg-surface-elevated border-card'
           }
         `}
       >
         {streakStatus === 'danger' && <AlertCircle size={20} className="text-red-400 flex-shrink-0" />}
         {streakStatus === 'warning' && <AlertCircle size={20} className="text-orange-400 flex-shrink-0" />}
-        {streakStatus === 'active' && <TrendingUp size={20} className="text-primary-blue flex-shrink-0" />}
-        {streakStatus === 'inactive' && <Calendar size={20} className="text-gray-500 flex-shrink-0" />}
-        <p className="text-sm text-gray-300">{message}</p>
+        {streakStatus === 'active' && <TrendingUp size={20} className="text-brand-blue flex-shrink-0" />}
+        {streakStatus === 'inactive' && <Calendar size={20} className="text-muted flex-shrink-0" />}
+        <p className="text-sm text-primary">{message}</p>
       </div>
 
       {/* Streak milestones */}
       {weeklyStreak > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-700">
-          <p className="text-xs text-gray-500 mb-2">Milestones:</p>
+        <div className="mt-4 pt-4 border-t border-border-medium">
+          <p className="text-xs text-muted mb-2">Milestones:</p>
           <div className="grid grid-cols-4 gap-2">
             {[4, 8, 12, 26, 52].map(milestone => (
               <div
@@ -182,8 +182,8 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
                 className={`
                   text-center py-2 rounded-lg text-xs
                   ${weeklyStreak >= milestone
-                    ? 'bg-primary-blue/20 text-primary-blue border border-primary-blue/30'
-                    : 'bg-gray-800 text-gray-600 border border-gray-700'
+                    ? 'bg-primary-blue/20 text-brand-blue border border-primary-blue/30'
+                    : 'bg-surface-elevated text-muted border-card'
                   }
                 `}
               >

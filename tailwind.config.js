@@ -8,25 +8,42 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Theme-aware colors using CSS variables
+        surface: 'var(--surface)',
+        'surface-elevated': 'var(--surface-elevated)',
+        'surface-accent': 'var(--surface-accent)',
+
+        // Text colors
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-muted': 'var(--text-muted)',
+
+        // Borders
+        'border-subtle': 'var(--border-subtle)',
+        'border-light': 'var(--border-light)',
+        'border-medium': 'var(--border-medium)',
+
+        // Brand colors
+        'brand-purple': 'var(--color-purple)',
+        'brand-blue': 'var(--color-blue)',
+        'brand-gold': 'var(--color-gold)',
+
+        // Keep old primary colors for backward compatibility
         primary: {
-          blue: '#3b82f6',      // Vibrant blue for CTAs
-          purple: '#8b5cf6',    // Secondary accent
-          green: '#10b981',     // Success, PRs
-          yellow: '#fbbf24',    // Warnings, highlights
-          red: '#ef4444',       // Errors, delete
+          blue: 'var(--color-blue)',
+          purple: 'var(--color-purple)',
+          green: '#10b981',
+          yellow: '#fbbf24',
+          red: '#ef4444',
         },
-        gray: {
-          50: '#F8F9FA',        // Lightest (rare use)
-          100: '#E9ECEF',       // Very light
-          200: '#DEE2E6',       // Light
-          300: '#CED4DA',       // Light-medium
-          400: '#ADB5BD',       // Medium (muted text)
-          500: '#6C757D',       // Medium-dark
-          600: '#495057',       // Dark
-          700: '#343A40',       // Very dark (cards)
-          800: '#212529',       // Near black (secondary bg)
-          900: '#000000',       // OLED black (primary bg)
-        },
+      },
+      backgroundColor: {
+        'card': 'var(--card-bg)',
+        'stats': 'var(--stats-bg)',
+      },
+      borderColor: {
+        'card': 'var(--border-subtle)',
+        'DEFAULT': 'var(--border-medium)',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],

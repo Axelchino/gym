@@ -1,0 +1,477 @@
+/**
+ * Global Theme System - GymTrackerPro
+ *
+ * Easy-to-edit CSS variables for all three modes.
+ * Edit colors, shadows, borders, etc. here without touching TypeScript!
+ */
+
+/* Default to dark mode if no theme is set */
+:root {
+  --surface: #111827;
+  --surface-elevated: #1F2937;
+  --text-primary: #F9FAFB;
+  --text-secondary: #E5E7EB;
+  --text-muted: #9CA3AF;
+  --border-medium: #374151;
+  --border-light: #4B5563;
+  --card-bg: #1F2937;
+  --card-border: 1px solid #374151;
+}
+
+/* ============================================
+   LIGHT MODE - Clean Day Look
+   ============================================
+
+   DESIGN RULES:
+   - Page background: Very light neutral gray (#F7F8FA)
+   - All cards: White (#FFFFFF) with thin light-gray border
+   - Text: Near-black primary, medium gray secondary (NO faint gray)
+   - Color usage: ONLY for accents (rails, top rules, pills, icons, CTAs)
+   - NO colored card fills - white cards only
+   - Buttons: Filled purple (primary), outline/light gray (secondary)
+   - Chips/tags: Light gray pill with thin border and dark text
+
+   ============================================ */
+.theme-light {
+  /* Surface colors */
+  --surface: #F7F8FA;              /* Page background - very light neutral gray */
+  --surface-elevated: #FFFFFF;     /* Card surfaces - pure white */
+  --surface-accent: #F5F5F5;       /* Subtle accents */
+
+  /* Brand colors */
+  --color-purple: #B482FF;         /* Primary CTA color */
+  --color-purple-deep: #8E63FF;    /* Comparison/secondary purple */
+  --color-purple-light: #C596FF;   /* Hover state */
+  --color-purple-dark: #9D6EE8;    /* Active state */
+  --color-blue: #0090CC;           /* General blue accent */
+  --color-blue-primary: #007DB2;   /* Chart primary series */
+
+  /* Text colors - NO faint gray */
+  --text-primary: #0F131A;         /* Near-black - always readable */
+  --text-secondary: #5B6472;       /* Medium gray - meta/labels */
+  --text-muted: #6B7280;           /* Muted but still readable */
+
+  /* Borders */
+  --border-subtle: #E3E7EE;        /* Thin light-gray card borders */
+  --border-light: #E5E7EB;         /* Lighter borders */
+  --border-medium: #D1D5DB;        /* Medium borders */
+
+  /* Shadows - subtle only */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 2px 4px 0 rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 4px 8px 0 rgb(0 0 0 / 0.08);
+  --shadow-xl: none;  /* No heavy shadows in light mode */
+
+  /* Component-specific */
+  --hero-bg: #FFFFFF;                          /* White card */
+  --hero-shadow: none;                         /* No shadow */
+  --hero-border: 1px solid var(--border-subtle);
+
+  --stats-bg: #FFFFFF;                         /* White cards */
+  --stats-border: 1px solid var(--border-subtle);
+
+  --card-bg: #FFFFFF;                          /* White cards only */
+  --card-border: 1px solid var(--border-subtle);
+  --card-hover-border: var(--color-purple);
+  --card-active-border: var(--color-purple-dark);
+
+  /* Buttons */
+  --button-primary-bg: var(--color-purple);      /* Filled purple - stands out */
+  --button-primary-hover: var(--color-purple-light);
+  --button-primary-active: var(--color-purple-dark);
+  --button-primary-text: #FFFFFF;
+
+  --button-secondary-bg: transparent;            /* Outline button */
+  --button-secondary-border: 1px solid var(--border-medium);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-hover-bg: var(--surface-accent);
+
+  /* Chips/Tags - light gray pill with border */
+  --chip-bg: #F5F5F5;                          /* Light gray pill */
+  --chip-border: 1px solid #E3E7EE;            /* Thin border */
+  --chip-text: var(--text-primary);            /* Dark text */
+
+  --badge-pr-bg: #F5F5F5;                      /* Light gray pill */
+  --badge-pr-border: 1px solid #E3E7EE;
+  --badge-pr-text: var(--text-primary);
+
+  /* Difficulty colors */
+  --difficulty-beginner: #22C55E;              /* Green */
+  --difficulty-intermediate: #F59E0B;          /* Amber */
+  --difficulty-advanced: #EF4444;              /* Red */
+
+  /* Chart/Graph colors */
+  --chart-primary: #007DB2;                    /* Main series blue */
+  --chart-secondary: #8E63FF;                  /* Comparison purple */
+  --chart-tertiary: #E1BB62;                   /* Highlight gold */
+  --chart-grid: #E3E7EE;                       /* Light grid lines */
+  --chart-text: #5B6472;                       /* Axis and labels */
+
+  /* Calendar specific */
+  --calendar-day-bg: #FFFFFF;                  /* White cards for all days */
+  --calendar-day-border: 1px solid var(--border-subtle);
+  --calendar-scheduled-rail: var(--color-purple);  /* Purple left rail for scheduled days */
+  --calendar-selected-border: 2px solid var(--color-purple);  /* Purple outline for selected */
+
+  /* Recent Activity card */
+  --recent-activity-bg: #FFFFFF;               /* White card */
+  --recent-activity-border: 1px solid var(--border-subtle);
+  --recent-activity-rail: var(--color-blue-primary);  /* Blue or purple left rail */
+}
+
+/* ============================================
+   DARK MODE - Stage Presence
+   ============================================ */
+.theme-dark {
+  /* Surface colors */
+  --surface: #1A1A2E;
+  --surface-elevated: #2A2A3E;
+  --surface-blue: #083B73;
+
+  /* Brand colors */
+  --color-purple: #8B42FF;
+  --color-purple-light: #A56BFF;
+  --color-purple-dark: #7433CC;
+  --color-blue: #0084FF;
+  --color-blue-primary: #0092E6;
+  --color-blue-hover: #00A2FF;
+  --color-blue-active: #007FCC;
+  --color-gold: #E1BB62;
+
+  /* Text colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #E0E0EC;
+  --text-muted: #B8B8C8;
+  --text-light: #8A8A9A;
+  --text-on-blue: #EAF2FF;
+  --text-on-blue-muted: #CFDAF5;
+
+  /* Borders */
+  --border-subtle: #2A2A3E;
+  --border-medium: #3A3A4E;
+  --border-light: #4A4A5E;
+
+  /* Shadows */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+
+  /* Inset rings for depth */
+  --ring-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  /* Component-specific */
+  --hero-bg: var(--surface-blue);
+  --hero-shadow: none;
+  --hero-border: none;
+  --hero-ring: var(--ring-inset);
+
+  --stats-bg: var(--surface);
+  --stats-border: 1px solid var(--border-subtle);
+
+  --card-bg: var(--surface);
+  --card-border: 1px solid var(--border-subtle);
+  --card-hover-border: var(--color-purple-light);
+  --card-active-border: var(--color-purple-dark);
+
+  --button-primary-bg: var(--color-blue-primary);
+  --button-primary-hover: var(--color-blue-hover);
+  --button-primary-active: var(--color-blue-active);
+  --button-primary-text: #FFFFFF;
+
+  --badge-pr-bg: #006DD4;
+  --badge-pr-text: #FFFFFF;
+
+  /* Difficulty colors */
+  --difficulty-beginner: #10b981;
+  --difficulty-intermediate: #fbbf24;
+  --difficulty-advanced: #ef4444;
+
+  /* Chart/Graph colors */
+  --chart-primary: var(--color-purple);
+  --chart-secondary: var(--color-blue);
+  --chart-tertiary: #10b981;
+  --chart-grid: #2A2A3E;
+  --chart-text: var(--text-muted);
+}
+
+/* ============================================
+   AMOLED MODE - Pure Black + Brutalist Grays
+   ============================================ */
+.theme-amoled {
+  /* Surface colors */
+  --surface: #000000;
+  --surface-elevated: #3A3A3A;
+  --surface-card: #1A1A1A;
+
+  /* Brand colors (muted for OLED) */
+  --color-gold: #E1BB62;
+  --color-gray: #3A3A3A;
+  --color-gray-light: #4A4A4A;
+  --color-gray-dark: #2A2A2A;
+
+  /* Text colors */
+  --text-primary: #F0F0F0;
+  --text-secondary: #D8D8D8;
+  --text-muted: #B0B0B0;
+  --text-light: #A0A0A0;
+  --text-badge: #C8C8C8;
+
+  /* Borders */
+  --border-subtle: #1A1A1A;
+  --border-medium: #2A2A2A;
+  --border-light: #3A3A3A;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px 0 rgb(0 0 0 / 0.8);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.9);
+  --shadow-lg: 0 10px 20px -5px rgb(0 0 0 / 0.9);
+  --shadow-xl: 0 20px 40px -10px rgb(0 0 0 / 1);
+
+  /* Component-specific */
+  --hero-bg: #000000;
+  --hero-shadow: var(--shadow-xl);
+  --hero-border: 1px solid var(--border-subtle);
+
+  --stats-bg: #000000;
+  --stats-border: 1px solid var(--border-subtle);
+
+  --card-bg: #000000;
+  --card-border: 1px solid var(--border-subtle);
+  --card-hover-border: var(--border-light);
+  --card-active-border: #0A0A0A;
+
+  --button-primary-bg: var(--color-gray);
+  --button-primary-hover: var(--color-gray-light);
+  --button-primary-active: var(--color-gray-dark);
+  --button-primary-text: #FFFFFF;
+
+  --badge-pr-bg: var(--surface-card);
+  --badge-pr-text: var(--text-badge);
+  --badge-pr-border: var(--border-medium);
+
+  /* Difficulty colors */
+  --difficulty-beginner: #10b981;
+  --difficulty-intermediate: #fbbf24;
+  --difficulty-advanced: #ef4444;
+
+  /* Chart/Graph colors */
+  --chart-primary: #B0B0B0;
+  --chart-secondary: #D8D8D8;
+  --chart-tertiary: #8A8A8A;
+  --chart-grid: #1A1A1A;
+  --chart-text: var(--text-muted);
+}
+
+/* ============================================
+   COMPONENT CLASSES
+   Easy to apply and tweak!
+   ============================================ */
+
+/* Hero Card */
+.hero-card {
+  background: var(--hero-bg);
+  border: var(--hero-border);
+  box-shadow: var(--hero-shadow);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.theme-dark .hero-card {
+  box-shadow: none;
+  border: none;
+  overflow: hidden;
+  box-shadow: var(--ring-inset);
+}
+
+/* Stats Tile */
+.stats-tile {
+  background: var(--stats-bg);
+  border: var(--stats-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top accent rule */
+.stats-tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.stats-tile.accent-purple::before {
+  background: var(--color-purple);
+}
+
+.stats-tile.accent-blue::before {
+  background: var(--color-blue);
+}
+
+.theme-dark .stats-tile.accent-gold::before {
+  background: var(--color-gold);
+}
+
+/* Exercise Card */
+.exercise-card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.exercise-card:hover {
+  border-color: var(--card-hover-border);
+}
+
+.exercise-card:active {
+  border-color: var(--card-active-border);
+}
+
+/* Left accent rail */
+.exercise-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.exercise-card.accent-purple::before {
+  background: var(--color-purple);
+}
+
+.exercise-card.accent-blue::before {
+  background: var(--color-blue);
+}
+
+.theme-dark .exercise-card.accent-gold::before {
+  background: var(--color-gold);
+}
+
+/* Buttons */
+.button-primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-primary:hover {
+  background: var(--button-primary-hover);
+}
+
+.button-primary:active {
+  background: var(--button-primary-active);
+}
+
+.button-primary:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.theme-light .button-primary:focus {
+  outline: 2px solid var(--color-purple);
+}
+
+.theme-amoled .button-primary {
+  border: 1px solid var(--border-subtle);
+}
+
+.theme-amoled .button-primary:focus {
+  outline: 2px solid var(--text-badge);
+  outline-offset: 2px;
+}
+
+/* PR Badge */
+.badge-pr {
+  background: var(--badge-pr-bg);
+  color: var(--badge-pr-text);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.theme-amoled .badge-pr {
+  border: 1px solid var(--badge-pr-border);
+}
+
+/* Navigation Buttons */
+.nav-button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-button.active {
+  background: var(--color-purple);
+  color: white;
+  border: none;
+}
+
+.nav-button.inactive {
+  background: transparent;
+  color: var(--text-muted);
+  border: 2px solid var(--border-medium);
+}
+
+.nav-button.inactive:hover {
+  border-color: var(--border-light);
+}
+
+.theme-dark .nav-button.active {
+  background: var(--color-purple);
+}
+
+.theme-dark .nav-button.inactive {
+  color: var(--text-secondary);
+}
+
+.theme-amoled .nav-button.active {
+  background: var(--color-gray);
+  color: white;
+  border: 1px solid var(--border-subtle);
+}
+
+.theme-amoled .nav-button.inactive {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border-light);
+}
+
+.theme-amoled .nav-button.inactive:hover {
+  border-color: var(--color-gray-light);
+}
+
+.theme-amoled .nav-button.inactive:active {
+  border-color: var(--color-gray-dark);
+}
+
+/* Text color utilities */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-light { color: var(--text-light); }
+
+.theme-dark .text-on-blue { color: var(--text-on-blue); }
+.theme-dark .text-on-blue-muted { color: var(--text-on-blue-muted); }

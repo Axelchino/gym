@@ -99,10 +99,10 @@ export function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Dumbbell className="text-primary-blue" size={32} />
+          <Dumbbell className="text-brand-blue" size={32} />
           <div>
-            <h1 className="text-3xl font-bold">GymTracker Pro</h1>
-            <p className="text-gray-400">Welcome back!</p>
+            <h1 className="text-3xl font-bold text-primary">GymTracker Pro</h1>
+            <p className="text-secondary">Welcome back!</p>
           </div>
         </div>
         {!isLoading && stats.allWorkouts.length > 0 && (
@@ -112,94 +112,94 @@ export function Dashboard() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="card">
+        <div className="card-stats accent-purple">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="text-primary-blue" size={20} />
-            <span className="text-sm text-gray-400">This Week</span>
+            <Calendar className="text-brand-purple" size={20} />
+            <span className="text-sm text-secondary">This Week</span>
           </div>
-          <p className="text-2xl font-bold">{isLoading ? '-' : stats.workoutsThisWeek}</p>
-          <p className="text-xs text-gray-500">Workouts</p>
+          <p className="text-2xl font-bold text-primary">{isLoading ? '-' : stats.workoutsThisWeek}</p>
+          <p className="text-xs text-muted">Workouts</p>
         </div>
 
-        <div className="card">
+        <div className="card-stats accent-blue">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="text-primary-green" size={20} />
-            <span className="text-sm text-gray-400">Volume</span>
+            <TrendingUp className="text-brand-blue" size={20} />
+            <span className="text-sm text-secondary">Volume</span>
           </div>
-          <p className="text-2xl font-bold">
+          <p className="text-2xl font-bold text-primary">
             {isLoading ? '-' : stats.totalVolumeThisWeek.toFixed(0)}
           </p>
-          <p className="text-xs text-gray-500">{weightUnit} lifted this week</p>
+          <p className="text-xs text-muted">{weightUnit} lifted this week</p>
         </div>
 
-        <div className="card">
+        <div className="card-stats accent-purple">
           <div className="flex items-center gap-2 mb-2">
-            <Award className="text-primary-yellow" size={20} />
-            <span className="text-sm text-gray-400">Streak</span>
+            <Award className="text-brand-purple" size={20} />
+            <span className="text-sm text-secondary">Streak</span>
           </div>
-          <p className="text-2xl font-bold">{isLoading ? '-' : stats.currentStreak}</p>
-          <p className="text-xs text-gray-500">Days</p>
+          <p className="text-2xl font-bold text-primary">{isLoading ? '-' : stats.currentStreak}</p>
+          <p className="text-xs text-muted">Days</p>
         </div>
 
-        <div className="card">
+        <div className="card-stats accent-blue">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="text-primary-blue" size={20} />
-            <span className="text-sm text-gray-400">PRs</span>
+            <TrendingUp className="text-brand-blue" size={20} />
+            <span className="text-sm text-secondary">PRs</span>
           </div>
-          <p className="text-2xl font-bold">{isLoading ? '-' : stats.totalPRs}</p>
-          <p className="text-xs text-gray-500">Personal records</p>
+          <p className="text-2xl font-bold text-primary">{isLoading ? '-' : stats.totalPRs}</p>
+          <p className="text-xs text-muted">Personal records</p>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="card-elevated">
-        <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+      <div className="card">
+        <h2 className="text-xl font-semibold text-primary mb-4">Recent Activity</h2>
         {isLoading ? (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-secondary">
             <p>Loading workouts...</p>
           </div>
         ) : stats.recentWorkouts.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-secondary">
             <p>No workouts yet</p>
             <p className="text-sm mt-2">Tap "Workout" to start your first session</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {stats.recentWorkouts.map((workout) => (
               <div
                 key={workout.id}
-                className="bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors"
+                className="card-rail accent-blue hover:border-brand-blue transition-colors cursor-pointer py-4 px-4"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">{workout.name}</h3>
-                  <div className="flex items-center gap-2">
+                <div className="flex items-baseline justify-between mb-3">
+                  <h3 className="text-base font-bold text-primary">{workout.name}</h3>
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => setEditingWorkoutId(workout.id)}
-                      className="text-gray-400 hover:text-primary-blue transition-colors"
+                      className="text-secondary hover:text-brand-blue transition-colors"
                       title="Edit workout"
                     >
                       <Edit size={16} />
                     </button>
-                    <span className="text-xs text-gray-400">{formatDate(workout.date)}</span>
+                    <span className="text-sm text-secondary font-medium">{formatDate(workout.date)}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-4 text-sm text-primary mb-3">
                   <span>{workout.exercises.length} exercises</span>
                   <span>{workout.totalVolume.toFixed(0)} {weightUnit}</span>
                   <span>{formatDuration(workout.duration)}</span>
                 </div>
                 {/* Exercise List */}
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2">
                   {workout.exercises.slice(0, 3).map((ex) => (
                     <span
                       key={ex.exerciseId}
-                      className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded"
+                      className="chip"
                     >
                       {ex.exerciseName}
                     </span>
                   ))}
                   {workout.exercises.length > 3 && (
-                    <span className="text-xs bg-gray-700 text-gray-400 px-2 py-1 rounded">
+                    <span className="chip">
                       +{workout.exercises.length - 3} more
                     </span>
                   )}
@@ -211,12 +211,12 @@ export function Dashboard() {
       </div>
 
       {/* Phase Status */}
-      <div className="card bg-gray-800 border border-gray-700">
+      <div className="card">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-2 h-2 bg-primary-green rounded-full animate-pulse"></div>
-          <span className="text-sm font-medium text-gray-300">Development Status</span>
+          <span className="text-sm font-medium text-primary">Development Status</span>
         </div>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-secondary">
           Phase 2: Workout Logger Complete ✅ | Phase 3: Analytics Coming Soon
         </p>
       </div>
