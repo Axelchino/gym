@@ -9,6 +9,7 @@ import { Profile } from './pages/Profile';
 import { Auth } from './pages/Auth';
 import UXDemo from './pages/UXDemo';
 import ThreeModesDemo from './pages/ThreeModesDemo';
+import ThemeDemo from './pages/ThemeDemo';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DevTestPanel } from './components/DevTestPanel';
@@ -33,6 +34,7 @@ function App() {
           {/* UX Demo - accessible without auth */}
           <Route path="/ux-demo" element={<UXDemo />} />
           <Route path="/3-modes" element={<ThreeModesDemo />} />
+          <Route path="/theme-demo" element={<ThemeDemo />} />
 
           {/* Protected routes */}
           <Route

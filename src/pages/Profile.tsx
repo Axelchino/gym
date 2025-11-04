@@ -1,14 +1,16 @@
-import { User, Settings, Download, LogOut, Edit2, Scale } from 'lucide-react';
+import { User, Settings, Download, LogOut, Edit2, Scale, Palette } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { db } from '../services/database';
 import type { UserProfile, UnitSystem } from '../types/user';
 import { getWorkoutLogs, getPersonalRecords } from '../services/supabaseDataService';
+import { useTheme, type Theme } from '../contexts/ThemeContext';
 
 export function Profile() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [stats, setStats] = useState({
@@ -205,6 +207,61 @@ export function Profile() {
         </div>
         <div className="mt-3 text-sm text-gray-400">
           Current: <span className="text-white font-medium">{userProfile?.unitPreference === 'imperial' ? 'Imperial (lbs)' : 'Metric (kg)'}</span>
+        </div>
+      </div>
+
+      {/* Theme Selector */}
+      <div className="card-elevated">
+        <div className="flex items-center gap-3 mb-4">
+          <Palette size={20} className="text-gray-400" />
+          <div>
+            <h3 className="font-semibold">Theme</h3>
+            <p className="text-sm text-gray-400">Choose your preferred color theme</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            onClick={() => setTheme('light')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              theme === 'light'
+                ? 'border-primary-blue bg-primary-blue/10'
+                : 'border-gray-700 hover:border-gray-600'
+            }`}
+          >
+            <div className="text-center">
+              <div className="text-2xl mb-1">☀️</div>
+              <div className="font-medium text-sm">Light</div>
+              {theme === 'light' && <div className="text-xs text-primary-blue mt-1">Active</div>}
+            </div>
+          </button>
+          <button
+            onClick={() => setTheme('dark')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              theme === 'dark'
+                ? 'border-primary-blue bg-primary-blue/10'
+                : 'border-gray-700 hover:border-gray-600'
+            }`}
+          >
+            <div className="text-center">
+              <div className="text-2xl mb-1">🌙</div>
+              <div className="font-medium text-sm">Dark</div>
+              {theme === 'dark' && <div className="text-xs text-primary-blue mt-1">Active</div>}
+            </div>
+          </button>
+          <button
+            onClick={() => setTheme('amoled')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              theme === 'amoled'
+                ? 'border-primary-blue bg-primary-blue/10'
+                : 'border-gray-700 hover:border-gray-600'
+            }`}
+          >
+            <div className="text-center">
+              <div className="text-2xl mb-1">⬛</div>
+              <div className="font-medium text-sm">AMOLED</div>
+              {theme === 'amoled' && <div className="text-xs text-primary-blue mt-1">Active</div>}
+            </div>
+          </button>
         </div>
       </div>
 

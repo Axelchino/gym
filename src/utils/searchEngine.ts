@@ -117,6 +117,17 @@ export function searchExercises(
   // Tokenize and stem query
   const terms = query.toLowerCase().split(/\s+/).map(stem).filter(Boolean);
 
+  // Detect equipment keywords in query for precision boosting (with fuzzy tolerance)
+  const equipmentKeywords = ['machine', 'cable', 'barbell', 'dumbbell', 'kettlebell', 'band', 'bodyweight', 'ez-bar'];
+  const hasEquipmentInQuery = terms.some(term =>
+    equipmentKeywords.some(eq => {
+      // Exact or substring match
+      if (eq.includes(term) || term.includes(eq)) return true;
+      // Fuzzy match for typos (e.g., "dumbell" → "dumbbell")
+      return fuzzyMatch(term, eq) >= 0.7;
+    })
+  );
+
   const results: SearchResult[] = [];
 
   for (const exercise of exercises) {
@@ -130,6 +141,8 @@ export function searchExercises(
     const secondaryMuscles = exercise.secondaryMuscles.map(m => m.toLowerCase());
     const category = exercise.category.toLowerCase();
     const equipment = exercise.equipment.toLowerCase();
+
+    let equipmentMatched = false;
 
     for (const term of terms) {
       // 1. EXACT NAME MATCH (3x weight = 30 points)
@@ -175,9 +188,22 @@ export function searchExercises(
         score += 15;
       }
 
-      // 6. EQUIPMENT (1x weight = 10 points)
+      // 6. EQUIPMENT (3x weight when equipment in query = 30 points, else 10)
       if (equipment.includes(term)) {
-        score += 10;
+        // If user searches equipment term, prioritize equipment matches heavily
+        score += hasEquipmentInQuery ? 30 : 10;
+        equipmentMatched = true;
+      } else {
+        // Check fuzzy match for equipment typos (e.g., "dumbell" → "dumbbell")
+        const equipmentWords = equipment.split(/[\s-]+/);
+        for (const eqWord of equipmentWords) {
+          const fuzzyScore = fuzzyMatch(term, eqWord);
+          if (fuzzyScore >= 0.7) {
+            score += hasEquipmentInQuery ? (fuzzyScore * 30) : 10;
+            equipmentMatched = true;
+            break;
+          }
+        }
       }
 
       // 7. SECONDARY MUSCLES (0.5x weight = 5 points)
@@ -188,14 +214,20 @@ export function searchExercises(
       }
     }
 
-    // Add popularity boost (max 10 points)
-    const popularityBoost = (exercise.popularityRank || 0) * 0.1;
-    score += popularityBoost;
+    // PRECISION PENALTY: If query has equipment keyword but exercise doesn't match, penalize
+    if (hasEquipmentInQuery && !equipmentMatched) {
+      score = score * 0.5; // 50% penalty for wrong equipment
+    }
 
     // Bonus: All query terms matched
     if (score > 0 && terms.length > 1) {
       score += 20;
     }
+
+    // Add popularity boost - SUBTLE tiebreaker only (max 3.5 points)
+    // User intent >> popularity when searching
+    const popularityBoost = (exercise.popularityRank || 0) * 0.003;
+    score += popularityBoost;
 
     // Only include if matched
     if (score > 0) {

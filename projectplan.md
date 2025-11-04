@@ -137,8 +137,8 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [x] Create `workouts` table (workout templates)
    - [x] Create `workout_logs` table (completed workouts)
    - [x] Create `sets` table (individual set data)
-   - [x] Create `achievements` table (milestone tracking)
-   - [x] Create `body_measurements` table (stats over time)
+   - [ ] Create `achievements` table (milestone tracking)
+   - [ ] Create `body_measurements` table (stats over time)
    - [x] Create `programs` table (for multi-week programming)
    - [ ] Create `sync_queue` table (pending sync operations) - deferred to Phase 5
 
@@ -295,6 +295,9 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [x] Integrate 1,146 enhanced exercises into app ✅
    - [x] Implement multi-keyword search with relevance scoring ✅
    - [x] Add sort by popularity (integrated into relevance scoring) ✅
+   - [x] **Equipment keyword detection with fuzzy matching** (e.g., "dumbell" → "dumbbell") ✅
+   - [x] **Equipment prioritization in search** (boost from 10→30 points when keyword detected) ✅
+   - [x] **Popularity rebalancing** (reduced multiplier 0.1→0.003 for better relevance) ✅
    - [ ] **See [exercisesProjectPlan.md](../../exercisesProjectPlan.md) for detailed exercise library expansion tasks**
    - [ ] Add category/muscle group filters
    - [ ] Add movement type filters (compound/isolation/stretch)
@@ -397,7 +400,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [x] Build PR notification system ✅
    - [x] Design PR history timeline ✅
    - [x] Track multiple PR types (weight, reps, volume, 1RM) ✅
-   - [x] Create PR celebration animations ✅
+   - [ ] Create PR celebration animations - deferred to Phase 6
 
 3. **Data Visualization Components**
    - [x] **Strength Progression Chart** ✅
@@ -598,7 +601,7 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 2. **Program Builder Interface**
    - [x] Add program templates (Push/Pull/Legs 3-day/6-day, Upper/Lower, Full Body) ✅
-   - [x] Create deload week support ✅
+   - [ ] Create deload week support
    - [x] Create custom multi-week program editor ✅
    - [x] Build week-by-week workout assignment ✅
    - [x] Assign workout templates to specific days ✅
@@ -706,8 +709,8 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 5. **Data Migration & Backup**
    - [x] Create data import flow (from local to cloud) ✅
    - [x] Implement automatic cloud backup (all writes go to cloud) ✅
-   - [x] Add manual backup download (CSV export for templates and workout logs) ✅
-   - [x] Build data restore functionality (CSV import) ✅
+   - [ ] Add manual backup download (CSV export for templates and workout logs) - partially working, needs update for new exercise database
+   - [ ] Build data restore functionality (CSV import) - partially working, needs update for new exercise database
 
 6. **Deployment**
    - [x] Deploy to Vercel (https://gym-tracker-five-kappa.vercel.app) ✅
@@ -847,9 +850,17 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Add success/error toast notifications
    - [ ] Create empty states for new users
    - [ ] Add onboarding tooltips
-   - [ ] Implement smooth transitions/animations
+   - [x] Implement smooth transitions/animations ✅
    - [ ] Optimize for mobile (touch gestures)
    - [ ] Add keyboard shortcuts documentation
+   - [x] **Theme System (3 Modes: Light/Dark/AMOLED)** ✅
+     - [x] Create CSS variable-based theme system (`src/styles/themes.css`) ✅
+     - [x] Implement ThemeContext with localStorage persistence ✅
+     - [x] Add theme selector in Profile settings ✅
+     - [x] Support Light Mode (white surfaces, purple/blue accents) ✅
+     - [x] Support Dark Mode (dark surfaces, blue hero slab, purple/gold accents) ✅
+     - [x] Support AMOLED Mode (pure black, brutalist grays) ✅
+     - [x] Smooth 0.3s theme transitions ✅
 
 7. **Data Export Enhancement**
    - [ ] CSV export for all data types
@@ -859,14 +870,14 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Add export scheduling (automatic weekly exports)
 
 ### Deliverables
-- ✅ Complete gamification system with daily/weekly/monthly quests
-- ✅ Friend system with activity feed and challenges
-- ✅ Template sharing via links/codes
-- ✅ Achievement system with 30+ achievements (including social)
-- ✅ Video demonstrations for 50+ exercises
-- ✅ Body measurements tracking with charts
-- ✅ Polished UI with animations and feedback
-- ✅ Enhanced data export options
+- [ ] Complete gamification system with daily/weekly/monthly quests
+- [ ] Friend system with activity feed and challenges
+- [ ] Template sharing via links/codes
+- [ ] Achievement system with 30+ achievements (including social)
+- [ ] Video demonstrations for 50+ exercises
+- [ ] Body measurements tracking with charts
+- [ ] Polished UI with animations and feedback
+- [ ] Enhanced data export options
 
 ### Enhancement Milestones
 - Quests feel engaging and achievable (like Duolingo)
@@ -944,11 +955,11 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
    - [ ] Add push notifications (optional)
 
 ### Deliverables
-- ✅ RPE/RIR tracking system
-- ✅ Smart progressive overload suggestions
-- ✅ Optimized performance (Lighthouse 90+)
-- ✅ Full accessibility compliance
-- ✅ Enhanced PWA functionality
+- [ ] RPE/RIR tracking system
+- [ ] Smart progressive overload suggestions
+- [ ] Optimized performance (Lighthouse 90+)
+- [ ] Full accessibility compliance
+- [ ] Enhanced PWA functionality
 
 ### Optimization Milestones
 - App loads in <2 seconds on 3G
@@ -1696,3 +1707,107 @@ _Current Focus: Phase 4 complete! Programming & Scheduling System implemented wi
   - Auto-loads selected template when navigating from calendar
   - Seamless workflow: click calendar day → workout loads with correct template
   - Uses React Router's `useSearchParams` for clean URL handling
+
+### Recent Updates (2025-11-01)
+
+**Global Theme System Implementation:**
+
+✅ **COMPLETE CSS-BASED THEME SYSTEM:**
+- **Problem:** User wanted to experiment with colors, shadows, borders without changing hex codes in TypeScript files
+- **Solution:** Created comprehensive CSS variable-based theme system for easy editing
+- **Files Created:**
+  - `src/styles/themes.css` - All theme variables and component classes (445 lines)
+  - `src/contexts/ThemeContext.tsx` - Theme state management with localStorage persistence
+  - `src/components/ThemeSwitcher.tsx` - Floating theme switcher for testing
+  - `src/pages/ThemeDemo.tsx` - Clean demo page showcasing CSS classes
+- **Files Modified:**
+  - `src/main.tsx` - Wrapped app in ThemeProvider, imported themes.css
+  - `src/index.css` - Converted `.btn-primary`, `.card`, `.input` to use CSS variables
+  - `src/pages/Profile.tsx` - Added theme selector with ☀️ Light, 🌙 Dark, ⬛ AMOLED buttons
+
+**CSS Variables Added:**
+- Colors: `--surface`, `--surface-elevated`, `--surface-accent`, `--text-primary/secondary/muted`, `--border-subtle/medium/light`, `--color-purple/blue/gold`
+- Components: `--hero-bg/shadow/border`, `--card-bg/border`, `--stats-bg`, `--button-primary-bg/hover/active/text`
+- Difficulty: `--difficulty-beginner/intermediate/advanced`
+- Charts: `--chart-primary/secondary/tertiary/grid/text`
+
+**Three Theme Modes:**
+1. **Light Mode** - Elegant day look with white surfaces (#FFFFFF), Purple (#B482FF), Blue (#0090CC)
+2. **Dark Mode** - Stage presence with dark surfaces (#1A1A2E), blue hero slab (#083B73), Purple (#8B42FF), Gold accents (#E1BB62)
+3. **AMOLED Mode** - Pure black (#000000) with brutalist grays (#3A3A3A), minimal borders (#1A1A1A)
+
+**User Benefits:**
+- Can now edit ANY color/shadow/border in `themes.css` without touching TypeScript
+- Theme persists across sessions via localStorage
+- Smooth 0.3s transitions on theme changes
+- One-click theme switching in Profile settings
+
+✅ **SEARCH ENGINE IMPROVEMENTS:**
+
+**Equipment Prioritization Fixed:**
+- **User Report:** "machine shoulder" showed non-machine exercises at top
+- **Root Cause:** Equipment matching only worth 10 points vs 30 for name matches
+- **Fix Applied:**
+  - Detect equipment keywords in search query (barbell, dumbbell, machine, cable, bodyweight, etc.)
+  - Boost equipment scoring from 10 → 30 points when equipment keyword detected
+  - Add 50% penalty for exercises that don't match equipment keyword
+  - Add fuzzy matching for typos (e.g., "dumbell" → "dumbbell") using Levenshtein distance
+- **File:** `src/utils/searchEngine.ts:120-220`
+
+**Popularity vs Relevance Rebalanced:**
+- **User Report:** "skull crusher triceps" not showing Skull Crusher in top results
+- **Root Cause:** Popularity boost gave up to 117 points, overwhelming name matches (30 points)
+- **Fix Applied:**
+  - Reduced popularity multiplier from 0.1 to 0.003 (97% reduction)
+  - Max popularity boost now 3.5 points instead of 117 points
+  - Search relevance now dominates, popularity acts as subtle tiebreaker
+- **File:** `src/utils/searchEngine.ts:227-230`
+
+✅ **DARK MODE HERO CARD REFINEMENT:**
+- User tested cyan border (#1FD2FF) on Dark Mode hero - looked inconsistent with stats/cards
+- Final design: Subtle inset ring (`ring-1 ring-inset ring-white/10`) instead of visible border
+- Creates "stage" feel without breaking design language
+- Implementation: `overflow-hidden` + `shadow-none` + inset ring
+- File: `src/pages/ThreeModesDemo.tsx:234`
+
+**Known Issues to Address:**
+1. 🔄 **Recent Activity Card Styling** - Some cards look off, needs investigation
+2. 🔄 **Strength Standards Resetting** - Data resets when profile changes, needs separate persistent storage
+3. 🔄 **Chart/Graph Integration** - Need to apply CSS variables to Analytics charts
+
+---
+
+## Current Sprint: Bug Fixes & Polish
+**Status:** In Progress
+**Priority:** High
+
+### Active Tasks
+
+1. **Theme System Integration Issues**
+   - [ ] Fix Recent Activity card styling inconsistencies
+     - [ ] Investigate which cards are not rendering correctly with theme system
+     - [ ] Apply proper CSS variables to Recent Activity components
+     - [ ] Test across all 3 themes (Light/Dark/AMOLED)
+   - [ ] Apply theme CSS variables to Analytics charts
+     - [ ] Update chart components to use `--chart-primary`, `--chart-secondary`, etc.
+     - [ ] Test chart colors across all themes
+     - [ ] Ensure chart grid lines use `--chart-grid` variable
+
+2. **Data Persistence Issues**
+   - [ ] Fix Strength Standards resetting when profile changes
+     - [ ] Move Strength Standards to separate persistent storage (localStorage or database table)
+     - [ ] Decouple from profile state
+     - [ ] Test that standards persist across profile edits
+     - [ ] Ensure bodyweight changes still update calculations correctly
+
+3. **Search Engine Enhancements** (Future)
+   - [ ] Add category/muscle group filters UI
+   - [ ] Add movement type filters (compound/isolation/stretch)
+   - [ ] Implement exercise favoriting system
+
+4. **UI/UX Polish** (Ongoing)
+   - [ ] Add loading states and skeletons
+   - [ ] Implement error boundaries
+   - [ ] Add success/error toast notifications
+   - [ ] Create empty states for new users
+   - [ ] Add onboarding tooltips
