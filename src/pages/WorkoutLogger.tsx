@@ -15,6 +15,7 @@ import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile 
 import { BUILTIN_WORKOUT_TEMPLATES, isBuiltinTemplate } from '../data/workoutTemplates';
 import {
   getWorkoutTemplates,
+  getWorkoutLogs,
   createWorkoutTemplate,
   updateWorkoutTemplate,
   deleteWorkoutTemplate
@@ -215,11 +216,8 @@ export function WorkoutLogger() {
     // Build the complete workout structure with all exercises and sets
     const exercises = [];
 
-    // Get all recent workouts to find previous data
-    const recentWorkouts = await db.workoutLogs
-      .orderBy('date')
-      .reverse()
-      .toArray();
+    // Get all recent workouts from Supabase to find previous data
+    const recentWorkouts = await getWorkoutLogs();
 
     for (let i = 0; i < template.exercises.length; i++) {
       const templateEx = template.exercises[i];
@@ -242,7 +240,7 @@ export function WorkoutLogger() {
         // Find previous workout data for this exercise
         let previousSets: any[] = [];
         for (const workout of recentWorkouts) {
-          const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.id);
+          const exerciseData = workout.exercises.find((ex: any) => ex.exerciseId === exercise.id);
           if (exerciseData && exerciseData.sets.length > 0) {
             previousSets = exerciseData.sets;
             break; // Found the most recent
@@ -374,11 +372,13 @@ export function WorkoutLogger() {
 
       let skippedExercises = 0;
 
-      // Add imported templates to database with remapped exercise IDs
+      // Add imported templates to Supabase with remapped exercise IDs
+      const existingTemplates = await getWorkoutTemplates();
+      const existingIds = new Set(existingTemplates.map(t => t.id));
+
       for (const template of importedTemplates) {
         // Check if template with same ID already exists
-        const existing = await db.workoutTemplates.get(template.id);
-        if (existing) {
+        if (existingIds.has(template.id)) {
           // Update ID to avoid conflicts
           template.id = uuidv4();
         }
@@ -405,7 +405,14 @@ export function WorkoutLogger() {
         // Only add template if it has at least one valid exercise
         if (remappedExercises.length > 0) {
           template.exercises = remappedExercises;
-          await db.workoutTemplates.add(template);
+          // Save to Supabase (PRIMARY SOURCE OF TRUTH)
+          await createWorkoutTemplate({
+            name: template.name,
+            description: template.description,
+            exercises: remappedExercises,
+            isActive: template.isActive ?? true,
+            schedule: template.schedule,
+          });
         }
       }
 

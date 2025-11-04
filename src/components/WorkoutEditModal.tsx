@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Save, Trash2, Plus } from 'lucide-react';
 import { SetRow } from './SetRow';
 import { db } from '../services/database';
+import { getWorkoutLogs, updateWorkoutLog } from '../services/supabaseDataService';
 import { useUserSettings } from '../hooks/useUserSettings';
 import type { WorkoutLog, Set } from '../types/workout';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,9 +26,14 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
   async function loadWorkout() {
     setIsLoading(true);
     try {
-      const workoutData = await db.workoutLogs.get(workoutId);
+      // Load all workouts from Supabase and find the one we want
+      const allWorkouts = await getWorkoutLogs();
+      const workoutData = allWorkouts.find(w => w.id === workoutId);
+
       if (workoutData) {
         setWorkout(workoutData);
+      } else {
+        console.error('Workout not found in Supabase');
       }
     } catch (error) {
       console.error('Error loading workout:', error);
@@ -149,16 +155,36 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
       // Recalculate total volume
       const totalVolume = workout.exercises.reduce((sum, ex) => sum + ex.totalVolume, 0);
 
-      // Update workout log
-      await db.workoutLogs.update(workout.id, {
-        ...workout,
+      // Calculate duration if endTime exists
+      const duration = workout.endTime
+        ? Math.round((workout.endTime.getTime() - workout.startTime.getTime()) / 60000)
+        : workout.duration;
+
+      // Update workout log in Supabase (PRIMARY SOURCE OF TRUTH)
+      await updateWorkoutLog(workout.id, {
+        name: workout.name,
+        date: workout.date,
+        startTime: workout.startTime,
+        endTime: workout.endTime,
+        duration,
         totalVolume,
+        exercises: workout.exercises,
+        notes: workout.notes,
       });
 
-      // Delete all existing sets for this workout
+      console.log('✅ Workout updated in Supabase:', workout.id);
+
+      // Also update IndexedDB for offline access
+      await db.workoutLogs.put({
+        ...workout,
+        totalVolume,
+        duration,
+      });
+
+      // Delete all existing sets for this workout in IndexedDB
       await db.sets.where('workoutLogId').equals(workout.id).delete();
 
-      // Re-add all sets
+      // Re-add all sets to IndexedDB
       const allSets = workout.exercises.flatMap(exercise =>
         exercise.sets.map(set => ({
           ...set,
@@ -169,6 +195,8 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
       if (allSets.length > 0) {
         await db.sets.bulkAdd(allSets);
       }
+
+      console.log('✅ Workout also cached in IndexedDB');
 
       onSave();
       onClose();

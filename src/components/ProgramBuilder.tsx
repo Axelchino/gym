@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Calendar, Save, Copy } from 'lucide-react';
 import { db } from '../services/database';
+import { getWorkoutTemplates } from '../services/supabaseDataService';
 import type { Program, ProgramWeek, ScheduledWorkout, WorkoutTemplate, ProgramGoal } from '../types/workout';
 import { v4 as uuidv4 } from 'uuid';
 import { BUILTIN_WORKOUT_TEMPLATES } from '../data/workoutTemplates';
@@ -29,10 +30,16 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
   }, []);
 
   async function loadTemplates() {
-    const userTemplates = await db.workoutTemplates.toArray();
-    // Merge user templates with built-in templates
-    const allTemplates = [...userTemplates, ...BUILTIN_WORKOUT_TEMPLATES as any[]];
-    setTemplates(allTemplates);
+    try {
+      const userTemplates = await getWorkoutTemplates();
+      // Merge user templates with built-in templates
+      const allTemplates = [...userTemplates, ...BUILTIN_WORKOUT_TEMPLATES as any[]];
+      setTemplates(allTemplates);
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      // Fall back to just built-in templates if Supabase fails
+      setTemplates(BUILTIN_WORKOUT_TEMPLATES as any[]);
+    }
   }
 
   function initializeWeeks() {
