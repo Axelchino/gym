@@ -31,8 +31,8 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
         set.completed
           ? 'bg-primary-blue/10 border border-primary-blue/30'
           : isPreviousSet
-          ? 'bg-gray-800/50 border border-gray-700'
-          : 'bg-gray-800 border border-gray-700'
+          ? 'bg-surface-accent/50 border border-card'
+          : 'bg-surface-accent border border-card'
       }`}
     >
       {/* Set Type Indicator - Click to cycle through types */}
@@ -60,7 +60,7 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
       )}
 
       {/* Set Number */}
-      <div className="w-full text-center font-semibold text-gray-400 text-sm sm:text-base">
+      <div className="w-full text-center font-semibold text-muted text-sm sm:text-base">
         {set.setNumber}
       </div>
 
@@ -85,9 +85,9 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
           }}
           placeholder={weightUnit}
           disabled={isPreviousSet}
-          className={`w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-sm sm:text-base ${
-            isPreviousSet ? 'text-gray-500' : set.isUserInput ? 'text-white' : 'text-gray-500'
-          } focus:outline-none focus:border-primary-blue focus:text-white`}
+          className={`w-full bg-card border border-card rounded px-2 py-1.5 text-center text-sm sm:text-base ${
+            isPreviousSet ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
+          } focus:outline-none focus:border-brand-blue focus:text-primary`}
         />
       </div>
 
@@ -112,9 +112,9 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
           }}
           placeholder="reps"
           disabled={isPreviousSet}
-          className={`w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-sm sm:text-base ${
-            isPreviousSet ? 'text-gray-500' : set.isUserInput ? 'text-white' : 'text-gray-500'
-          } focus:outline-none focus:border-primary-blue focus:text-white`}
+          className={`w-full bg-card border border-card rounded px-2 py-1.5 text-center text-sm sm:text-base ${
+            isPreviousSet ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
+          } focus:outline-none focus:border-brand-blue focus:text-primary`}
         />
       </div>
 
@@ -132,9 +132,9 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
           }}
           placeholder="RIR"
           disabled={isPreviousSet}
-          className={`w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-center text-xs sm:text-sm ${
-            isPreviousSet ? 'text-gray-500' : set.isUserInput ? 'text-white' : 'text-gray-500'
-          } focus:outline-none focus:border-primary-blue focus:text-white`}
+          className={`w-full bg-card border border-card rounded px-2 py-1.5 text-center text-xs sm:text-sm ${
+            isPreviousSet ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
+          } focus:outline-none focus:border-brand-blue focus:text-primary`}
         />
       </div>
 
@@ -145,7 +145,7 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
           className={`w-full h-8 flex items-center justify-center rounded transition-colors ${
             set.completed
               ? 'bg-primary-green text-white'
-              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+              : 'bg-surface-accent text-secondary hover:bg-border-medium'
           }`}
           title="Mark as complete"
         >
@@ -157,7 +157,7 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
       {!isPreviousSet && (
         <button
           onClick={onDelete}
-          className="w-full h-8 flex items-center justify-center rounded bg-gray-700 text-gray-400 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+          className="w-full h-8 flex items-center justify-center rounded bg-surface-accent text-secondary hover:bg-red-900/30 hover:text-red-400 transition-colors"
           title="Delete set"
         >
           <X size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -166,7 +166,7 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
 
       {isPreviousSet && (
         <>
-          <div className="text-xs text-gray-500 text-center">Prev</div>
+          <div className="text-xs text-muted text-center">Prev</div>
           <div></div>
         </>
       )}

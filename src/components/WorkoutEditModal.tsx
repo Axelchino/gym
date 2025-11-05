@@ -221,8 +221,8 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-        <div className="bg-gray-900 rounded-lg p-6 max-w-4xl w-full">
-          <p className="text-center text-gray-400">Loading workout...</p>
+        <div className="bg-surface-elevated rounded-lg p-6 max-w-4xl w-full">
+          <p className="text-center text-secondary">Loading workout...</p>
         </div>
       </div>
     );
@@ -231,7 +231,7 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
   if (!workout) {
     return (
       <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-        <div className="bg-gray-900 rounded-lg p-6 max-w-4xl w-full">
+        <div className="bg-surface-elevated rounded-lg p-6 max-w-4xl w-full">
           <p className="text-center text-red-400">Workout not found</p>
           <button onClick={onClose} className="mt-4 w-full btn-secondary">
             Close
@@ -243,14 +243,14 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-gray-900 rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col my-8">
+      <div className="bg-surface-elevated rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col my-8">
         {/* Header */}
-        <div className="p-6 border-b border-gray-800 flex items-center justify-between sticky top-0 bg-gray-900 rounded-t-lg">
+        <div className="p-6 border-b border-border-medium flex items-center justify-between sticky top-0 bg-surface-elevated rounded-t-lg">
           <div>
-            <h2 className="text-2xl font-bold mb-1">Edit Workout</h2>
-            <p className="text-sm text-gray-400">{formatDate(workout.date)}</p>
+            <h2 className="text-2xl font-bold text-primary mb-1">Edit Workout</h2>
+            <p className="text-sm text-secondary">{formatDate(workout.date)}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-secondary hover:text-primary">
             <X size={24} />
           </button>
         </div>
@@ -260,18 +260,18 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
           {/* Workout Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="card text-center">
-              <p className="text-xs text-gray-400 mb-1">Duration</p>
-              <p className="text-xl font-bold">{workout.duration} min</p>
+              <p className="text-xs text-muted mb-1">Duration</p>
+              <p className="text-xl font-bold text-primary">{workout.duration} min</p>
             </div>
             <div className="card text-center">
-              <p className="text-xs text-gray-400 mb-1">Total Volume</p>
-              <p className="text-xl font-bold">
+              <p className="text-xs text-muted mb-1">Total Volume</p>
+              <p className="text-xl font-bold text-primary">
                 {workout.exercises.reduce((sum, ex) => sum + ex.totalVolume, 0).toFixed(0)} {weightUnit}
               </p>
             </div>
             <div className="card text-center">
-              <p className="text-xs text-gray-400 mb-1">Exercises</p>
-              <p className="text-xl font-bold">{workout.exercises.length}</p>
+              <p className="text-xs text-muted mb-1">Exercises</p>
+              <p className="text-xl font-bold text-primary">{workout.exercises.length}</p>
             </div>
           </div>
 
@@ -281,15 +281,15 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
               {/* Exercise Header */}
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="font-semibold text-lg">{exercise.exerciseName}</h3>
-                  <p className="text-sm text-gray-400">
+                  <h3 className="font-semibold text-lg text-primary">{exercise.exerciseName}</h3>
+                  <p className="text-sm text-secondary">
                     {exercise.totalVolume.toFixed(0)} {weightUnit} total volume
                   </p>
                 </div>
               </div>
 
               {/* Set Headers */}
-              <div className="grid grid-cols-[auto,auto,1fr,1fr,1fr,auto,auto] gap-2 px-2 pb-2 text-xs text-gray-400 font-medium">
+              <div className="grid grid-cols-[auto,auto,1fr,1fr,1fr,auto,auto] gap-2 px-2 pb-2 text-xs text-muted font-medium">
                 <div className="w-10 text-center">Type</div>
                 <div className="w-8 text-center">Set</div>
                 <div className="text-center">Weight ({weightUnit})</div>
@@ -315,7 +315,7 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
               {/* Add Set Button */}
               <button
                 onClick={() => handleAddSet(exercise.exerciseId)}
-                className="w-full mt-3 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2 rounded transition-colors flex items-center justify-center gap-2"
+                className="w-full mt-3 bg-surface-accent hover:bg-border-medium text-secondary py-2 rounded transition-colors flex items-center justify-center gap-2"
               >
                 <Plus size={16} />
                 Add Set
@@ -325,7 +325,7 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-800 flex gap-3 sticky bottom-0 bg-gray-900 rounded-b-lg">
+        <div className="p-6 border-t border-border-medium flex gap-3 sticky bottom-0 bg-surface-elevated rounded-b-lg">
           <button onClick={onClose} className="flex-1 btn-secondary">
             Cancel
           </button>

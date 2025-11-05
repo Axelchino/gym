@@ -11,8 +11,9 @@ import { getWorkoutLogs, getPersonalRecords } from '../services/supabaseDataServ
 interface DashboardStats {
   workoutsThisWeek: number;
   totalVolumeThisWeek: number;
+  totalVolumeLastWeek: number;
   currentStreak: number;
-  totalPRs: number;
+  prsThisWeek: number;
   recentWorkouts: WorkoutLog[];
   allWorkouts: WorkoutLog[];
 }
@@ -22,8 +23,9 @@ export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     workoutsThisWeek: 0,
     totalVolumeThisWeek: 0,
+    totalVolumeLastWeek: 0,
     currentStreak: 0,
-    totalPRs: 0,
+    prsThisWeek: 0,
     recentWorkouts: [],
     allWorkouts: [],
   });
@@ -50,12 +52,24 @@ export function Dashboard() {
       const workoutsThisWeek = allWorkouts.filter(w => new Date(w.date) >= startOfWeek);
       const totalVolumeThisWeek = workoutsThisWeek.reduce((sum, w) => sum + w.totalVolume, 0);
 
+      // Calculate last week's stats
+      const startOfLastWeek = new Date(startOfWeek);
+      startOfLastWeek.setDate(startOfWeek.getDate() - 7);
+      const endOfLastWeek = new Date(startOfWeek);
+      endOfLastWeek.setMilliseconds(-1); // Just before this week starts
+
+      const workoutsLastWeek = allWorkouts.filter(w => {
+        const workoutDate = new Date(w.date);
+        return workoutDate >= startOfLastWeek && workoutDate <= endOfLastWeek;
+      });
+      const totalVolumeLastWeek = workoutsLastWeek.reduce((sum, w) => sum + w.totalVolume, 0);
+
       // Calculate current streak
       const currentStreak = calculateStreak(allWorkouts);
 
-      // Get total PRs from Supabase
+      // Get PRs from this week
       const allPRs = await getPersonalRecords();
-      const totalPRs = allPRs.length;
+      const prsThisWeek = allPRs.filter(pr => new Date(pr.achievedAt) >= startOfWeek).length;
 
       // Get recent workouts (last 5)
       const recentWorkouts = allWorkouts.slice(0, 5);
@@ -63,8 +77,9 @@ export function Dashboard() {
       setStats({
         workoutsThisWeek: workoutsThisWeek.length,
         totalVolumeThisWeek,
+        totalVolumeLastWeek,
         currentStreak,
-        totalPRs,
+        prsThisWeek,
         recentWorkouts,
         allWorkouts,
       });
@@ -126,9 +141,23 @@ export function Dashboard() {
             <TrendingUp className="text-brand-blue" size={20} />
             <span className="text-sm text-secondary">Volume</span>
           </div>
-          <p className="text-2xl font-bold text-primary">
-            {isLoading ? '-' : stats.totalVolumeThisWeek.toFixed(0)}
-          </p>
+          <div className="flex items-baseline gap-2">
+            <p className="text-2xl font-bold text-primary">
+              {isLoading ? '-' : stats.totalVolumeThisWeek.toFixed(0)}
+            </p>
+            {!isLoading && stats.totalVolumeLastWeek > 0 && (
+              <span className={`text-xs font-medium ${
+                stats.totalVolumeThisWeek > stats.totalVolumeLastWeek
+                  ? 'text-primary-green'
+                  : stats.totalVolumeThisWeek < stats.totalVolumeLastWeek
+                  ? 'text-red-400'
+                  : 'text-muted'
+              }`}>
+                {stats.totalVolumeThisWeek > stats.totalVolumeLastWeek ? '↑' : stats.totalVolumeThisWeek < stats.totalVolumeLastWeek ? '↓' : '→'}
+                {Math.abs(((stats.totalVolumeThisWeek - stats.totalVolumeLastWeek) / stats.totalVolumeLastWeek) * 100).toFixed(0)}%
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted">{weightUnit} lifted this week</p>
         </div>
 
@@ -144,10 +173,10 @@ export function Dashboard() {
         <div className="card-stats accent-blue">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="text-brand-blue" size={20} />
-            <span className="text-sm text-secondary">PRs</span>
+            <span className="text-sm text-secondary">PRs This Week</span>
           </div>
-          <p className="text-2xl font-bold text-primary">{isLoading ? '-' : stats.totalPRs}</p>
-          <p className="text-xs text-muted">Personal records</p>
+          <p className="text-2xl font-bold text-primary">{isLoading ? '-' : stats.prsThisWeek}</p>
+          <p className="text-xs text-muted">New personal records</p>
         </div>
       </div>
 
@@ -208,17 +237,6 @@ export function Dashboard() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Phase Status */}
-      <div className="card">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2 h-2 bg-primary-green rounded-full animate-pulse"></div>
-          <span className="text-sm font-medium text-primary">Development Status</span>
-        </div>
-        <p className="text-xs text-secondary">
-          Phase 2: Workout Logger Complete ✅ | Phase 3: Analytics Coming Soon
-        </p>
       </div>
 
       {/* Workout Edit Modal */}
