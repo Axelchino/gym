@@ -1843,6 +1843,119 @@ _Current Focus: Phase 4 complete! Programming & Scheduling System implemented wi
 
 ---
 
+### Recent Updates (2025-11-06 - Evening)
+
+**MAJOR REDESIGN: Apple-Style Minimal Dashboard & Navigation:**
+
+✅ **TOP HEADER NAVIGATION SYSTEM:**
+- **Replaced BottomNav with Header:**
+  - Created new `src/components/navigation/Header.tsx`
+  - Layout: Logo left → Search center → Profile + "Start Workout" button right
+  - Sticky header with backdrop blur (`bg-surface/95 backdrop-blur-sm`)
+  - Icons at 50% opacity idle, 100% on hover with strokeWidth 1.5
+  - Search bar with left-aligned icon, clean minimal styling
+  - Primary CTA: "Start Workout" button with bright blue accent
+- **Updated Layout:**
+  - File: `src/components/layout/Layout.tsx`
+  - Removed bottom navigation (mobile-first approach abandoned)
+  - Centered container with 1280px max width
+  - Removed bottom padding (pb-16)
+  - Clean, desktop-first professional layout
+
+✅ **5-TILE HERO ROW - COMPLETE DASHBOARD REDESIGN:**
+- **New Metric Layout:**
+  - Grid: 5 columns, 24px gaps (dense, professional)
+  - Volume: spans 2 columns (hero metric)
+  - Workouts, PRs, Streak: 1 column each
+  - Bodyweight: placeholder for future feature (not yet implemented)
+- **Typography System:**
+  - Hero numbers: `text-5xl` (48px), `font-bold`, `tabular-nums`
+  - Section titles: `text-lg` (18px), `font-semibold`
+  - All-caps labels: `text-xs` (12px), `uppercase`, `tracking-wide`
+  - SF Pro Display/Text added to font stack
+- **Visual Design:**
+  - All icons: 50% opacity idle, 100% on hover
+  - Icon strokeWidth: 1.5 (thin, refined)
+  - Single accent color: brand-blue only
+  - Grayscale base with minimal color
+  - No colored top borders (removed accent-blue/accent-purple)
+  - File: `src/pages/Dashboard.tsx`
+
+✅ **TIMELINE-STYLE RECENT ACTIVITY:**
+- **Layout Changes:**
+  - Left rail (3px vertical bar) on each activity card
+  - Changes from gray → brand-blue on hover
+  - One-line summary per workout
+  - Metadata inline with bullet separators (·)
+  - Date on right only (subtle, tabular-nums)
+- **Exercise Display:**
+  - Shows first 2 exercises inline: "Bench Press, Squats +3"
+  - No rounded pills - inline text only
+  - Minimal, scannable format
+  - Removed card-rail colored accents
+- **Spacing:**
+  - Larger top margin before section (mt-12)
+  - 3px gaps between activity items (dense)
+  - Section title: 18px, uppercase, tracking-wide
+  - File: `src/pages/Dashboard.tsx:180-223`
+
+✅ **GLOBAL DESIGN SYSTEM UPDATES:**
+- **Card Styling (src/index.css):**
+  - All cards: 1px hairline borders (`border: 1px solid var(--border-subtle)`)
+  - Border radius: 6px (consistent, minimal)
+  - Removed box-shadows entirely
+  - No colored ::before pseudo-elements
+  - Uniform padding: 1.25rem for stats, 1.5rem for content
+  - Transition: border-color only (subtle, fast)
+- **Chip/Tag System:**
+  - Changed from rounded pills to square tags
+  - Border radius: 3px (subtle corners)
+  - Uppercase text, letter-spacing: 0.025em
+  - 1px borders, minimal padding (0.25rem 0.5rem)
+  - Font size: 11px (0.6875rem)
+  - Removed pill styling (border-radius: 9999px)
+- **Typography:**
+  - Added `.tabular-nums` utility class
+  - Tailwind config updated with comments for each size
+  - Ensured text-5xl = 48px, text-lg = 18px, text-xs = 12px
+
+✅ **REMOVED FEATURES:**
+- Viewport toggle (phone/tablet preview)
+- Phone-first responsive design
+- Colored accent bars on cards
+- Rounded pill chips
+- StreakDisplay compact mode (removed from header)
+- Multiple accent colors (purple, gold)
+- Bottom navigation
+- Mobile-specific layouts
+
+**Technical Changes:**
+- Created `src/components/navigation/Header.tsx` (48 lines)
+- Updated `src/components/layout/Layout.tsx` (removed BottomNav import)
+- Completely rewrote `src/pages/Dashboard.tsx` (removed 110+ lines of old code)
+- Updated `src/index.css`:
+  - Modified `.card`, `.card-stats`, `.card-elevated` styles
+  - Added `.card-timeline` for left-rail design
+  - Updated `.chip` and `.badge-pr` to square design
+  - Removed `.card-rail` accent-blue/purple/gold ::before rules
+- Updated `tailwind.config.js` font size scale
+
+**Design Philosophy:**
+- **Inspiration:** Apple Health, Fitness+, macOS design
+- **NOT a clone:** Our own identity with Apple-level polish
+- **Density:** Increased global density with 1200-1280px container, 24px gaps
+- **Hierarchy:** Clear visual tiers (Volume > Workouts/PRs/Streak > Activity)
+- **Minimalism:** Grayscale base, single accent color, hairline borders
+- **Typography:** Proper scale, tabular figures for all numbers
+- **Icons:** Thin outlines, 50% opacity idle, 100% on hover
+- **Professional:** Desktop-first, suitable for portfolio/job applications
+
+**Before vs After:**
+- Before: Phone-first responsive with viewport toggle, colored accents, rounded pills
+- After: Desktop-first dense layout, minimal grayscale, square tags, timeline style
+
+---
+
 ## Current Sprint: Bug Fixes & Polish
 **Status:** In Progress
 **Priority:** High
