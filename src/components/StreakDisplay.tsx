@@ -16,10 +16,12 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    // Get start of current week (Sunday)
+    // Get start of current week (Monday)
     const today = new Date();
     const currentWeekStart = new Date(today);
-    currentWeekStart.setDate(today.getDate() - today.getDay());
+    const dayOfWeek = today.getDay();
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday is 0, we want Monday
+    currentWeekStart.setDate(today.getDate() - daysFromMonday);
     currentWeekStart.setHours(0, 0, 0, 0);
 
     let streak = 0;

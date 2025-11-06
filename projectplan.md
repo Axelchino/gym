@@ -1777,6 +1777,72 @@ _Current Focus: Phase 4 complete! Programming & Scheduling System implemented wi
 
 ---
 
+### Recent Updates (2025-11-06)
+
+**Dashboard Hierarchy & Phone-First Design:**
+
+✅ **DASHBOARD REDESIGN - PHONE-FIRST APPROACH:**
+- **Problem:** Dashboard tried to be responsive for both web and phone, resulting in poor experience on both platforms
+- **Solution:** Redesigned as phone-first (320-430px primary), tablet secondary (768px+), desktop nice-to-have
+- **Implementation:**
+  - Phone layout: Volume hero (full width, text-5xl) → Workouts/PRs side-by-side → Recent Activity full width
+  - Tablet layout: Stats stacked left column (35%) → Recent Activity right column (65%)
+  - Volume is always top hierarchy/most prominent (per user requirement)
+  - Added viewport toggle (smartphone/monitor icon) for testing phone layout on desktop
+  - Viewport toggle creates max-width 430px container with phone view
+  - File: `src/pages/Dashboard.tsx`
+
+✅ **DASHBOARD METRICS IMPROVEMENTS:**
+- **Volume Metric Redesign:**
+  - Changed from "This Week vs Last Week" to rolling 7-day windows
+  - Compare last 7 days vs previous 7 days for fair comparison
+  - Fixes issue where partial week always showed behind/red
+  - Text size: text-5xl on phone, text-6xl on tablet (largest metric)
+  - Shows percentage change with color coding (green ↑, red ↓, gray →)
+- **PRs Changed to Monthly (30 days):**
+  - User feedback: Weekly PRs too frequent for intermediate lifters
+  - Changed from 7-day to 30-day rolling window
+  - Prevents demotivating "0 PRs" for weeks without progress
+- **Workouts Changed to 7-day Count:**
+  - Changed from "This Week" to rolling 7-day count
+  - Side-by-side with PRs in 2-column grid
+  - Text size: text-3xl (secondary to Volume)
+
+✅ **STREAK DISPLAY UPDATES:**
+- **Weekly Streak Calculation:**
+  - Changed from Sunday-start to Monday-start weeks (per user preference)
+  - Minimum 1 workout per week to continue streak
+  - Implements loss aversion messaging ("Don't break your X week streak!")
+  - File: `src/components/StreakDisplay.tsx:19-25`
+- **Visual Hierarchy:**
+  - Compact streak display in Dashboard header (next to welcome message)
+  - Flame icon color-coded by status (yellow=active, orange=warning, red=danger)
+  - Shows milestone tracking (4, 8, 12, 26, 52 weeks)
+
+✅ **PERSONALIZED WELCOME MESSAGE:**
+- **Implementation:**
+  - Added user name from auth context (`user.user_metadata.name`)
+  - Shows "Welcome back, {name}!" if user has name
+  - Gracefully fallbacks to "Welcome back!" for incognito/no name
+  - Doesn't look broken when name is missing
+  - File: `src/pages/Dashboard.tsx:39, 150-152`
+
+**Technical Changes:**
+- Imported `useAuth` context for user data access
+- Added `viewportMode` state ('phone' | 'tablet') for toggle
+- Created `ViewportWrapper` component for phone preview (max-width 430px centered)
+- Conditional classes based on viewportMode to prevent md: breakpoints in phone mode
+- Rolling window calculations with proper date handling (setHours for day precision)
+
+**Design Philosophy:**
+- Phone-first, not responsive scaling
+- Volume as primary focus (2x larger than other stats)
+- Clear visual hierarchy: Volume (Tier 1) → Workouts/PRs (Tier 2) → Recent Activity (Tier 3)
+- Minimalistic, maintains existing theme system
+- Takes inspiration from Apple Health but keeps our design identity
+
+---
+
 ## Current Sprint: Bug Fixes & Polish
 **Status:** In Progress
 **Priority:** High
