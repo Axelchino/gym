@@ -777,10 +777,166 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ---
 
-## Phase 6: Gamification & Social Features
-**Timeline:** Weeks 15-18
+## Phase 5.5: Migration Strategy - The Trojan Horse
+**Timeline:** Week 15 (1 week sprint)
 **Status:** Not Started
 **Dependencies:** Phase 5
+**Priority:** CRITICAL - This is the user acquisition strategy
+
+### The Strategy: Make Switching Effortless
+
+**Core Insight:** Users WANT better analytics and UI, but they WON'T switch if it means losing 2+ years of workout history.
+
+**Solution:** Import their entire Strong/Hevy data in 30 seconds. Let product quality speak for itself.
+
+**Why This Changes Everything:**
+- **Removes #1 barrier** - "I can't lose my data" → "I can bring my data"
+- **Zero switching cost** - Try risk-free, can always go back
+- **Side-by-side comparison** - Users see our analytics vs theirs (we win)
+- **Viral loop** - "Holy shit, look at this app" → friends ask "how do I get my data in?"
+- **Competitive moat** - Strong/Hevy WON'T prioritize export (keeps users locked in)
+
+**How Underdogs Win:**
+- Notion beat Evernote: "Import from Evernote" button
+- Superhuman beat Gmail: "Connect Gmail in 60 seconds"
+- Figma beat Sketch: "Import .sketch files"
+- Linear beat Jira: "Import Jira projects"
+
+**Pattern:** Lower switching cost to ZERO. Let quality do the rest.
+
+### Objectives
+- Build CSV import for Strong and Hevy
+- Create frictionless onboarding for existing users
+- Enable "try before you commit" workflow
+- Track import analytics (how many users migrate)
+
+### Tasks
+
+1. **Strong App Import**
+   - [ ] **CSV Parser for Strong format:**
+     ```csv
+     Date,Exercise Name,Set Order,Weight,Reps,Distance,Seconds,Notes,Workout Name,RPE
+     2024-01-15,Bench Press,1,225,5,,,First set,Push Day,7
+     ```
+   - [ ] Map Strong schema → GymTracker schema
+   - [ ] Handle set types (warmup, drop set, failure)
+   - [ ] Preserve notes and RPE data
+   - [ ] Group by date + workout name
+   - [ ] Auto-detect unit (lbs vs kg)
+   - [ ] Bulk insert to Supabase (optimize for 1000+ workouts)
+   - [ ] Show import summary: "✅ Imported 247 workouts from 2022-2024"
+
+2. **Hevy Import**
+   - [ ] **CSV Parser for Hevy format:**
+     ```csv
+     Date,Workout Name,Exercise Name,Set Type,Weight (kg),Reps,RPE,Notes
+     2024-01-15,Push Day,Bench Press,Normal,102,5,8,
+     ```
+   - [ ] Map Hevy schema → GymTracker schema
+   - [ ] Handle Hevy-specific fields (set types, superset indicators)
+   - [ ] Preserve workout notes and exercise notes
+   - [ ] Same optimization and summary as Strong
+
+3. **Onboarding Flow for Existing Users**
+   - [ ] **Welcome screen with import option:**
+     - "Do you currently use Strong or Hevy?"
+     - → Yes: "Import your data" (big CTA)
+     - → No: "Start fresh"
+   - [ ] **Import instruction modal:**
+     - Show exactly how to export from Strong/Hevy
+     - Screenshots of Settings → Export
+     - "Takes 30 seconds"
+   - [ ] **File upload with drag-and-drop:**
+     - Accept .csv files
+     - Show preview of data before import
+     - Loading state with progress bar
+   - [ ] **Import success screen:**
+     - "🎉 Imported 247 workouts, 42 exercises, 1,847 sets"
+     - "Oldest: Jan 2022 | Newest: Nov 2024"
+     - Show sample workout from their history
+     - CTA: "See Your Analytics" (showcase our strength)
+
+4. **Import Analytics Dashboard (Internal)**
+   - [ ] Track import metrics:
+     - How many users import vs start fresh
+     - Which app they import from (Strong vs Hevy)
+     - Average # of workouts imported
+     - Import success rate
+   - [ ] Identify power users (2+ years of data)
+   - [ ] A/B test import messaging
+
+5. **Landing Page Messaging (Marketing)**
+   - [ ] **Hero section rewrite:**
+     - Old: "Track your workouts with better analytics"
+     - New: "Switch from Strong or Hevy in 30 seconds"
+   - [ ] **Feature list:**
+     - ✅ Import your entire workout history
+     - ✅ Better analytics than Strong
+     - ✅ No ads, unlike Hevy
+     - ✅ Actually good UI
+   - [ ] **Social proof:**
+     - "Join 500+ lifters who switched" (update as we grow)
+   - [ ] **CTA:**
+     - Primary: "Import Your Data" (not "Sign Up")
+     - Secondary: "Start Fresh"
+
+6. **Reddit/Forum Launch Strategy**
+   - [ ] **Title:** "[Tool] Import your Strong/Hevy data and see what you've been missing"
+   - [ ] **Post structure:**
+     - Problem: Strong UI sucks, Hevy has aggressive paywalls
+     - Solution: Built better tracker, can import entire history in 30s
+     - Proof: Screenshots of import flow + analytics comparison
+     - CTA: Link to app
+     - Transparency: Free to try, no commitment
+   - [ ] Post to:
+     - /r/fitness (2.5M members)
+     - /r/weightroom (500k members)
+     - /r/bodybuilding (400k members)
+     - /r/SideProject (200k members)
+
+### Deliverables
+- [ ] Strong CSV import (tested with 1000+ workout files)
+- [ ] Hevy CSV import (tested with 1000+ workout files)
+- [ ] Onboarding flow for import vs fresh start
+- [ ] Import success screen showcasing analytics
+- [ ] Landing page rewrite (migration-focused)
+- [ ] Reddit launch post (ready to deploy)
+
+### Success Metrics
+- **Week 1:** 10+ users import their data
+- **Week 2:** 50+ users, 20% retention after 7 days
+- **Week 4:** 200+ users, users posting screenshots on Reddit
+- **Month 2:** 500+ users, organic word-of-mouth growth
+- **Month 3:** First "I switched from Hevy" post appears organically
+
+### Why This is the Strategy
+
+**Not competing on features** (Strong/Hevy have 5+ years of development)
+**Competing on migration ease + quality** (they can't match both)
+
+**The Pitch:**
+> "Strong has ugly UI. Hevy has aggressive paywalls. I built something better. Bring your data, try it for free, see the difference. If you don't like it, your original data is still there. Zero risk."
+
+**The Viral Loop:**
+1. Reddit post gets traction (import = killer feature)
+2. Power users import 2+ years of data
+3. See analytics they never had before
+4. Post comparison screenshots: "Strong vs GymTracker Pro"
+5. Friends ask "how do I get my data in there?"
+6. Word spreads organically
+7. Fitness influencer friend notices the buzz
+8. Posts video: "Why I switched from Hevy" (shows 30s import)
+9. 50k views → 5k downloads
+10. Network effects kick in
+
+**This is how you win against giants.**
+
+---
+
+## Phase 6: Gamification & Social Features
+**Timeline:** Weeks 16-19 (was 15-18)
+**Status:** Not Started
+**Dependencies:** Phase 5.5
 
 ### Objectives
 - **Gamification System** (Duolingo-inspired engagement)
