@@ -43,6 +43,48 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 
 ---
 
+## Scalability & Data Architecture
+
+### Database Strategy: Build Our Own
+
+**Decision:** Self-host exercise database with static assets on CDN instead of relying on third-party APIs.
+
+**Rationale:**
+- **Exercise content = static, shared across all users** (1,146 exercises with images/GIFs ≈ 500MB-2GB total)
+- **User data = dynamic, grows with users** (workout logs ≈ 600KB per user per year)
+- Exercise database uploaded ONCE, served to everyone via CDN (Cloudflare R2 @ $0.015/GB)
+- Zero recurring API fees vs $50-500/month for ExerciseDB/Wger APIs
+- Full control over content quality, monetization flexibility, no rate limits
+
+**Cost Projections at Scale:**
+- **10 users:** Free tier (Supabase 500MB)
+- **1,000 users:** ~$50/month (database + CDN)
+- **10,000 users:** ~$200-300/month
+- **100,000 users:** ~$1,000-2,000/month
+
+**Comparison to APIs:**
+- Third-party APIs: $50-500/month at ANY scale + rate limits + dependency risk
+- Self-hosted: $0 for exercise content, costs scale linearly with user data only
+
+**Implementation:**
+- Exercise metadata stored in Supabase (JSON)
+- Images/GIFs hosted on Cloudflare R2 (cheap object storage)
+- Start with 50 most common exercises, expand over time
+- Use placeholder images initially, replace gradually
+
+**What We're NOT Doing (Expensive):**
+- ❌ Form check video uploads (GB per user)
+- ❌ Real-time tracking like WeakAuras (generates massive data)
+- ✅ Discrete session logging only (2-4KB per workout)
+
+**Data Collection Philosophy:**
+- Minimal by nature: only store what users manually enter
+- No analytics tracking, session recordings, or telemetry
+- Workout logs = tiny text data (600KB/year per user)
+- Already optimized - can't make it smaller without losing functionality
+
+---
+
 ## Technical Architecture Decisions
 
 ### Frontend Stack
@@ -788,11 +830,49 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
      - [ ] Friend list with activity feed
      - [ ] See friends' recent workouts (opt-in)
      - [ ] Friend workout streak tracking
-   - [ ] **Template Sharing:**
-     - [ ] Generate shareable template link/code
+   - [ ] **Template & Workout Sharing System:**
+
+     **Approach:** Database with short URLs (NOT encoded strings)
+
+     **Why Database Approach:**
+     - Clean, shareable links: `gymtracker.app/shared/abc123`
+     - Can revoke/disable shares without deleting content
+     - Track views and analytics (how many people viewed)
+     - Support expiring links (auto-delete after 30 days)
+     - Enable social previews (nice cards on Discord/Twitter)
+     - Scalable storage: 10,000 shared links = 2MB (~pennies)
+
+     **Why NOT Encoded URLs (WeakAuras-style):**
+     - URLs become 5000+ characters (ugly, may break on some platforms)
+     - Can't revoke once shared
+     - Can't track who viewed it
+     - No expiration support
+     - Worse user experience
+     - Only advantage: works offline (not a priority for sharing)
+
+     **Database Schema:**
+     ```sql
+     shared_workouts:
+       - id (short code: "abc123")
+       - workout_id (reference to original)
+       - user_id (who shared it)
+       - created_at
+       - expires_at (optional 30-day auto-delete)
+       - views (track engagement)
+       - is_active (revoke without deleting)
+     ```
+
+     **Features to Implement:**
+     - [ ] Generate unique short link on share button click
+     - [ ] Create read-only share page (`/shared/:id`)
+     - [ ] "Clone to My Workouts" button for viewers
+     - [ ] View counter on shared links
+     - [ ] Revoke link from profile/manage shares page
+     - [ ] Optional expiration (7/30/90 days, or never)
+     - [ ] Social media preview cards (Open Graph meta tags)
      - [ ] Import template from friend's link
      - [ ] Browse community templates (optional)
-     - [ ] Template rating system
+     - [ ] Template rating system (upvotes/favorites)
    - [ ] **Challenges with Friends:**
      - [ ] Create group challenges
      - [ ] "Who can hit more PRs this week?"
@@ -872,7 +952,11 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 ### Deliverables
 - [ ] Complete gamification system with daily/weekly/monthly quests
 - [ ] Friend system with activity feed and challenges
-- [ ] Template sharing via links/codes
+- [ ] **Template & workout sharing via database-backed short URLs**
+  - Shareable links with revoke/expiration support
+  - View tracking and analytics
+  - Read-only share pages with clone functionality
+  - Social media preview cards
 - [ ] Achievement system with 30+ achievements (including social)
 - [ ] Video demonstrations for 50+ exercises
 - [ ] Body measurements tracking with charts
@@ -882,7 +966,8 @@ The **"Data Scientist's Gym App"** - exceptional analytics, clear progressive ov
 ### Enhancement Milestones
 - Quests feel engaging and achievable (like Duolingo)
 - Friend features encourage long-distance workout buddies
-- Template sharing is effortless
+- **Template sharing is effortless with clean URLs, revocation support, and view tracking**
+- Shared workouts can be cloned to viewer's account with one click
 - Achievements feel rewarding and motivating
 - Videos load quickly and play smoothly
 - UI feels premium and responsive

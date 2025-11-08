@@ -8,9 +8,10 @@ interface SetRowProps {
   isPreviousSet?: boolean;
   weightUnit?: string;
   previousSet?: Set; // Previous workout data for this set number
+  readOnly?: boolean;
 }
 
-export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightUnit = 'kg', previousSet }: SetRowProps) {
+export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightUnit = 'kg', previousSet, readOnly = false }: SetRowProps) {
   // Determine set type for display and styling
   const setType = set.isWarmup ? 'W' : set.isFailure ? 'UF' : 'N';
   const borderColor = set.isWarmup
@@ -84,10 +85,10 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
             }
           }}
           placeholder={weightUnit}
-          disabled={isPreviousSet}
+          disabled={isPreviousSet || readOnly}
           className={`w-full bg-card border border-card rounded px-2 py-1.5 text-center text-sm sm:text-base ${
-            isPreviousSet ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
-          } focus:outline-none focus:border-brand-blue focus:text-primary`}
+            isPreviousSet || readOnly ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
+          } focus:outline-none focus:border-brand-purple focus:text-primary`}
         />
       </div>
 
@@ -111,10 +112,10 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
             }
           }}
           placeholder="reps"
-          disabled={isPreviousSet}
+          disabled={isPreviousSet || readOnly}
           className={`w-full bg-card border border-card rounded px-2 py-1.5 text-center text-sm sm:text-base ${
-            isPreviousSet ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
-          } focus:outline-none focus:border-brand-blue focus:text-primary`}
+            isPreviousSet || readOnly ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
+          } focus:outline-none focus:border-brand-purple focus:text-primary`}
         />
       </div>
 
@@ -131,15 +132,15 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
             }
           }}
           placeholder="RIR"
-          disabled={isPreviousSet}
+          disabled={isPreviousSet || readOnly}
           className={`w-full bg-card border border-card rounded px-2 py-1.5 text-center text-xs sm:text-sm ${
-            isPreviousSet ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
-          } focus:outline-none focus:border-brand-blue focus:text-primary`}
+            isPreviousSet || readOnly ? 'text-muted' : set.isUserInput ? 'text-primary' : 'text-muted'
+          } focus:outline-none focus:border-brand-purple focus:text-primary`}
         />
       </div>
 
       {/* Complete Button */}
-      {!isPreviousSet && (
+      {!isPreviousSet && !readOnly && (
         <button
           onClick={() => onUpdate({ completed: !set.completed, isUserInput: true })}
           className={`w-full h-8 flex items-center justify-center rounded transition-colors ${
@@ -154,7 +155,7 @@ export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightU
       )}
 
       {/* Delete Button */}
-      {!isPreviousSet && (
+      {!isPreviousSet && !readOnly && (
         <button
           onClick={onDelete}
           className="w-full h-8 flex items-center justify-center rounded bg-surface-accent text-secondary hover:bg-red-900/30 hover:text-red-400 transition-colors"

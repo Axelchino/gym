@@ -38,11 +38,14 @@
   --surface-elevated: #FFFFFF;     /* Card surfaces - pure white */
   --surface-accent: #F5F5F5;       /* Subtle accents */
 
-  /* Brand colors */
-  --color-purple: #B482FF;         /* Primary CTA color */
-  --color-purple-deep: #8E63FF;    /* Comparison/secondary purple */
-  --color-purple-light: #C596FF;   /* Hover state */
-  --color-purple-dark: #9D6EE8;    /* Active state */
+  /* Brand colors - Lavender palette */
+  --color-purple-light-tint: #EDE0FF;  /* Light tint for chip backgrounds */
+  --color-purple-base: #B482FF;        /* Base lavender for sparkline */
+  --color-purple: #7E29FF;             /* Medium for text, links, underlines */
+  --color-purple-light: #9254FF;       /* Lighter purple for hover states */
+  --color-purple-dark: #6C0AFF;        /* Dark for filled buttons */
+  --color-purple-button-hover: #7214FF; /* Button hover state */
+  --color-purple-ring-track: #D7BDFF;  /* Ring track tint */
   --color-blue: #0090CC;           /* General blue accent */
   --color-blue-primary: #007DB2;   /* Chart primary series */
 
@@ -52,7 +55,7 @@
   --text-muted: #6B7280;           /* Muted but still readable */
 
   /* Borders */
-  --border-subtle: #E3E7EE;        /* Thin light-gray card borders */
+  --border-subtle: #E6E7EF;        /* Thin light-gray card borders */
   --border-light: #E5E7EB;         /* Lighter borders */
   --border-medium: #D1D5DB;        /* Medium borders */
 

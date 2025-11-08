@@ -11,9 +11,10 @@ interface WorkoutEditModalProps {
   workoutId: string;
   onClose: () => void;
   onSave: () => void;
+  readOnly?: boolean;
 }
 
-export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModalProps) {
+export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false }: WorkoutEditModalProps) {
   const { weightUnit } = useUserSettings();
   const [workout, setWorkout] = useState<WorkoutLog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -247,7 +248,7 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
         {/* Header */}
         <div className="p-6 border-b border-border-medium flex items-center justify-between sticky top-0 bg-surface-elevated rounded-t-lg">
           <div>
-            <h2 className="text-2xl font-bold text-primary mb-1">Edit Workout</h2>
+            <h2 className="text-2xl font-bold text-primary mb-1">{readOnly ? 'View Workout' : 'Edit Workout'}</h2>
             <p className="text-sm text-secondary">{formatDate(workout.date)}</p>
           </div>
           <button onClick={onClose} className="text-secondary hover:text-primary">
@@ -308,36 +309,56 @@ export function WorkoutEditModal({ workoutId, onClose, onSave }: WorkoutEditModa
                     onUpdate={(updates) => handleUpdateSet(exercise.exerciseId, set.id, updates)}
                     onDelete={() => handleDeleteSet(exercise.exerciseId, set.id)}
                     weightUnit={weightUnit}
+                    readOnly={readOnly}
                   />
                 ))}
               </div>
 
               {/* Add Set Button */}
-              <button
-                onClick={() => handleAddSet(exercise.exerciseId)}
-                className="w-full mt-3 bg-surface-accent hover:bg-border-medium text-secondary py-2 rounded transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus size={16} />
-                Add Set
-              </button>
+              {!readOnly && (
+                <button
+                  onClick={() => handleAddSet(exercise.exerciseId)}
+                  className="w-full mt-3 bg-surface-accent hover:bg-border-medium text-secondary py-2 rounded transition-colors flex items-center justify-center gap-2"
+                >
+                  <Plus size={16} />
+                  Add Set
+                </button>
+              )}
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-border-medium flex gap-3 sticky bottom-0 bg-surface-elevated rounded-b-lg">
-          <button onClick={onClose} className="flex-1 btn-secondary">
-            Cancel
-          </button>
-          <button
-            onClick={handleSaveWorkout}
-            disabled={isSaving}
-            className="flex-1 btn-primary flex items-center justify-center gap-2"
-          >
-            <Save size={16} />
-            {isSaving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
+        {!readOnly && (
+          <div className="p-6 border-t border-border-medium flex gap-3 sticky bottom-0 bg-surface-elevated rounded-b-lg">
+            <button onClick={onClose} className="flex-1 btn-secondary">
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveWorkout}
+              disabled={isSaving}
+              className="flex-1 flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-lg transition-all"
+              style={{
+                backgroundColor: '#EDE0FF',
+                color: '#7E29FF',
+                border: '1px solid #D7BDFF',
+              }}
+              onMouseEnter={(e) => {
+                if (!isSaving) {
+                  e.currentTarget.style.backgroundColor = '#E4D2FF';
+                  e.currentTarget.style.borderColor = '#C9B0FF';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#EDE0FF';
+                e.currentTarget.style.borderColor = '#D7BDFF';
+              }}
+            >
+              <Save size={16} />
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

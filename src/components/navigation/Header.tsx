@@ -1,50 +1,118 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, User, Plus, Dumbbell } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
 
 export function Header() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const location = useLocation();
+
+  const navLinks = [
+    { to: '/', label: 'Home' },
+    { to: '/analytics', label: 'Progress' },
+    { to: '/program', label: 'Program' },
+    { to: '/exercises', label: 'Exercises' },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-border-subtle">
-      <div className="mx-auto px-6 py-4" style={{ maxWidth: '1280px' }}>
-        <div className="flex items-center justify-between gap-6">
-          {/* Logo - Left */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <Dumbbell className="text-brand-blue opacity-50 group-hover:opacity-100 transition-opacity" size={24} strokeWidth={1.5} />
-            <span className="text-lg font-semibold text-primary tracking-tight">GymTracker Pro</span>
-          </Link>
+    <header className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+      <div className="mx-auto px-6 py-3" style={{ maxWidth: '1280px' }}>
+        <div className="flex items-center">
+          {/* Left: Logo */}
+          <div className="flex items-center justify-start" style={{ width: '260px' }}>
+            <Link to="/" className="flex items-center gap-2 group">
+              <Dumbbell className="text-secondary opacity-60 group-hover:opacity-100 transition-opacity" size={24} strokeWidth={1.5} />
+              <span className="text-lg font-semibold text-primary tracking-tight">GymTracker Pro</span>
+            </Link>
+          </div>
 
-          {/* Search - Center */}
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted opacity-50" size={16} strokeWidth={1.5} />
-              <input
-                type="text"
-                placeholder="Search exercises..."
-                className="w-full pl-10 pr-4 py-2 bg-card text-primary text-sm border border-card rounded-md focus:outline-none focus:border-brand-blue/50 transition-colors placeholder:text-muted"
-              />
+          {/* Center: Navigation Tabs & Search */}
+          <div className="flex-1 flex items-center justify-center gap-6">
+            <nav className="flex items-center gap-1">
+              {navLinks.map(({ to, label }) => {
+                const isActive = location.pathname === to;
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="relative px-4 py-3 text-sm font-medium text-primary hover:text-secondary transition-colors"
+                    style={{
+                      borderBottom: isActive ? '2px solid #7E29FF' : '2px solid transparent',
+                    }}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Search */}
+            <div style={{ width: '200px' }}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted opacity-50" size={16} strokeWidth={1.5} />
+                <input
+                  type="text"
+                  placeholder="Search exercises..."
+                  className="w-full pl-10 pr-4 py-2 bg-card text-primary text-sm border border-card rounded-md focus:outline-none focus:ring-2 focus:ring-brand-purple/50 focus:border-transparent transition-all placeholder:text-muted"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Actions - Right */}
-          <div className="flex items-center gap-3">
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3" style={{ width: '260px', justifyContent: 'flex-end' }}>
             {/* Profile Button */}
             <button
               onClick={() => navigate('/profile')}
               className="p-2 rounded-md hover:bg-surface-accent transition-colors"
               title="Profile"
             >
-              <User className="text-secondary opacity-50 hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
+              <User className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
             </button>
 
-            {/* Start Workout - Primary CTA */}
+            {/* Start Workout - Light Focus Style */}
             <button
               onClick={() => navigate('/workout')}
-              className="flex items-center gap-2 px-4 py-2 bg-brand-blue text-white text-sm font-semibold rounded-md hover:bg-brand-blue/90 transition-colors"
+              className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
+              style={{
+                backgroundColor: '#EDE0FF',
+                color: '#7E29FF',
+                border: '1px solid #D7BDFF',
+                borderRadius: '10px',
+                height: '40px',
+                paddingLeft: '18px',
+                paddingRight: '18px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#E4D2FF';
+                e.currentTarget.style.borderColor = '#C9B0FF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#EDE0FF';
+                e.currentTarget.style.borderColor = '#D7BDFF';
+                if (document.activeElement !== e.currentTarget) {
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.backgroundColor = '#DDC7FF';
+                e.currentTarget.style.borderColor = '#C3A5FF';
+                e.currentTarget.style.transform = 'translateY(1px)';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.backgroundColor = '#E4D2FF';
+                e.currentTarget.style.borderColor = '#C9B0FF';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 2px #B482FF';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.backgroundColor = '#EDE0FF';
+                e.currentTarget.style.borderColor = '#D7BDFF';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <Plus size={18} strokeWidth={2} />
+              <Plus size={16} strokeWidth={2} />
               Start Workout
             </button>
           </div>

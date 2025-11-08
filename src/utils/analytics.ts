@@ -209,6 +209,7 @@ export function calculateWorkoutStats(workouts: WorkoutLog[]): WorkoutStats {
 
 /**
  * Calculate workout streak (consecutive days with workouts)
+ * Grace period: 2 days - you can skip up to 2 days and maintain your streak
  */
 export function calculateStreak(workouts: WorkoutLog[]): number {
   if (workouts.length === 0) return 0;
@@ -231,7 +232,8 @@ export function calculateStreak(workouts: WorkoutLog[]): number {
   for (const workoutDate of uniqueDates) {
     const daysDiff = Math.floor((currentDate - workoutDate) / (1000 * 60 * 60 * 24));
 
-    if (daysDiff === 0 || daysDiff === 1) {
+    // Allow up to 2 days gap (grace period)
+    if (daysDiff <= 2) {
       streak++;
       currentDate = workoutDate;
     } else {

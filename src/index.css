@@ -68,8 +68,9 @@
      ========================================== */
 
   .btn-primary {
-    background: var(--button-primary-bg);
-    color: var(--button-primary-text);
+    background: #EDE0FF;
+    color: #7E29FF;
+    border: 1px solid #D7BDFF;
     font-weight: 600;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
@@ -77,11 +78,14 @@
   }
 
   .btn-primary:hover {
-    background: var(--button-primary-hover);
+    background: #E4D2FF;
+    border-color: #C9B0FF;
   }
 
   .btn-primary:active {
-    background: var(--button-primary-active);
+    background: #DDC7FF;
+    border-color: #C3A5FF;
+    transform: translateY(1px);
   }
 
   .btn-secondary {
@@ -142,52 +146,125 @@
 
   .card {
     background: var(--card-bg);
-    border: 1px solid var(--border-subtle);
+    border: 1.5px solid var(--border-subtle);
     border-radius: 6px;
     padding: 1.5rem;
     transition: border-color 0.2s;
+    position: relative;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-light) 20%, var(--border-light) 80%, transparent);
+    border-radius: 6px 6px 0 0;
+    opacity: 0.3;
   }
 
   .card-elevated {
     background: var(--card-bg);
-    border: 1px solid var(--border-subtle);
+    border: 1.5px solid var(--border-subtle);
     border-radius: 6px;
     padding: 1.5rem;
     transition: border-color 0.2s;
+    position: relative;
   }
 
-  /* Stats card - Clean, no colored accents */
+  .card-elevated::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-light) 20%, var(--border-light) 80%, transparent);
+    border-radius: 6px 6px 0 0;
+    opacity: 0.3;
+  }
+
+  /* Stats card - Compressed, reduced padding */
   .card-stats {
     background: var(--stats-bg);
     border: 1px solid var(--border-subtle);
     border-radius: 6px;
-    padding: 1.25rem;
+    padding: 0.625rem;
     transition: border-color 0.2s;
+    position: relative;
   }
 
-  /* Timeline card with left rail */
-  .card-timeline {
-    background: var(--card-bg);
+  .card-stats:hover {
+    border-color: #7E29FF;
+  }
+
+  /* Volume card stays white (no purple tint) */
+  .card-stats-volume {
+    background: var(--stats-bg);
     border: 1px solid var(--border-subtle);
     border-radius: 6px;
-    padding: 1rem 1rem 1rem 0.75rem;
-    position: relative;
+    padding: 0.625rem;
     transition: border-color 0.2s;
+    position: relative;
   }
 
+  .card-stats-volume:hover {
+    border-color: #7E29FF;
+  }
+
+  /* Timeline card with spine and dot */
+  .card-timeline {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 1rem 1rem 1rem 2.5rem;
+    position: relative;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Left spine */
   .card-timeline::before {
     content: '';
     position: absolute;
-    left: 0;
+    left: 0.875rem;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background: var(--border-medium);
-    border-radius: 6px 0 0 6px;
+    width: 1px;
+    background: var(--border-subtle);
   }
 
-  .card-timeline:hover::before {
+  /* Date dot */
+  .card-timeline::after {
+    content: '';
+    position: absolute;
+    left: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: var(--border-medium);
+    border-radius: 50%;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-timeline:hover {
+    border-color: var(--brand-blue);
+  }
+
+  .card-timeline:hover::after {
     background: var(--brand-blue);
+    width: 8px;
+    height: 8px;
+    left: 0.5625rem;
+  }
+
+  .card-timeline:active {
+    transform: translateY(1px);
   }
 
   /* ==========================================
@@ -251,5 +328,30 @@
 
   .animate-slideInLeft {
     animation: slideInLeft 0.4s ease-out;
+  }
+
+  /* Shimmer loading animation for numbers */
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: 200px 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--surface-elevated) 0%,
+      var(--border-light) 50%,
+      var(--surface-elevated) 100%
+    );
+    background-size: 200px 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 0.5rem;
+    display: inline-block;
+    min-width: 60px;
+    min-height: 48px;
   }
 }

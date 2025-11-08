@@ -161,14 +161,14 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
           p-3 rounded-lg flex items-center gap-2
           ${streakStatus === 'danger' ? 'bg-red-500/10 border border-red-500/30' :
             streakStatus === 'warning' ? 'bg-orange-500/10 border border-orange-500/30' :
-            streakStatus === 'active' ? 'bg-primary-blue/10 border border-primary-blue/30' :
+            streakStatus === 'active' ? 'bg-brand-purple/10 border border-brand-purple/30' :
             'bg-surface-elevated border-card'
           }
         `}
       >
         {streakStatus === 'danger' && <AlertCircle size={20} className="text-red-400 flex-shrink-0" />}
         {streakStatus === 'warning' && <AlertCircle size={20} className="text-orange-400 flex-shrink-0" />}
-        {streakStatus === 'active' && <TrendingUp size={20} className="text-brand-blue flex-shrink-0" />}
+        {streakStatus === 'active' && <TrendingUp size={20} className="text-brand-purple flex-shrink-0" />}
         {streakStatus === 'inactive' && <Calendar size={20} className="text-muted flex-shrink-0" />}
         <p className="text-sm text-primary">{message}</p>
       </div>
@@ -184,7 +184,7 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
                 className={`
                   text-center py-2 rounded-lg text-xs
                   ${weeklyStreak >= milestone
-                    ? 'bg-primary-blue/20 text-brand-blue border border-primary-blue/30'
+                    ? 'bg-brand-purple/20 text-brand-purple border border-brand-purple/30'
                     : 'bg-surface-elevated text-muted border-card'
                   }
                 `}
