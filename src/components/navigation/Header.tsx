@@ -1,9 +1,37 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, User, Plus, Dumbbell } from 'lucide-react';
+import { Search, User, Plus, Dumbbell, RotateCcw } from 'lucide-react';
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Clear all browser cache and reload
+  function clearCacheAndReload() {
+    // Clear localStorage
+    localStorage.clear();
+
+    // Clear sessionStorage
+    sessionStorage.clear();
+
+    // Clear IndexedDB
+    if (window.indexedDB) {
+      window.indexedDB.databases?.().then((dbs) => {
+        dbs.forEach((db) => {
+          if (db.name) window.indexedDB.deleteDatabase(db.name);
+        });
+      });
+    }
+
+    // Unregister service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.unregister());
+      });
+    }
+
+    // Hard reload with cache bypass
+    window.location.reload();
+  }
 
   const navLinks = [
     { to: '/', label: 'Home' },
@@ -59,6 +87,15 @@ export function Header() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-3" style={{ width: '260px', justifyContent: 'flex-end' }}>
+            {/* Clear Cache Button */}
+            <button
+              onClick={clearCacheAndReload}
+              className="p-2 rounded-md hover:bg-surface-accent transition-colors"
+              title="Clear Cache & Reload"
+            >
+              <RotateCcw className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={18} strokeWidth={1.5} />
+            </button>
+
             {/* Profile Button */}
             <button
               onClick={() => navigate('/profile')}
