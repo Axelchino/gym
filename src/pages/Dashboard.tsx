@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, Calendar, Award, Flame, Edit2, Share2 } from 'lucide-react';
+import { TrendingUp, Calendar, Award, Flame, Edit2, Share2, Copy } from 'lucide-react';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useAuth } from '../contexts/AuthContext';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber';
@@ -8,7 +8,9 @@ import { Sparkline } from '../components/Sparkline';
 import { StreakVisualization } from '../components/StreakVisualization';
 import { calculateStreak } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
-import { getWorkoutLogs, getPersonalRecords } from '../services/supabaseDataService';
+import { getWorkoutLogs, getPersonalRecords, createWorkoutTemplate } from '../services/supabaseDataService';
+import { SaveTemplateModal } from '../components/SaveTemplateModal';
+import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 
 interface DashboardStats {
   workoutsLast7Days: number;
@@ -44,6 +46,8 @@ export function Dashboard() {
   const [periodFilter, setPeriodFilter] = useState<'7d' | '30d' | '90d'>('7d');
   const [typeFilter, setTypeFilter] = useState<'all' | 'program' | 'free'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'heaviest' | 'duration'>('newest');
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutLog | null>(null);
 
   // Animated numbers for hero tiles
   const animatedVolume = useAnimatedNumber(stats.volumeLast7Days, 400, !isLoading);
@@ -253,6 +257,28 @@ export function Dashboard() {
     });
 
     return totalSets > 0 ? totalVolume / totalSets : 0;
+  }
+
+  // Convert workout to template
+  function handleConvertToTemplate(workout: WorkoutLog) {
+    setSelectedWorkout(workout);
+    setShowSaveTemplateModal(true);
+  }
+
+  // Save workout as template
+  async function handleSaveAsTemplate(templateName: string) {
+    if (!selectedWorkout) return;
+
+    try {
+      const templateData = convertWorkoutLogToTemplate(selectedWorkout, templateName);
+      await createWorkoutTemplate(templateData);
+      setShowSaveTemplateModal(false);
+      setSelectedWorkout(null);
+      alert(`Template "${templateName}" created successfully!`);
+    } catch (error) {
+      console.error('Error creating template:', error);
+      alert('Failed to create template. Please try again.');
+    }
   }
 
   return (
@@ -620,6 +646,30 @@ export function Dashboard() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            handleConvertToTemplate(workout);
+                          }}
+                          className="p-1.5 rounded hover:bg-surface-accent transition-all group/btn"
+                          title="Save as Template"
+                          onMouseEnter={(e) => {
+                            const icon = e.currentTarget.querySelector('svg');
+                            if (icon) {
+                              icon.style.color = '#7E29FF';
+                              icon.style.opacity = '1';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            const icon = e.currentTarget.querySelector('svg');
+                            if (icon) {
+                              icon.style.color = '';
+                              icon.style.opacity = '0.6';
+                            }
+                          }}
+                        >
+                          <Copy size={14} strokeWidth={1.5} className="text-secondary transition-all" style={{ opacity: 0.6 }} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
                             // TODO: Implement share functionality
                             alert('Share feature coming soon!');
                           }}
@@ -675,6 +725,18 @@ export function Dashboard() {
             loadDashboardStats();
           }}
           readOnly={false}
+        />
+      )}
+
+      {/* Save Template Modal */}
+      {showSaveTemplateModal && selectedWorkout && (
+        <SaveTemplateModal
+          defaultName={selectedWorkout.name}
+          onSave={handleSaveAsTemplate}
+          onClose={() => {
+            setShowSaveTemplateModal(false);
+            setSelectedWorkout(null);
+          }}
         />
       )}
     </div>

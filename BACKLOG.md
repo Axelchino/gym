@@ -9,25 +9,30 @@
 ## 🎯 Current Sprint (What's Next Immediately)
 
 ### Critical Bug Fixes & Polish
-**Priority:** CRITICAL - Must fix before public release
+**Priority:** HIGH - Polish before public release
 
-- [ ] **Recent Activity Card Styling**
-  - [ ] Investigate which cards are not rendering correctly with theme system
-  - [ ] Apply proper CSS variables to Recent Activity components
-  - [ ] Test across all 3 themes (Light/Dark/AMOLED)
-  - [ ] Ensure consistent hairline borders and hover states
-
-- [ ] **Analytics Chart Theme Integration**
-  - [ ] Update chart components to use CSS variables (`--chart-primary`, `--chart-secondary`)
-  - [ ] Test chart colors across all themes (Light/Dark/AMOLED)
-  - [ ] Ensure text/axis labels respect theme colors
+- [ ] **Theme System - UX Issues Across Light/Dark/AMOLED**
+  - [ ] Verify all components look correct in all 3 themes
+  - [ ] Check Recent Activity cards styling across themes
+  - [ ] Update Analytics chart components to use CSS variables (`--chart-primary`, `--chart-secondary`)
+  - [ ] Test chart colors/text/axis labels across all themes
   - [ ] Fix any hardcoded color values in Recharts components
+  - [ ] Ensure consistent borders, hover states, and contrast ratios
 
-- [ ] **Strength Standards Persistence Bug**
-  - [ ] Data resets when profile changes
-  - [ ] Create separate persistent storage for strength standards
+- [ ] **Strength Standards Persistence Bug** (if still present)
+  - [ ] Verify if data resets when profile changes
+  - [ ] Create separate persistent storage for strength standards if needed
   - [ ] Decouple from profile state management
-  - [ ] Add migration for existing users
+
+- [ ] **Dashboard Recent Activity - Filter Functionality Missing**
+  - [ ] Implement time period filter (7 days, 30 days, 90 days, All)
+  - [ ] Implement type filter (All, Program, Free)
+  - [ ] Implement sort options (Newest, Heaviest, Duration)
+  - [ ] Currently dropdowns exist but have no functionality
+
+- [ ] **Dashboard Recent Activity - Share Feature**
+  - [ ] Implement workout sharing (currently shows "Share feature coming soon!")
+  - [ ] This connects to Phase 6 social features (database-backed short URLs)
 
 ### High-Priority UX Improvements
 
@@ -40,6 +45,9 @@
   - [ ] Add custom exercise creation flow
 
 - [ ] **Active Workout Improvements**
+  - [x] **BUG: Adding exercise to empty workout doesn't create initial set**
+    - [x] Auto-create 1 empty set when adding exercise to workout
+    - [x] Allows user to start logging immediately without clicking "Add Set"
   - [ ] Display previous workout data side-by-side (same exercise, last session)
   - [ ] Pre-fill weight/reps with last workout data
   - [ ] Add exercise notes during workout (not just set notes)
@@ -48,6 +56,11 @@
   - [ ] Optimize set logging to <3 seconds consistently
 
 - [ ] **Template System Polish**
+  - [x] **FEATURE: Save completed workout as template** ✅
+    - [x] Add "Save as Template" button on workout completion screen (PR celebration modal)
+    - [x] Add "Convert to Template" action in workout history (Dashboard)
+    - [x] Template name prompt modal with pre-filled workout name
+    - [x] Converts workout log → template with target sets/reps from actual performance
   - [ ] Implement drag-and-drop exercise ordering in template builder
   - [ ] Add template duplication feature
   - [ ] Create template categories/tags (Push, Pull, Legs, etc.)

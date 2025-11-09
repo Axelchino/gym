@@ -20,6 +20,9 @@ import {
   updateWorkoutTemplate,
   deleteWorkoutTemplate
 } from '../services/supabaseDataService';
+import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
+import { SaveTemplateModal } from '../components/SaveTemplateModal';
+import type { WorkoutLog } from '../types/workout';
 
 export function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,6 +65,8 @@ export function WorkoutLogger() {
   const [showPRCelebration, setShowPRCelebration] = useState(false);
   const [detectedPRs, setDetectedPRs] = useState<any[]>([]);
   const [hasLoadedFromUrl, setHasLoadedFromUrl] = useState(false);
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [savedWorkout, setSavedWorkout] = useState<WorkoutLog | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -167,10 +172,41 @@ export function WorkoutLogger() {
     const result = await saveWorkout();
     setShowSaveConfirm(false);
 
+    // Store the saved workout for potential template conversion
+    if (result && result.workout) {
+      setSavedWorkout(result.workout);
+    }
+
     // Show PR celebration if any PRs were detected
     if (result && result.prs && result.prs.length > 0) {
       setDetectedPRs(result.prs);
       setShowPRCelebration(true);
+    } else if (result && result.workout) {
+      // No PRs - show save as template modal directly (optional)
+      // Or just let them access it from Dashboard
+      // For now, we'll just keep the workout saved so they can convert it later
+    }
+  }
+
+  async function handleSaveAsTemplate(templateName: string) {
+    if (!savedWorkout) return;
+
+    try {
+      const templateData = convertWorkoutLogToTemplate(savedWorkout, templateName);
+      await createWorkoutTemplate(templateData);
+
+      // Reload templates
+      await loadTemplates();
+
+      // Close modal and reset state
+      setShowSaveTemplateModal(false);
+      setSavedWorkout(null);
+
+      // Success feedback (optional: add toast notification here)
+      alert(`Template "${templateName}" created successfully!`);
+    } catch (error) {
+      console.error('Error creating template:', error);
+      alert('Failed to create template. Please try again.');
     }
   }
 
@@ -1081,15 +1117,43 @@ export function WorkoutLogger() {
               })}
             </div>
 
-            {/* Close Button */}
-            <button
-              onClick={() => setShowPRCelebration(false)}
-              className="w-full btn-primary py-3 text-lg font-semibold"
-            >
-              Let's Go! 💪
-            </button>
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowPRCelebration(false);
+                  if (savedWorkout) {
+                    setShowSaveTemplateModal(true);
+                  }
+                }}
+                className="flex-1 btn-secondary py-3 text-sm font-semibold"
+              >
+                Save as Template
+              </button>
+              <button
+                onClick={() => {
+                  setShowPRCelebration(false);
+                  setSavedWorkout(null);
+                }}
+                className="flex-1 btn-primary py-3 text-lg font-semibold"
+              >
+                Let's Go! 💪
+              </button>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Save Template Modal */}
+      {showSaveTemplateModal && savedWorkout && (
+        <SaveTemplateModal
+          defaultName={savedWorkout.name}
+          onSave={handleSaveAsTemplate}
+          onClose={() => {
+            setShowSaveTemplateModal(false);
+            setSavedWorkout(null);
+          }}
+        />
       )}
     </div>
   );

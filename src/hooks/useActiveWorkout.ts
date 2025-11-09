@@ -120,12 +120,27 @@ export function useActiveWorkout() {
   const addExercise = useCallback((exercise: Exercise) => {
     if (!activeWorkout) return;
 
+    // Create initial empty set so user can start logging immediately
+    const initialSet: Set = {
+      id: crypto.randomUUID(),
+      workoutLogId: '', // Will be set when workout is saved
+      exerciseId: exercise.id,
+      setNumber: 1,
+      weight: 0,
+      reps: 0,
+      isWarmup: false,
+      isDropSet: false,
+      isFailure: false,
+      completed: false,
+      timestamp: new Date(),
+    };
+
     const newLoggedExercise: LoggedExercise = {
       exerciseId: exercise.id,
       exerciseName: exercise.name,
       equipment: exercise.equipment,
       orderIndex: activeWorkout.exercises.length,
-      sets: [],
+      sets: [initialSet], // Start with 1 empty set instead of empty array
       totalVolume: 0,
     };
 
@@ -345,7 +360,7 @@ export function useActiveWorkout() {
 
       console.log('✅ Workout save complete!');
 
-      return { workoutId: savedWorkout.id, prs: allPRs };
+      return { workoutId: savedWorkout.id, workout: savedWorkout, prs: allPRs };
     } catch (error) {
       setIsSaving(false);
 
