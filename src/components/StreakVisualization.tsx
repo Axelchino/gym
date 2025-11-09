@@ -26,22 +26,16 @@ export function StreakVisualization({
     })
   );
 
-  // Determine state for each day: 'active' | 'hold' | 'empty'
-  const getDayState = (dayIndex: number): 'active' | 'hold' | 'empty' => {
-    if (currentStreak === 0) return 'empty';
-
+  // Determine state for each day: 'active' | 'hold' | 'broken' | 'empty'
+  const getDayState = (dayIndex: number): 'active' | 'hold' | 'broken' | 'empty' => {
     // Convert Sunday (0) to index 6, Monday (1) to 0, etc.
     const todayIndex = todayDayOfWeek === 0 ? 6 : todayDayOfWeek - 1;
 
     // Calculate days back from today
     const daysBack = todayIndex - dayIndex;
+
     if (daysBack < 0) {
       // Day is in the future (later in the week)
-      return 'empty';
-    }
-
-    // Check if this day is within the streak window
-    if (daysBack >= currentStreak) {
       return 'empty';
     }
 
@@ -53,7 +47,28 @@ export function StreakVisualization({
     // Check if there was a workout on this day
     const hadWorkout = workoutDateSet.has(dayDate.getTime());
 
-    return hadWorkout ? 'active' : 'hold';
+    // If no streak at all, show all days as empty
+    if (currentStreak === 0) return 'empty';
+
+    // Active if had workout
+    if (hadWorkout) return 'active';
+
+    // For days without workouts, check if streak was broken
+    // Find the last workout before this day
+    const sortedWorkoutDates = Array.from(workoutDateSet).sort((a, b) => b - a);
+    const lastWorkoutBeforeThisDay = sortedWorkoutDates.find(wDate => wDate < dayDate.getTime());
+
+    if (lastWorkoutBeforeThisDay) {
+      const daysSinceLastWorkout = Math.floor((dayDate.getTime() - lastWorkoutBeforeThisDay) / (1000 * 60 * 60 * 24));
+
+      // If gap > 2 days, streak is broken
+      if (daysSinceLastWorkout > 2) {
+        return 'broken';
+      }
+    }
+
+    // Within grace period (≤2 days) or no previous workout found
+    return 'hold';
   };
 
   return (
@@ -73,15 +88,23 @@ export function StreakVisualization({
                 backgroundColor:
                   state === 'active'
                     ? '#B482FF'
+                    : state === 'broken'
+                    ? 'rgba(107, 114, 128, 0.2)'
                     : state === 'hold'
                     ? 'rgba(180, 130, 255, 0.3)'
                     : 'transparent',
                 border: `1.5px solid ${
-                  state === 'active' || state === 'hold' ? '#B482FF' : '#D7BDFF'
+                  state === 'active' || state === 'hold'
+                    ? '#B482FF'
+                    : state === 'broken'
+                    ? '#6B7280'
+                    : '#D7BDFF'
                 }`,
                 color:
                   state === 'active'
                     ? '#FFFFFF'
+                    : state === 'broken'
+                    ? '#6B7280'
                     : state === 'hold'
                     ? '#B482FF'
                     : '#9CA3AF',

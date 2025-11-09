@@ -273,7 +273,7 @@ export function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-4" style={{ minHeight: '60px' }}>
+          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
             <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedVolume).toLocaleString()}
             </p>
@@ -326,7 +326,7 @@ export function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-4" style={{ minHeight: '60px' }}>
+          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
             <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedWorkouts)}
             </p>
@@ -358,7 +358,7 @@ export function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-4" style={{ minHeight: '60px' }}>
+          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
             <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedPRs)}
             </p>
@@ -392,14 +392,14 @@ export function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-4" style={{ minHeight: '60px' }}>
+          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
             <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedStreak)}
             </p>
           </div>
 
           {/* Visual zone: Duolingo-style streak visualization */}
-          <div className="mb-3 flex justify-center" style={{ height: '40px' }}>
+          <div className="mb-4 flex justify-center items-center" style={{ height: '28px' }}>
             {!isLoading && (
               <StreakVisualization
                 currentStreak={stats.currentStreak}
