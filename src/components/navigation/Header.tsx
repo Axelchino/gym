@@ -1,9 +1,11 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, User, Plus, Dumbbell, RotateCcw } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   // Clear all browser cache and reload
   function clearCacheAndReload() {
@@ -96,62 +98,125 @@ export function Header() {
               <RotateCcw className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={18} strokeWidth={1.5} />
             </button>
 
-            {/* Profile Button */}
-            <button
-              onClick={() => navigate('/profile')}
-              className="p-2 rounded-md hover:bg-surface-accent transition-colors"
-              title="Profile"
-            >
-              <User className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
-            </button>
+            {/* Show different buttons for authenticated vs guest users */}
+            {user ? (
+              <>
+                {/* Profile Button - authenticated only */}
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="p-2 rounded-md hover:bg-surface-accent transition-colors"
+                  title="Profile"
+                >
+                  <User className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
+                </button>
 
-            {/* Start Workout - Light Focus Style */}
-            <button
-              onClick={() => navigate('/workout')}
-              className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
-              style={{
-                backgroundColor: '#EDE0FF',
-                color: '#7E29FF',
-                border: '1px solid #D7BDFF',
-                borderRadius: '10px',
-                height: '40px',
-                paddingLeft: '18px',
-                paddingRight: '18px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#E4D2FF';
-                e.currentTarget.style.borderColor = '#C9B0FF';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#EDE0FF';
-                e.currentTarget.style.borderColor = '#D7BDFF';
-                if (document.activeElement !== e.currentTarget) {
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.backgroundColor = '#DDC7FF';
-                e.currentTarget.style.borderColor = '#C3A5FF';
-                e.currentTarget.style.transform = 'translateY(1px)';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.backgroundColor = '#E4D2FF';
-                e.currentTarget.style.borderColor = '#C9B0FF';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 0 2px #B482FF';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.backgroundColor = '#EDE0FF';
-                e.currentTarget.style.borderColor = '#D7BDFF';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <Plus size={16} strokeWidth={2} />
-              Start Workout
-            </button>
+                {/* Start Workout - authenticated */}
+                <button
+                  onClick={() => navigate('/workout')}
+                  className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
+                  style={{
+                    backgroundColor: '#EDE0FF',
+                    color: '#7E29FF',
+                    border: '1px solid #D7BDFF',
+                    borderRadius: '10px',
+                    height: '40px',
+                    paddingLeft: '18px',
+                    paddingRight: '18px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    e.currentTarget.style.borderColor = '#C9B0FF';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.backgroundColor = '#DDC7FF';
+                    e.currentTarget.style.borderColor = '#C3A5FF';
+                    e.currentTarget.style.transform = 'translateY(1px)';
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    e.currentTarget.style.borderColor = '#C9B0FF';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 0 2px #B482FF';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <Plus size={16} strokeWidth={2} />
+                  Start Workout
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Try Workout - guest mode */}
+                <button
+                  onClick={() => navigate('/workout')}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors px-4 py-2 rounded-md hover:bg-surface-accent"
+                >
+                  <Plus size={16} strokeWidth={2} />
+                  Try Workout
+                </button>
+
+                {/* Sign In button - guest mode */}
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
+                  style={{
+                    backgroundColor: '#EDE0FF',
+                    color: '#7E29FF',
+                    border: '1px solid #D7BDFF',
+                    borderRadius: '10px',
+                    height: '40px',
+                    paddingLeft: '18px',
+                    paddingRight: '18px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    e.currentTarget.style.borderColor = '#C9B0FF';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.backgroundColor = '#DDC7FF';
+                    e.currentTarget.style.borderColor = '#C3A5FF';
+                    e.currentTarget.style.transform = 'translateY(1px)';
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    e.currentTarget.style.borderColor = '#C9B0FF';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 0 2px #B482FF';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  Sign In
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

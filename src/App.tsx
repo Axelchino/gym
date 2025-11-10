@@ -36,15 +36,8 @@ function App() {
           <Route path="/3-modes" element={<ThreeModesDemo />} />
           <Route path="/theme-demo" element={<ThemeDemo />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
+          {/* Main routes - accessible to guests and authenticated users */}
+          <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="workout" element={<WorkoutLogger />} />
             <Route path="program" element={<Program />} />
