@@ -36,11 +36,12 @@
 
 ### High-Priority UX Improvements
 
-- [ ] **Guest/Demo Mode - Unauthenticated Access**
-  - [ ] Remove auth requirement for browsing the app
+- [ ] **Guest/Demo Mode - Unauthenticated Access** (In Progress)
+  - [x] Remove auth requirement for browsing the app
+  - [x] Add persistent "Sign up to save your workouts" banner for guest users
+  - [x] Show "Sign In" button and "Try Workout" button in header for guests
   - [ ] Allow users to log workouts locally (localStorage only, no cloud save)
-  - [ ] Allow browsing Exercise Library without login
-  - [ ] Show persistent "Sign up to save your workouts" banner for guest users
+  - [ ] Allow browsing Exercise Library without login (currently works)
   - [ ] Show empty states with CTAs on Dashboard/Analytics for guests
   - [ ] Disable cloud-dependent features (Save Template, Sync, Edit History)
   - [ ] Clear messaging: "Your workout will be lost on refresh - sign up to keep it"
