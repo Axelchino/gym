@@ -57,12 +57,18 @@ export function Dashboard() {
 
   useEffect(() => {
     loadDashboardStats();
-  }, []);
+  }, [user]);
 
   async function loadDashboardStats() {
     setIsLoading(true);
 
     try {
+      // If user is not authenticated (guest mode), don't load data
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
       // Get all workouts from Supabase
       const allWorkouts = await getWorkoutLogs();
 
@@ -307,28 +313,32 @@ export function Dashboard() {
           </div>
 
           {/* Sparkline + Delta */}
-          <div className="flex items-center justify-between mb-3">
-            {!isLoading && stats.volumeSparklineData.length > 0 && (
-              <div className="flex-1">
-                <Sparkline
-                  data={stats.volumeSparklineData}
-                  width={200}
-                  height={28}
-                  color="#B482FF"
-                  peakDotColor="#7E29FF"
-                  strokeWidth={1}
-                  animate={true}
-                />
+          <div className="mb-3" style={{ height: '28px' }}>
+            {!isLoading && stats.volumeSparklineData.length > 0 ? (
+              <div className="flex items-center justify-between h-full">
+                <div className="flex-1">
+                  <Sparkline
+                    data={stats.volumeSparklineData}
+                    width={200}
+                    height={28}
+                    color="#B482FF"
+                    peakDotColor="#7E29FF"
+                    strokeWidth={1}
+                    animate={true}
+                  />
+                </div>
+                {stats.volumePrev7Days > 0 && (
+                  <div className="ml-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold" style={{
+                    backgroundColor: stats.volumeLast7Days > stats.volumePrev7Days ? 'rgba(22, 163, 74, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    color: stats.volumeLast7Days > stats.volumePrev7Days ? '#16A34A' : '#EF4444'
+                  }}>
+                    {stats.volumeLast7Days > stats.volumePrev7Days ? '↑' : '↓'}
+                    {Math.abs(((stats.volumeLast7Days - stats.volumePrev7Days) / stats.volumePrev7Days) * 100).toFixed(0)}%
+                  </div>
+                )}
               </div>
-            )}
-            {!isLoading && stats.volumePrev7Days > 0 && (
-              <div className="ml-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold" style={{
-                backgroundColor: stats.volumeLast7Days > stats.volumePrev7Days ? 'rgba(22, 163, 74, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                color: stats.volumeLast7Days > stats.volumePrev7Days ? '#16A34A' : '#EF4444'
-              }}>
-                {stats.volumeLast7Days > stats.volumePrev7Days ? '↑' : '↓'}
-                {Math.abs(((stats.volumeLast7Days - stats.volumePrev7Days) / stats.volumePrev7Days) * 100).toFixed(0)}%
-              </div>
+            ) : (
+              <div></div>
             )}
           </div>
 
@@ -425,7 +435,7 @@ export function Dashboard() {
           </div>
 
           {/* Visual zone: Duolingo-style streak visualization */}
-          <div className="mb-4 flex justify-center items-center" style={{ height: '28px' }}>
+          <div className="mb-3 flex justify-center items-center" style={{ height: '28px' }}>
             {!isLoading && (
               <StreakVisualization
                 currentStreak={stats.currentStreak}
@@ -516,9 +526,54 @@ export function Dashboard() {
             <p className="text-sm">Loading workouts...</p>
           </div>
         ) : stats.recentWorkouts.length === 0 ? (
-          <div className="text-center py-12 text-secondary">
-            <p className="text-sm">No workouts yet</p>
-            <p className="text-xs mt-2 text-muted">Click "Start Workout" to begin</p>
+          <div className="text-center py-12">
+            {!user ? (
+              <div className="max-w-md mx-auto space-y-4">
+                <p className="text-base font-medium text-primary">Start your fitness journey</p>
+                <p className="text-sm text-secondary">Sign up to track your workouts and save your progress</p>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={() => window.location.href = '/auth'}
+                    className="text-sm font-semibold px-5 py-2.5 rounded-md transition-all"
+                    style={{
+                      backgroundColor: '#EDE0FF',
+                      color: '#7E29FF',
+                      border: '1px solid #D7BDFF',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    }}
+                  >
+                    Sign Up Free
+                  </button>
+                  <button
+                    onClick={() => window.location.href = '/workout'}
+                    className="text-sm font-medium px-5 py-2.5 rounded-md transition-all"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--text-secondary)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    Try a Workout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-secondary">
+                <p className="text-sm">No workouts yet</p>
+                <p className="text-xs mt-2 text-muted">Click "Start Workout" to begin</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-3">

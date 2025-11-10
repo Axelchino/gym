@@ -10,8 +10,10 @@ import {
   createWorkoutLog,
   createPersonalRecord,
 } from '../services/supabaseDataService';
+import { useAuth } from '../contexts/AuthContext';
 
 const ACTIVE_WORKOUT_KEY = 'gym-tracker-active-workout';
+const GUEST_WORKOUTS_KEY = 'gym-tracker-guest-workouts';
 
 interface ActiveWorkout {
   name: string;
@@ -48,6 +50,7 @@ function loadWorkoutFromStorage(): ActiveWorkout | null {
 }
 
 export function useActiveWorkout() {
+  const { user } = useAuth();
   const [activeWorkout, setActiveWorkout] = useState<ActiveWorkout | null>(loadWorkoutFromStorage);
   const [isWorkoutActive, setIsWorkoutActive] = useState(() => {
     const stored = loadWorkoutFromStorage();
@@ -279,14 +282,44 @@ export function useActiveWorkout() {
     setIsSaving(true);
 
     try {
-      // STEP 1: Verify user is authenticated BEFORE attempting save
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      // STEP 1: Check if user is authenticated
+      // For guest users, save to localStorage only
+      if (!user) {
+        console.log('👤 Guest mode: Saving workout to localStorage only...');
 
-      if (authError || !user) {
-        throw new Error('You must be logged in to save workouts. Please sign in and try again.');
+        const guestWorkout: WorkoutLog = {
+          id: uuidv4(),
+          userId: 'guest',
+          name: activeWorkout.name,
+          date: new Date(),
+          startTime: activeWorkout.startTime,
+          endTime: new Date(),
+          duration: Math.round((new Date().getTime() - activeWorkout.startTime.getTime()) / 60000),
+          totalVolume: activeWorkout.exercises.reduce((sum, ex) => sum + ex.totalVolume, 0),
+          exercises: activeWorkout.exercises,
+          synced: false,
+          createdAt: new Date(),
+        };
+
+        // Save to guest workouts in localStorage
+        const existingGuestWorkouts = JSON.parse(localStorage.getItem(GUEST_WORKOUTS_KEY) || '[]');
+        existingGuestWorkouts.push(guestWorkout);
+        localStorage.setItem(GUEST_WORKOUTS_KEY, JSON.stringify(existingGuestWorkouts));
+
+        // Clear active workout
+        setActiveWorkout(null);
+        setIsWorkoutActive(false);
+        setIsSaving(false);
+
+        console.log('✅ Guest workout saved to localStorage');
+
+        // Show warning that data will be lost
+        alert('✅ Workout saved locally!\n\n⚠️ Note: Sign up to save your workouts permanently. Guest workouts are only stored on this device and may be lost.');
+
+        return { workoutId: guestWorkout.id, workout: guestWorkout, prs: [] };
       }
 
-      console.log('✅ User authenticated, proceeding with save...');
+      console.log('✅ User authenticated, proceeding with cloud save...');
 
       // STEP 2: Create workout log in Supabase
       const savedWorkout = await createWorkoutLog({
@@ -383,7 +416,7 @@ export function useActiveWorkout() {
 
       throw error;
     }
-  }, [activeWorkout, calculateVolume, isSaving]);
+  }, [activeWorkout, calculateVolume, isSaving, user]);
 
   // Cancel workout (with confirmation)
   const cancelWorkout = useCallback(() => {

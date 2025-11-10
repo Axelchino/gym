@@ -88,26 +88,20 @@ export function StreakVisualization({
                 backgroundColor:
                   state === 'active'
                     ? '#B482FF'
-                    : state === 'broken'
+                    : state === 'broken' || state === 'empty'
                     ? 'rgba(107, 114, 128, 0.2)'
-                    : state === 'hold'
-                    ? 'rgba(180, 130, 255, 0.3)'
-                    : 'transparent',
+                    : 'rgba(180, 130, 255, 0.3)',
                 border: `1.5px solid ${
                   state === 'active' || state === 'hold'
                     ? '#B482FF'
-                    : state === 'broken'
-                    ? '#6B7280'
-                    : '#D7BDFF'
+                    : '#6B7280'
                 }`,
                 color:
                   state === 'active'
                     ? '#FFFFFF'
-                    : state === 'broken'
+                    : state === 'broken' || state === 'empty'
                     ? '#6B7280'
-                    : state === 'hold'
-                    ? '#B482FF'
-                    : '#9CA3AF',
+                    : '#B482FF',
                 transition: animate ? 'all 0.3s ease-out' : 'none',
                 transitionDelay: animate ? `${index * 50}ms` : '0ms',
                 fontSize: '10px',

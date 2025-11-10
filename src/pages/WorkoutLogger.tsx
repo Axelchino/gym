@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Plus, Save, X, Trash2, Clock, Timer, Edit, Dumbbell, Trophy, TrendingUp, Zap, Download, Upload } from 'lucide-react';
+import { Play, Plus, Save, X, Trash2, Clock, Timer, Edit, Dumbbell, Trophy, TrendingUp, Zap, Download, Upload, AlertCircle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useActiveWorkout } from '../hooks/useActiveWorkout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useRestTimer } from '../hooks/useRestTimer';
+import { useAuth } from '../contexts/AuthContext';
 import { ExerciseSelector } from '../components/ExerciseSelector';
 import { SetRow } from '../components/SetRow';
 import { TemplateBuilder } from '../components/TemplateBuilder';
@@ -26,6 +27,7 @@ import type { WorkoutLog } from '../types/workout';
 
 export function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
 
   const {
     activeWorkout,
@@ -496,43 +498,55 @@ export function WorkoutLogger() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Workout Templates</h2>
             <div className="flex items-center gap-3">
-              {templates.length > 0 && (
+              {/* Template management buttons - only for authenticated users */}
+              {user && (
                 <>
+                  {templates.length > 0 && (
+                    <>
+                      <button
+                        onClick={handleExportTemplates}
+                        className="text-primary-green text-sm flex items-center gap-1 hover:text-primary-green/80 transition-colors"
+                        title="Export all templates"
+                      >
+                        <Download size={16} />
+                        Export
+                      </button>
+                      <button
+                        onClick={handleImportTemplates}
+                        className="text-primary-yellow text-sm flex items-center gap-1 hover:text-primary-yellow/80 transition-colors"
+                        title="Import templates"
+                      >
+                        <Upload size={16} />
+                        Import
+                      </button>
+                    </>
+                  )}
+                  {templates.length === 0 && (
+                    <button
+                      onClick={handleImportTemplates}
+                      className="text-primary-yellow text-sm flex items-center gap-1 hover:text-primary-yellow/80 transition-colors"
+                      title="Import templates"
+                    >
+                      <Upload size={16} />
+                      Import
+                    </button>
+                  )}
                   <button
-                    onClick={handleExportTemplates}
-                    className="text-primary-green text-sm flex items-center gap-1 hover:text-primary-green/80 transition-colors"
-                    title="Export all templates"
+                    onClick={() => setShowTemplateBuilder(true)}
+                    className="text-primary-blue text-sm flex items-center gap-1 hover:text-primary-blue/80 transition-colors"
                   >
-                    <Download size={16} />
-                    Export
-                  </button>
-                  <button
-                    onClick={handleImportTemplates}
-                    className="text-primary-yellow text-sm flex items-center gap-1 hover:text-primary-yellow/80 transition-colors"
-                    title="Import templates"
-                  >
-                    <Upload size={16} />
-                    Import
+                    <Plus size={16} />
+                    New Template
                   </button>
                 </>
               )}
-              {templates.length === 0 && (
-                <button
-                  onClick={handleImportTemplates}
-                  className="text-primary-yellow text-sm flex items-center gap-1 hover:text-primary-yellow/80 transition-colors"
-                  title="Import templates"
-                >
-                  <Upload size={16} />
-                  Import
-                </button>
+
+              {/* Guest mode - show sign-in prompt */}
+              {!user && (
+                <p className="text-xs text-muted italic">
+                  Sign in to create and manage templates
+                </p>
               )}
-              <button
-                onClick={() => setShowTemplateBuilder(true)}
-                className="text-primary-blue text-sm flex items-center gap-1 hover:text-primary-blue/80 transition-colors"
-              >
-                <Plus size={16} />
-                New Template
-              </button>
             </div>
           </div>
 
@@ -566,25 +580,28 @@ export function WorkoutLogger() {
                               {template.exercises.length} exercises
                             </p>
                           </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                setEditingTemplate(template);
-                                setShowTemplateBuilder(true);
-                              }}
-                              className="text-gray-400 hover:text-primary-blue transition-colors"
-                              title="Edit template"
-                            >
-                              <Edit size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTemplate(template.id)}
-                              className="text-gray-400 hover:text-red-400 transition-colors"
-                              title="Delete template"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
+                          {/* Edit/Delete buttons - only for authenticated users */}
+                          {user && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => {
+                                  setEditingTemplate(template);
+                                  setShowTemplateBuilder(true);
+                                }}
+                                className="text-gray-400 hover:text-primary-blue transition-colors"
+                                title="Edit template"
+                              >
+                                <Edit size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTemplate(template.id)}
+                                className="text-gray-400 hover:text-red-400 transition-colors"
+                                title="Delete template"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         {/* Exercise Preview */}
@@ -661,16 +678,19 @@ export function WorkoutLogger() {
                               {template.exercises.length} exercises
                             </p>
                           </div>
-                          <button
-                            onClick={() => {
-                              setEditingTemplate(template as any);
-                              setShowTemplateBuilder(true);
-                            }}
-                            className="text-gray-400 hover:text-primary-blue transition-colors"
-                            title="Copy & modify template"
-                          >
-                            <Edit size={18} />
-                          </button>
+                          {/* Copy & modify button - only for authenticated users */}
+                          {user && (
+                            <button
+                              onClick={() => {
+                                setEditingTemplate(template as any);
+                                setShowTemplateBuilder(true);
+                              }}
+                              className="text-gray-400 hover:text-primary-blue transition-colors"
+                              title="Copy & modify template"
+                            >
+                              <Edit size={18} />
+                            </button>
+                          )}
                         </div>
 
                         {/* Exercise Preview */}
@@ -727,6 +747,43 @@ export function WorkoutLogger() {
 
   return (
     <div className="space-y-6 pb-24">
+      {/* Guest Mode Warning Banner */}
+      {!user && isWorkoutActive && (
+        <div className="sticky top-0 z-20 px-4 py-3 rounded-md" style={{
+          backgroundColor: 'rgba(255, 193, 7, 0.1)',
+          border: '1px solid rgba(255, 193, 7, 0.3)'
+        }}>
+          <div className="flex items-center gap-3">
+            <AlertCircle size={18} strokeWidth={1.5} style={{ color: '#FFC107', flexShrink: 0 }} />
+            <div className="flex-1">
+              <p className="text-sm font-medium" style={{ color: '#FFC107' }}>
+                Demo Mode - Workout will only be saved locally
+              </p>
+              <p className="text-xs text-secondary mt-0.5">
+                Sign up to save permanently and sync across devices
+              </p>
+            </div>
+            <button
+              onClick={() => window.location.href = '/auth'}
+              className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
+              style={{
+                backgroundColor: '#FFC107',
+                color: '#111216',
+                border: '1px solid #FFC107',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#FFB300';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#FFC107';
+              }}
+            >
+              Sign Up
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="sticky top-0 z-10 bg-dark-bg/95 backdrop-blur-sm pb-4 border-b border-gray-800">
         <div className="flex items-center justify-between mb-3">

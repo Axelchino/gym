@@ -160,16 +160,54 @@ export function Header() {
               </>
             ) : (
               <>
-                {/* Try Workout - guest mode */}
+                {/* Try Workout - guest mode - secondary button style */}
                 <button
                   onClick={() => navigate('/workout')}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors px-4 py-2 rounded-md hover:bg-surface-accent"
+                  className="flex items-center gap-2 text-sm font-medium transition-all focus:outline-none focus-visible:outline-none"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '10px',
+                    height: '40px',
+                    paddingLeft: '18px',
+                    paddingRight: '18px',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface)';
+                    e.currentTarget.style.transform = 'translateY(1px)';
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
                   <Plus size={16} strokeWidth={2} />
                   Try Workout
                 </button>
 
-                {/* Sign In button - guest mode */}
+                {/* Sign In button - guest mode - primary purple button */}
                 <button
                   onClick={() => navigate('/auth')}
                   className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
@@ -181,6 +219,7 @@ export function Header() {
                     height: '40px',
                     paddingLeft: '18px',
                     paddingRight: '18px',
+                    whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#E4D2FF';

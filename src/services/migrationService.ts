@@ -1,8 +1,10 @@
 import { db } from './database';
+import { migrateGuestWorkouts, hasGuestWorkouts } from './guestMigration';
 
 /**
  * Migration Service
  * Handles migrating local data from "default-user" to authenticated user
+ * Also handles migrating guest workouts from localStorage
  */
 
 export const migrationService = {
@@ -103,7 +105,19 @@ export const migrationService = {
       }
       console.log(`✅ Migrated ${measurements.length} body measurements`);
 
-      // 8. Delete old default-user profile (optional - keep for now as backup)
+      // 8. Migrate guest workouts from localStorage to Supabase
+      let guestWorkoutCount = 0;
+      if (hasGuestWorkouts()) {
+        try {
+          guestWorkoutCount = await migrateGuestWorkouts();
+          console.log(`✅ Migrated ${guestWorkoutCount} guest workouts from localStorage`);
+        } catch (error) {
+          console.error('⚠️ Error migrating guest workouts:', error);
+          // Don't fail the entire migration if guest workouts fail
+        }
+      }
+
+      // 9. Delete old default-user profile (optional - keep for now as backup)
       // await db.users.delete('default-user');
 
       console.log('🎉 Data migration complete!');
@@ -113,6 +127,7 @@ export const migrationService = {
         prs: prs.length,
         programs: programs.length,
         measurements: measurements.length,
+        guestWorkouts: guestWorkoutCount,
       });
     } catch (error) {
       console.error('❌ Error during data migration:', error);
@@ -139,7 +154,9 @@ export const migrationService = {
       .equals('default-user')
       .count();
 
-    return templates > 0 || logs > 0 || programs > 0;
+    const guestWorkouts = hasGuestWorkouts();
+
+    return templates > 0 || logs > 0 || programs > 0 || guestWorkouts;
   },
 
   /**

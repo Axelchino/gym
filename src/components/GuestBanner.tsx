@@ -16,18 +16,18 @@ export function GuestBanner() {
   if (isDismissed) return null;
 
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+    <div className="sticky top-0 z-50" style={{ backgroundColor: 'rgba(126, 41, 255, 0.08)', borderBottom: '1px solid rgba(126, 41, 255, 0.15)' }}>
       <div className="mx-auto px-6 py-3" style={{ maxWidth: '1280px' }}>
         <div className="flex items-center justify-between gap-4">
           {/* Left: Icon + Message */}
           <div className="flex items-center gap-3">
-            <AlertCircle size={20} strokeWidth={1.5} className="flex-shrink-0" />
+            <AlertCircle size={18} strokeWidth={1.5} className="flex-shrink-0" style={{ color: '#7E29FF', opacity: 0.7 }} />
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-              <span className="text-sm font-medium">
-                You're using Guest Mode - workouts won't be saved
+              <span className="text-sm font-medium text-secondary">
+                Guest Mode - workouts won't be saved
               </span>
-              <span className="text-xs text-purple-200">
-                Data will be lost when you refresh or close the browser
+              <span className="text-xs text-muted">
+                Sign up to keep your data
               </span>
             </div>
           </div>
@@ -36,16 +36,34 @@ export function GuestBanner() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/auth')}
-              className="px-4 py-1.5 text-sm font-semibold bg-white text-purple-700 rounded-md hover:bg-purple-50 transition-colors whitespace-nowrap"
+              className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap"
+              style={{
+                backgroundColor: '#EDE0FF',
+                color: '#7E29FF',
+                border: '1px solid #D7BDFF',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#E4D2FF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#EDE0FF';
+              }}
             >
-              Sign Up to Save
+              Sign Up
             </button>
             <button
               onClick={handleDismiss}
-              className="p-1 hover:bg-purple-600 rounded transition-colors"
+              className="p-1 rounded transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(126, 41, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
               title="Dismiss"
             >
-              <X size={18} strokeWidth={1.5} />
+              <X size={16} strokeWidth={1.5} />
             </button>
           </div>
         </div>
