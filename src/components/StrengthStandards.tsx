@@ -1,9 +1,13 @@
-import { useState, useMemo } from 'react';
-import { Trophy, TrendingUp, Target } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Trophy, TrendingUp, User } from 'lucide-react';
 import type { WorkoutLog } from '../types/workout';
 import { calculate1RM } from '../utils/analytics';
-import { calculateStrengthLevel, getLevelColor, getLevelBadgeColor, type StrengthLevel, type StandardType } from '../utils/strengthStandards';
+import { calculateStrengthLevel, getLevelColor, getLevelBadgeColor, getLevelBadgeColorHex, type StrengthLevel, type StandardType } from '../utils/strengthStandards';
 import { useUserSettings } from '../hooks/useUserSettings';
+import { useAuth } from '../contexts/AuthContext';
+import { db } from '../services/database';
+import type { UserProfile } from '../types/user';
+import { useNavigate } from 'react-router-dom';
 
 interface StrengthStandardsProps {
   workouts: WorkoutLog[];
@@ -13,10 +17,24 @@ const BIG_LIFTS = ['Squat', 'Bench Press', 'Deadlift', 'Overhead Press'];
 
 export function StrengthStandards({ workouts }: StrengthStandardsProps) {
   const { weightUnit } = useUserSettings();
-  // TODO: Phase 5 - Get bodyweight from user profile instead of local state
-  const [bodyweight, setBodyweight] = useState<number>(75); // Default 75kg
-  const [sex, setSex] = useState<'male' | 'female'>('male');
-  const [showSettings, setShowSettings] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [user]);
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+    const profile = await db.users.get(user.id);
+    setUserProfile(profile || null);
+  };
+
+  // Get bodyweight and sex from profile, with fallbacks
+  const bodyweight = userProfile?.currentWeight || 75; // Default 75kg if not set
+  const sex = userProfile?.sex === 'female' ? 'female' : 'male'; // Default to male, skip "prefer-not-to-say"
+  const hasProfileData = !!userProfile?.currentWeight && userProfile?.sex && userProfile.sex !== 'prefer-not-to-say';
 
   // Calculate best 1RM for each big lift
   const liftStats = useMemo(() => {
@@ -80,73 +98,66 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
 
   return (
     <div className="card-elevated">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">
+          <h2 className="text-2xl font-bold mb-1 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
             <Trophy className="text-primary-yellow" size={28} />
             Strength Standards
           </h2>
-          <p className="text-sm text-gray-400">Compare your lifts to population standards</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Compare your lifts against everyday athletes and competitive powerlifters</p>
         </div>
-
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="text-sm text-primary-blue hover:text-primary-blue/80 transition-colors"
-        >
-          {showSettings ? 'Hide Settings' : 'Settings'}
-        </button>
       </div>
 
-      {/* Settings Panel */}
-      {showSettings && (
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Bodyweight ({weightUnit})</label>
-              <input
-                type="number"
-                value={bodyweight}
-                onChange={(e) => setBodyweight(parseFloat(e.target.value) || 75)}
-                className="input w-full"
-                placeholder="Enter your bodyweight"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Sex</label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSex('male')}
-                  className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                    sex === 'male'
-                      ? 'bg-primary-blue text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  }`}
-                >
-                  Male
-                </button>
-                <button
-                  onClick={() => setSex('female')}
-                  className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
-                    sex === 'female'
-                      ? 'bg-primary-blue text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  }`}
-                >
-                  Female
-                </button>
+      {/* Explanation of dual comparison */}
+      <div className="card mb-6">
+        <div>
+          <h3 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Two Standards, Better Context</h3>
+          <div className="space-y-3 text-sm">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold" style={{ background: 'var(--color-blue, #3B82F6)', color: 'white' }}>G</span>
+              </div>
+              <div>
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Everyday Athletes</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Benchmarks against consistent gym trainees (ExRx standards)</p>
               </div>
             </div>
-
+            <div className="flex gap-3">
+              <div className="flex-shrink-0">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold" style={{ background: 'var(--color-purple, #7E29FF)', color: 'white' }}>P</span>
+              </div>
+              <div>
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Competitive Powerlifters</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Compares you to athletes who compete in the sport (SymmetricStrength)</p>
+              </div>
+            </div>
+            <p className="text-xs pt-2 border-t" style={{ color: 'var(--text-muted)', borderColor: 'var(--border-subtle)' }}>
+              Most people fall somewhere between Beginner and Intermediate for everyday athletes. Being "Intermediate" among competitive powerlifters means you're very strong!
+            </p>
           </div>
+        </div>
+      </div>
 
-          <div className="bg-gray-900/50 rounded-lg p-3">
-            <p className="text-xs text-gray-400 mb-2">
-              Showing comparisons against both <span className="font-semibold text-primary-green">General Population</span> (ExRx) and <span className="font-semibold text-primary-yellow">Competitive Powerlifters</span> (SymmetricStrength)
-            </p>
-            <p className="text-xs text-gray-500">
-              Note: Bodyweight will be automatically pulled from your profile in Phase 5
-            </p>
+      {/* Profile Data Prompt */}
+      {!hasProfileData && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <User className="text-yellow-500 flex-shrink-0 mt-0.5" size={20} />
+            <div className="flex-1">
+              <h3 className="font-semibold text-yellow-500 mb-1">Add Your Stats for Accurate Comparisons</h3>
+              <p className="text-sm text-gray-300 mb-3">
+                To see personalized strength standards, please add your bodyweight and sex in your profile.
+              </p>
+              <button
+                onClick={() => navigate('/profile')}
+                className="text-sm bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 px-4 py-2 rounded-lg transition-colors border border-yellow-500/30"
+              >
+                Update Profile →
+              </button>
+              <p className="text-xs text-gray-500 mt-2">
+                We respect your privacy. This data is only used for strength comparisons and can be skipped.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -157,31 +168,34 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
           {strengthLevels.map(({ lift, generalLevel, powerliftingLevel, stats }) => (
             <div
               key={lift}
-              className={`bg-gray-800/50 border rounded-lg p-4 ${
-                stats
-                  ? 'border-gray-700 hover:border-primary-blue/30 transition-colors'
-                  : 'border-gray-800'
-              }`}
+              className={`card ${stats ? 'hover:border-[var(--color-purple)]' : ''}`}
+              style={{ background: 'var(--card-bg)', borderColor: stats ? 'var(--border-subtle)' : 'var(--border-subtle)' }}
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-lg">{lift}</h3>
                 {generalLevel && powerliftingLevel && (
                   <div className="flex gap-2">
                     <div
-                      className={`px-2 py-1 rounded text-xs font-bold border ${getLevelBadgeColor(
-                        generalLevel.level
-                      )} ${getLevelColor(generalLevel.level)}`}
-                      title="vs General Population"
+                      className="px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5"
+                      style={{
+                        backgroundColor: getLevelBadgeColorHex(generalLevel.level),
+                        color: '#111216'
+                      }}
+                      title="vs Everyday Athletes"
                     >
-                      🏋️ {generalLevel.level}
+                      <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold" style={{ background: 'var(--color-blue, #3B82F6)', color: 'white' }}>G</span>
+                      {generalLevel.level}
                     </div>
                     <div
-                      className={`px-2 py-1 rounded text-xs font-bold border ${getLevelBadgeColor(
-                        powerliftingLevel.level
-                      )} ${getLevelColor(powerliftingLevel.level)}`}
-                      title="vs Powerlifters"
+                      className="px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5"
+                      style={{
+                        backgroundColor: getLevelBadgeColorHex(powerliftingLevel.level),
+                        color: '#111216'
+                      }}
+                      title="vs Competitive Powerlifters"
                     >
-                      💪 {powerliftingLevel.level}
+                      <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold" style={{ background: 'var(--color-purple, #7E29FF)', color: 'white' }}>P</span>
+                      {powerliftingLevel.level}
                     </div>
                   </div>
                 )}
@@ -191,26 +205,26 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                 <>
                   {/* Current Stats */}
                   <div className="mb-4">
-                    <div className="text-sm text-gray-400 mb-1">Best Lift</div>
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Best Lift</div>
+                    <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                       {stats.bestWeight.toFixed(1)} {weightUnit} × {stats.bestReps}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                       Est. 1RM: {stats.best1RM.toFixed(1)} {weightUnit} ({generalLevel.currentRatio.toFixed(2)}x BW)
                     </div>
                   </div>
 
                   {/* Dual Progress Bars */}
                   <div className="space-y-3">
-                    {/* General Population Progress */}
+                    {/* Everyday Athletes Progress */}
                     <div>
                       <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-gray-400">🏋️ vs Gym Rats</span>
-                        <span className={getLevelColor(generalLevel.level)}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Everyday Athletes</span>
+                        <span style={{ color: 'var(--text-primary)' }}>
                           {generalLevel.percentage.toFixed(0)}%
                         </span>
                       </div>
-                      <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
                         <div
                           className={`h-full transition-all duration-500 ${
                             generalLevel.level === 'Beginner' ? 'bg-gray-400' :
@@ -223,7 +237,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                         ></div>
                       </div>
                       {generalLevel.level !== 'Elite' && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                           Next: {generalLevel.nextLevelWeight.toFixed(0)} {weightUnit}
                         </div>
                       )}
@@ -233,12 +247,12 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                     {powerliftingLevel && (
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="text-gray-400">💪 vs Powerlifters</span>
-                          <span className={getLevelColor(powerliftingLevel.level)}>
+                          <span style={{ color: 'var(--text-secondary)' }}>Competitive Powerlifters</span>
+                          <span style={{ color: 'var(--text-primary)' }}>
                             {powerliftingLevel.percentage.toFixed(0)}%
                           </span>
                         </div>
-                        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
                           <div
                             className={`h-full transition-all duration-500 ${
                               powerliftingLevel.level === 'Beginner' ? 'bg-gray-400' :
@@ -251,7 +265,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                           ></div>
                         </div>
                         {powerliftingLevel.level !== 'Elite' && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                             Next: {powerliftingLevel.nextLevelWeight.toFixed(0)} {weightUnit}
                           </div>
                         )}
@@ -260,7 +274,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                   </div>
                 </>
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
                   <TrendingUp size={32} className="mx-auto mb-2 opacity-30" />
                   <p className="text-sm">No data for this lift yet</p>
                   <p className="text-xs mt-1">Complete workouts to see your strength level</p>
@@ -270,7 +284,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
           <Trophy size={48} className="mx-auto mb-3 opacity-30" />
           <p>No strength data yet</p>
           <p className="text-sm mt-2">
@@ -281,16 +295,18 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
 
       {/* Legend */}
       {hasAnyData && (
-        <div className="mt-6 pt-6 border-t border-gray-700">
-          <div className="text-xs text-gray-500 mb-2 font-medium">Strength Levels:</div>
+        <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          <div className="text-xs mb-2 font-medium" style={{ color: 'var(--text-muted)' }}>Strength Levels:</div>
           <div className="flex flex-wrap gap-2">
             {(['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite'] as StrengthLevel[]).map(
               level => (
                 <div
                   key={level}
-                  className={`px-2 py-1 rounded text-xs border ${getLevelBadgeColor(
-                    level
-                  )} ${getLevelColor(level)}`}
+                  className="px-2.5 py-1.5 rounded-md text-xs font-bold"
+                  style={{
+                    backgroundColor: getLevelBadgeColorHex(level),
+                    color: '#111216'
+                  }}
                 >
                   {level}
                 </div>

@@ -422,7 +422,7 @@ export function Dashboard() {
             </div>
             {!isLoading && (
               <p className="text-xs text-secondary">
-                Week {Math.floor(new Date().getDate() / 7) + 1} of 4
+                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </p>
             )}
           </div>

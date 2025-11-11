@@ -255,40 +255,63 @@ function normalizeExerciseName(name: string): string {
 
 /**
  * Get color for strength level
+ * Updated for better contrast with solid badge backgrounds
  */
 export function getLevelColor(level: StrengthLevel): string {
   switch (level) {
     case 'Beginner':
-      return 'text-gray-400';
+      return 'text-gray-700 dark:text-gray-300';
     case 'Novice':
-      return 'text-blue-400';
+      return 'text-blue-700 dark:text-blue-300';
     case 'Intermediate':
-      return 'text-green-400';
+      return 'text-green-700 dark:text-green-300';
     case 'Advanced':
-      return 'text-yellow-400';
+      return 'text-yellow-700 dark:text-yellow-300';
     case 'Elite':
-      return 'text-purple-400';
+      return 'text-purple-700 dark:text-purple-300';
     default:
-      return 'text-gray-400';
+      return 'text-gray-700 dark:text-gray-300';
   }
 }
 
 /**
  * Get background color for strength level badge
+ * Very light pastel colors matching the Dashboard chip aesthetic (#EDE0FF)
  */
 export function getLevelBadgeColor(level: StrengthLevel): string {
   switch (level) {
     case 'Beginner':
-      return 'bg-gray-500/20 border-gray-500';
+      return 'bg-gray-50 dark:bg-gray-700';
     case 'Novice':
-      return 'bg-blue-500/20 border-blue-500';
+      return 'bg-blue-50 dark:bg-blue-900';
     case 'Intermediate':
-      return 'bg-green-500/20 border-green-500';
+      return 'bg-green-50 dark:bg-green-900';
     case 'Advanced':
-      return 'bg-yellow-500/20 border-yellow-500';
+      return 'bg-yellow-50 dark:bg-yellow-900';
     case 'Elite':
-      return 'bg-purple-500/20 border-purple-500';
+      return 'bg-purple-50 dark:bg-purple-900';
     default:
-      return 'bg-gray-500/20 border-gray-500';
+      return 'bg-gray-50 dark:bg-gray-700';
+  }
+}
+
+/**
+ * Get background color hex for strength level badge
+ * Light pastel colors with more saturation for better visibility
+ */
+export function getLevelBadgeColorHex(level: StrengthLevel): string {
+  switch (level) {
+    case 'Beginner':
+      return '#E5E7EB'; // Light gray (gray-200)
+    case 'Novice':
+      return '#BFDBFE'; // Light blue (blue-200)
+    case 'Intermediate':
+      return '#BBF7D0'; // Light green (green-200)
+    case 'Advanced':
+      return '#FEF08A'; // Light yellow (yellow-200)
+    case 'Elite':
+      return '#E9D5FF'; // Light purple (purple-200)
+    default:
+      return '#E5E7EB';
   }
 }
