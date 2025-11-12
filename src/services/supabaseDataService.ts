@@ -539,10 +539,12 @@ export async function getUserProfile(): Promise<any> {
     age: data.age,
     height: data.height ? parseFloat(data.height) : undefined,
     weight: data.weight ? parseFloat(data.weight) : undefined,
+    currentWeight: data.weight ? parseFloat(data.weight) : undefined, // Alias for compatibility
     startingWeight: data.starting_weight ? parseFloat(data.starting_weight) : undefined,
     goal: data.goal,
     experienceLevel: data.experience_level,
-    unitPreference: data.unit_preference === 'metric' ? 'kg' : 'lbs',
+    sex: data.sex,
+    unitPreference: data.unit_preference === 'metric' ? 'metric' : 'imperial',
     actual1rm: data.actual_1rm,
     createdAt: new Date(data.created_at),
     updatedAt: new Date(data.updated_at),
@@ -560,11 +562,13 @@ export async function updateUserProfile(updates: any): Promise<void> {
   if (updates.age !== undefined) updateData.age = updates.age;
   if (updates.height !== undefined) updateData.height = updates.height;
   if (updates.weight !== undefined) updateData.weight = updates.weight;
+  if (updates.currentWeight !== undefined) updateData.weight = updates.currentWeight; // Handle both field names
   if (updates.startingWeight !== undefined) updateData.starting_weight = updates.startingWeight;
   if (updates.goal !== undefined) updateData.goal = updates.goal;
   if (updates.experienceLevel !== undefined) updateData.experience_level = updates.experienceLevel;
+  if (updates.sex !== undefined) updateData.sex = updates.sex;
   if (updates.unitPreference !== undefined) {
-    updateData.unit_preference = updates.unitPreference === 'kg' ? 'metric' : 'imperial';
+    updateData.unit_preference = updates.unitPreference === 'metric' ? 'metric' : 'imperial';
   }
   if (updates.actual1rm !== undefined) updateData.actual_1rm = updates.actual1rm;
 

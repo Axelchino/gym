@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { db } from '../services/database';
 import type { UserProfile, UnitSystem } from '../types/user';
-import { getWorkoutLogs, getPersonalRecords } from '../services/supabaseDataService';
+import { getWorkoutLogs, getPersonalRecords, getUserProfile, updateUserProfile } from '../services/supabaseDataService';
 import { useTheme, type Theme } from '../contexts/ThemeContext';
 
 export function Profile() {
@@ -28,44 +28,34 @@ export function Profile() {
   const loadProfile = async () => {
     if (!user) return;
 
-    // Try to load existing profile or create a new one
-    let profile = await db.users.get(user.id);
+    try {
+      // Load profile from Supabase (cloud storage)
+      const profile = await getUserProfile();
 
-    if (!profile) {
-      // Create profile for new authenticated user
-      profile = {
-        id: user.id,
-        name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
-        email: user.email,
-        goal: 'hypertrophy',
-        experienceLevel: 'intermediate',
-        unitPreference: 'metric',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      await db.users.add(profile);
-    } else {
-      // Update name from auth if it's different (in case user changed it in Google)
-      const authName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
-      if (profile.name !== authName && profile.name === 'Gym Tracker User') {
-        // Update old default profile with real name
-        await db.users.update(user.id, {
-          name: authName,
-          email: user.email,
-          updatedAt: new Date(),
-        });
-        profile.name = authName;
-        profile.email = user.email;
+      // Also cache in IndexedDB for offline access
+      await db.users.put(profile);
+
+      setUserProfile(profile);
+    } catch (error) {
+      console.error('Error loading profile from Supabase:', error);
+
+      // Fallback to IndexedDB if Supabase fails
+      const localProfile = await db.users.get(user.id);
+      if (localProfile) {
+        setUserProfile(localProfile);
       }
     }
-
-    setUserProfile(profile);
   };
 
   const toggleUnitPreference = async () => {
     if (!user || !userProfile) return;
 
     const newUnit: UnitSystem = userProfile.unitPreference === 'metric' ? 'imperial' : 'metric';
+
+    // Update in Supabase (cloud)
+    await updateUserProfile({ unitPreference: newUnit });
+
+    // Also update in IndexedDB cache
     await db.users.update(user.id, {
       unitPreference: newUnit,
       updatedAt: new Date()
@@ -298,10 +288,16 @@ export function Profile() {
           onClose={() => setShowEditModal(false)}
           onSave={async (updates) => {
             if (!user) return;
+
+            // Update in Supabase (cloud)
+            await updateUserProfile(updates);
+
+            // Also update in IndexedDB cache
             await db.users.update(user.id, {
               ...updates,
               updatedAt: new Date(),
             });
+
             await loadProfile();
             setShowEditModal(false);
           }}
