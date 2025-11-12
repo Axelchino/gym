@@ -171,14 +171,22 @@ function getPercentileFromLevel(
   currentLevelThreshold: number,
   nextLevelThreshold: number
 ): number {
+  // Special handling for World Class (no next level)
+  if (level === 'World Class') {
+    // Already at max tier - show top 1.0% baseline
+    // If significantly beyond threshold, show 0.1%
+    const percentBeyond = ((ratio - currentLevelThreshold) / currentLevelThreshold) * 100;
+    if (percentBeyond > 10) {
+      return 0.1; // Exceptional, way beyond standards
+    }
+    return 1.0; // Top tier
+  }
+
   // Calculate progress through current tier (0-1)
   const tierProgress = (ratio - currentLevelThreshold) / (nextLevelThreshold - currentLevelThreshold);
   const clampedProgress = Math.max(0, Math.min(1, tierProgress));
 
   switch (level) {
-    case 'World Class':
-      // Top 1.0-1.5%, interpolate within range
-      return 1.5 - (clampedProgress * 0.5);
     case 'Elite':
       // Top 1.6-9%, interpolate within range
       return 9.0 - (clampedProgress * 7.4);
