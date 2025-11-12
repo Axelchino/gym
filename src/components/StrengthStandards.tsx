@@ -218,9 +218,17 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                   <div className="space-y-3">
                     {/* Everyday Athletes Progress */}
                     <div>
-                      <div className="flex items-center justify-between text-xs mb-1">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
                         <span style={{ color: 'var(--text-secondary)' }}>Everyday Athletes</span>
-                        <span style={{ color: 'var(--text-primary)' }} className="font-semibold">
+                      </div>
+                      <div className="mb-2">
+                        <span
+                          className="inline-block px-2 py-0.5 rounded text-xs font-bold"
+                          style={{
+                            backgroundColor: getLevelBadgeColorHex(generalLevel.level),
+                            color: '#111216'
+                          }}
+                        >
                           Top {generalLevel.percentile}%
                         </span>
                       </div>
@@ -247,9 +255,17 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                     {/* Powerlifting Progress */}
                     {powerliftingLevel && (
                       <div>
-                        <div className="flex items-center justify-between text-xs mb-1">
+                        <div className="flex items-center justify-between text-xs mb-1.5">
                           <span style={{ color: 'var(--text-secondary)' }}>Competitive Powerlifters</span>
-                          <span style={{ color: 'var(--text-primary)' }} className="font-semibold">
+                        </div>
+                        <div className="mb-2">
+                          <span
+                            className="inline-block px-2 py-0.5 rounded text-xs font-bold"
+                            style={{
+                              backgroundColor: getLevelBadgeColorHex(powerliftingLevel.level),
+                              color: '#111216'
+                            }}
+                          >
                             Top {powerliftingLevel.percentile}%
                           </span>
                         </div>

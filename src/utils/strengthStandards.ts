@@ -374,26 +374,3 @@ export function getLevelBadgeColorHex(level: StrengthLevel): string {
       return '#E5E7EB';
   }
 }
-
-/**
- * Get background color hex for strength level badge
- * Light pastel colors with more saturation for better visibility
- */
-export function getLevelBadgeColorHex(level: StrengthLevel): string {
-  switch (level) {
-    case 'Beginner':
-      return '#E5E7EB'; // Light gray (gray-200)
-    case 'Novice':
-      return '#BFDBFE'; // Light blue (blue-200)
-    case 'Intermediate':
-      return '#BBF7D0'; // Light green (green-200)
-    case 'Advanced':
-      return '#FEF08A'; // Light yellow (yellow-200)
-    case 'Elite':
-      return '#E9D5FF'; // Light purple (purple-200)
-    case 'World Class':
-      return '#FED7AA'; // Light orange (orange-200)
-    default:
-      return '#E5E7EB';
-  }
-}
