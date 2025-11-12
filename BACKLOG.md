@@ -19,10 +19,50 @@
   - [ ] Fix any hardcoded color values in Recharts components
   - [ ] Ensure consistent borders, hover states, and contrast ratios
 
-- [ ] **Strength Standards Persistence Bug** (if still present)
-  - [ ] Verify if data resets when profile changes
-  - [ ] Create separate persistent storage for strength standards if needed
-  - [ ] Decouple from profile state management
+- [ ] **Strength Standards - Complete UX/UI Overhaul** (In Progress - Awaiting Review)
+  - [ ] **Persistence Issues:**
+    - [ ] Bodyweight and sex not persisting across devices/refreshes (uses local state) → IMPLEMENTED (needs testing)
+    - [ ] Move bodyweight and sex to user profile (database-backed) → IMPLEMENTED (needs testing)
+    - [ ] Sync settings everywhere (Strength Standards, Profile) → IMPLEMENTED (needs testing)
+  - [ ] **Design/Styling Issues:**
+    - [ ] UX doesn't correlate with rest of program → FIXED (removed settings panel, using theme-aware card styling)
+    - [ ] Level chips (badges) are hard to read → FIXED (solid colors with high contrast, light/dark mode support)
+    - [ ] Keep colored progress bars (different colors for each level) → KEPT
+  - [ ] **Explanation & Settings:**
+    - [ ] "Gym Rat" vs "Powerlifter" distinction hidden in settings - confusing → FIXED (clean inline explanation with purple accent border)
+    - [ ] Either remove from settings and explain inline, OR keep in settings but link to profile → CHOSE inline explanation
+    - [ ] Better explanation of dual comparison system (General vs Powerlifting) → REDESIGNED
+  - [ ] **User Profile Integration:**
+    - [ ] Add bodyweight field to Profile/User tab → IMPLEMENTED (Profile.tsx:384-398)
+    - [ ] Add sex/gender field to Profile/User tab → IMPLEMENTED with privacy message (Profile.tsx:400-418)
+    - [ ] Sync these fields to Strength Standards component automatically → IMPLEMENTED
+    - [ ] Show prompt if data missing → IMPLEMENTED (yellow banner with navigate to profile)
+  - [ ] **Onboarding Flow:** (Documented, not yet implemented)
+    - [ ] When user creates account, ask for bodyweight and sex
+    - [ ] Include "Skip" option for privacy-conscious users
+    - [ ] Respect users who don't want to share this data with a random company
+    - [ ] If skipped, show prompt in Strength Standards to add data for better results (PARTIAL - prompt exists)
+  - [x] **Percentile Rankings & Meaningful Comparisons** ✅ COMPLETE (2025-11-11)
+    - [x] Replace confusing "75% to next level" with global percentile rank → IMPLEMENTED ("Top X%")
+    - [x] Show "Top X% of lifters" based on research-backed data → IMPLEMENTED (Elite = 2.5%, Advanced = 15%, etc.)
+    - [x] Research accurate percentile distributions → COMPLETED (see data/exercise_rankings/strength_standards_percentiles.md):
+      - World Class = Top 1.0-1.5% (NEW hidden tier, orange badge)
+      - Elite = Top 1.6-9% (purple badge)
+      - Advanced = Top 10-29% (yellow badge)
+      - Intermediate = Top 30-49% (green badge)
+      - Novice = Top 50-79% (blue badge)
+      - Beginner = Bottom 80-100% (gray badge)
+    - [x] Show dual percentile ranks (General vs Powerlifting) → IMPLEMENTED (both standards show "Top X%")
+    - [x] Handle extreme values gracefully (e.g., 500x10 bench) → IMPLEMENTED:
+      - Progress bar capped at 100% using Math.min()
+      - World Class tier catches extreme values (percentage = 100%)
+      - "Next level" text hidden when at World Class
+      - UI remains stable at all ratios
+    - [x] Add "World Class" tier (orange, hidden) for top 1-1.5% → IMPLEMENTED:
+      - Thresholds = Elite × 1.15 (15% increase)
+      - All 4 exercises × 2 genders × 2 standards (32 thresholds added)
+      - Research-backed percentile mapping (1.0-1.5% confirmed)
+      - Color scheme: Orange badge (RPG mythic tier convention)
 
 - [ ] **Dashboard Recent Activity - Filter Functionality Missing**
   - [ ] Implement time period filter (7 days, 30 days, 90 days, All)

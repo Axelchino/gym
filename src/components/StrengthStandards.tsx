@@ -214,29 +214,30 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                     </div>
                   </div>
 
-                  {/* Dual Progress Bars */}
+                  {/* Dual Progress Bars with Percentile Rankings */}
                   <div className="space-y-3">
                     {/* Everyday Athletes Progress */}
                     <div>
                       <div className="flex items-center justify-between text-xs mb-1">
                         <span style={{ color: 'var(--text-secondary)' }}>Everyday Athletes</span>
-                        <span style={{ color: 'var(--text-primary)' }}>
-                          {generalLevel.percentage.toFixed(0)}%
+                        <span style={{ color: 'var(--text-primary)' }} className="font-semibold">
+                          Top {generalLevel.percentile}%
                         </span>
                       </div>
                       <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
                         <div
                           className={`h-full transition-all duration-500 ${
-                            generalLevel.level === 'Beginner' ? 'bg-gray-400' :
-                            generalLevel.level === 'Novice' ? 'bg-blue-400' :
-                            generalLevel.level === 'Intermediate' ? 'bg-green-400' :
+                            generalLevel.level === 'World Class' ? 'bg-orange-400' :
+                            generalLevel.level === 'Elite' ? 'bg-purple-400' :
                             generalLevel.level === 'Advanced' ? 'bg-yellow-400' :
-                            'bg-purple-400'
+                            generalLevel.level === 'Intermediate' ? 'bg-green-400' :
+                            generalLevel.level === 'Novice' ? 'bg-blue-400' :
+                            'bg-gray-400'
                           }`}
-                          style={{ width: `${generalLevel.percentage}%` }}
+                          style={{ width: `${Math.min(100, generalLevel.percentage)}%` }}
                         ></div>
                       </div>
-                      {generalLevel.level !== 'Elite' && (
+                      {generalLevel.level !== 'World Class' && (
                         <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                           Next: {generalLevel.nextLevelWeight.toFixed(0)} {weightUnit}
                         </div>
@@ -248,23 +249,24 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
                           <span style={{ color: 'var(--text-secondary)' }}>Competitive Powerlifters</span>
-                          <span style={{ color: 'var(--text-primary)' }}>
-                            {powerliftingLevel.percentage.toFixed(0)}%
+                          <span style={{ color: 'var(--text-primary)' }} className="font-semibold">
+                            Top {powerliftingLevel.percentile}%
                           </span>
                         </div>
                         <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
                           <div
                             className={`h-full transition-all duration-500 ${
-                              powerliftingLevel.level === 'Beginner' ? 'bg-gray-400' :
-                              powerliftingLevel.level === 'Novice' ? 'bg-blue-400' :
-                              powerliftingLevel.level === 'Intermediate' ? 'bg-green-400' :
+                              powerliftingLevel.level === 'World Class' ? 'bg-orange-400' :
+                              powerliftingLevel.level === 'Elite' ? 'bg-purple-400' :
                               powerliftingLevel.level === 'Advanced' ? 'bg-yellow-400' :
-                              'bg-purple-400'
+                              powerliftingLevel.level === 'Intermediate' ? 'bg-green-400' :
+                              powerliftingLevel.level === 'Novice' ? 'bg-blue-400' :
+                              'bg-gray-400'
                             }`}
-                            style={{ width: `${powerliftingLevel.percentage}%` }}
+                            style={{ width: `${Math.min(100, powerliftingLevel.percentage)}%` }}
                           ></div>
                         </div>
-                        {powerliftingLevel.level !== 'Elite' && (
+                        {powerliftingLevel.level !== 'World Class' && (
                           <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                             Next: {powerliftingLevel.nextLevelWeight.toFixed(0)} {weightUnit}
                           </div>
@@ -296,9 +298,9 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
       {/* Legend */}
       {hasAnyData && (
         <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div className="text-xs mb-2 font-medium" style={{ color: 'var(--text-muted)' }}>Strength Levels:</div>
+          <div className="text-xs mb-2 font-medium" style={{ color: 'var(--text-muted)' }}>Strength Levels (Lower percentile = Better):</div>
           <div className="flex flex-wrap gap-2">
-            {(['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite'] as StrengthLevel[]).map(
+            {(['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite', 'World Class'] as StrengthLevel[]).map(
               level => (
                 <div
                   key={level}
@@ -312,6 +314,9 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                 </div>
               )
             )}
+          </div>
+          <div className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+            Percentiles compare you against lifters who train consistently. Top 1% = World Class, Top 90% = Beginner.
           </div>
         </div>
       )}

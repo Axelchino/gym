@@ -3,13 +3,14 @@
  * Uses SymmetricStrength.com methodology
  */
 
-export type StrengthLevel = 'Beginner' | 'Novice' | 'Intermediate' | 'Advanced' | 'Elite';
+export type StrengthLevel = 'Beginner' | 'Novice' | 'Intermediate' | 'Advanced' | 'Elite' | 'World Class';
 export type StandardType = 'general' | 'powerlifting';
 
 export interface StrengthStandard {
   exercise: string;
   level: StrengthLevel;
   percentage: number; // Progress toward next level (0-100)
+  percentile: number; // Percentile rank (1-100, lower = better)
   currentRatio: number; // Weight lifted / bodyweight
   nextLevelRatio: number; // Ratio needed for next level
   nextLevelWeight: number; // Weight needed for next level
@@ -23,6 +24,7 @@ const STANDARDS_GENERAL_MALE = {
     intermediate: 1.50,
     advanced: 1.90,
     elite: 2.30,
+    worldClass: 2.65,
   },
   'Bench Press': {
     beginner: 0.45,
@@ -30,6 +32,7 @@ const STANDARDS_GENERAL_MALE = {
     intermediate: 1.10,
     advanced: 1.45,
     elite: 1.80,
+    worldClass: 2.05,
   },
   'Deadlift': {
     beginner: 0.90,
@@ -37,6 +40,7 @@ const STANDARDS_GENERAL_MALE = {
     intermediate: 1.80,
     advanced: 2.25,
     elite: 2.70,
+    worldClass: 3.10,
   },
   'Overhead Press': {
     beginner: 0.30,
@@ -44,6 +48,7 @@ const STANDARDS_GENERAL_MALE = {
     intermediate: 0.75,
     advanced: 1.00,
     elite: 1.30,
+    worldClass: 1.50,
   },
 };
 
@@ -54,6 +59,7 @@ const STANDARDS_GENERAL_FEMALE = {
     intermediate: 1.05,
     advanced: 1.35,
     elite: 1.70,
+    worldClass: 1.95,
   },
   'Bench Press': {
     beginner: 0.25,
@@ -61,6 +67,7 @@ const STANDARDS_GENERAL_FEMALE = {
     intermediate: 0.65,
     advanced: 0.90,
     elite: 1.15,
+    worldClass: 1.30,
   },
   'Deadlift': {
     beginner: 0.55,
@@ -68,6 +75,7 @@ const STANDARDS_GENERAL_FEMALE = {
     intermediate: 1.25,
     advanced: 1.60,
     elite: 2.00,
+    worldClass: 2.30,
   },
   'Overhead Press': {
     beginner: 0.20,
@@ -75,6 +83,7 @@ const STANDARDS_GENERAL_FEMALE = {
     intermediate: 0.50,
     advanced: 0.65,
     elite: 0.85,
+    worldClass: 0.98,
   },
 };
 
@@ -86,6 +95,7 @@ const STANDARDS_POWERLIFTING_MALE = {
     intermediate: 1.75,
     advanced: 2.25,
     elite: 2.75,
+    worldClass: 3.15,
   },
   'Bench Press': {
     beginner: 0.50,
@@ -93,6 +103,7 @@ const STANDARDS_POWERLIFTING_MALE = {
     intermediate: 1.25,
     advanced: 1.75,
     elite: 2.25,
+    worldClass: 2.60,
   },
   'Deadlift': {
     beginner: 1.00,
@@ -100,6 +111,7 @@ const STANDARDS_POWERLIFTING_MALE = {
     intermediate: 2.00,
     advanced: 2.50,
     elite: 3.00,
+    worldClass: 3.45,
   },
   'Overhead Press': {
     beginner: 0.35,
@@ -107,6 +119,7 @@ const STANDARDS_POWERLIFTING_MALE = {
     intermediate: 0.85,
     advanced: 1.15,
     elite: 1.50,
+    worldClass: 1.75,
   },
 };
 
@@ -117,6 +130,7 @@ const STANDARDS_POWERLIFTING_FEMALE = {
     intermediate: 1.25,
     advanced: 1.60,
     elite: 2.00,
+    worldClass: 2.30,
   },
   'Bench Press': {
     beginner: 0.30,
@@ -124,6 +138,7 @@ const STANDARDS_POWERLIFTING_FEMALE = {
     intermediate: 0.75,
     advanced: 1.10,
     elite: 1.50,
+    worldClass: 1.75,
   },
   'Deadlift': {
     beginner: 0.65,
@@ -131,6 +146,7 @@ const STANDARDS_POWERLIFTING_FEMALE = {
     intermediate: 1.40,
     advanced: 1.75,
     elite: 2.15,
+    worldClass: 2.47,
   },
   'Overhead Press': {
     beginner: 0.20,
@@ -138,10 +154,40 @@ const STANDARDS_POWERLIFTING_FEMALE = {
     intermediate: 0.55,
     advanced: 0.75,
     elite: 1.00,
+    worldClass: 1.15,
   },
 };
 
-const LEVEL_ORDER: StrengthLevel[] = ['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite'];
+const LEVEL_ORDER: StrengthLevel[] = ['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite', 'World Class'];
+
+/**
+ * Map strength level to percentile rank (1-100, lower = better)
+ * Based on research: Elite = top 2.5%, Novice = stronger than ~20%
+ */
+function getPercentileFromLevel(level: StrengthLevel, ratio: number, threshold: number): number {
+  switch (level) {
+    case 'World Class':
+      // Top 1-1.5%, map 1.0-1.5 based on how far above threshold
+      return 1.0;
+    case 'Elite':
+      // Top 1.6-9%, map based on progress through Elite range
+      return 2.5;
+    case 'Advanced':
+      // Top 10-29%
+      return 15;
+    case 'Intermediate':
+      // Top 30-49%
+      return 40;
+    case 'Novice':
+      // Top 50-79%
+      return 65;
+    case 'Beginner':
+      // Bottom 80-100%
+      return 90;
+    default:
+      return 90;
+  }
+}
 
 /**
  * Calculate strength level for a given exercise
@@ -172,13 +218,16 @@ export function calculateStrengthLevel(
 
   const ratio = weightLifted / bodyweight;
 
-  // Determine current level
+  // Determine current level (including World Class)
   let level: StrengthLevel = 'Beginner';
   let nextLevelRatio = exerciseStandards.novice;
 
-  if (ratio >= exerciseStandards.elite) {
+  if (ratio >= exerciseStandards.worldClass) {
+    level = 'World Class';
+    nextLevelRatio = exerciseStandards.worldClass; // Already at max
+  } else if (ratio >= exerciseStandards.elite) {
     level = 'Elite';
-    nextLevelRatio = exerciseStandards.elite; // Already at max
+    nextLevelRatio = exerciseStandards.worldClass;
   } else if (ratio >= exerciseStandards.advanced) {
     level = 'Advanced';
     nextLevelRatio = exerciseStandards.elite;
@@ -195,17 +244,20 @@ export function calculateStrengthLevel(
 
   // Calculate progress to next level
   let percentage = 0;
-  if (level === 'Elite') {
+  if (level === 'World Class') {
     percentage = 100;
   } else {
     const currentLevelIndex = LEVEL_ORDER.indexOf(level);
     const currentLevelRatio = currentLevelIndex === 0
       ? 0
-      : exerciseStandards[level.toLowerCase() as keyof typeof exerciseStandards];
+      : exerciseStandards[level.toLowerCase().replace(' ', '') as keyof typeof exerciseStandards];
 
     percentage = ((ratio - currentLevelRatio) / (nextLevelRatio - currentLevelRatio)) * 100;
     percentage = Math.min(100, Math.max(0, percentage));
   }
+
+  // Calculate percentile rank
+  const percentile = getPercentileFromLevel(level, ratio, nextLevelRatio);
 
   const nextLevelWeight = nextLevelRatio * bodyweight;
 
@@ -213,6 +265,7 @@ export function calculateStrengthLevel(
     exercise: normalizedName,
     level,
     percentage,
+    percentile,
     currentRatio: ratio,
     nextLevelRatio,
     nextLevelWeight,
@@ -269,6 +322,8 @@ export function getLevelColor(level: StrengthLevel): string {
       return 'text-yellow-700 dark:text-yellow-300';
     case 'Elite':
       return 'text-purple-700 dark:text-purple-300';
+    case 'World Class':
+      return 'text-orange-700 dark:text-orange-300';
     default:
       return 'text-gray-700 dark:text-gray-300';
   }
@@ -276,22 +331,24 @@ export function getLevelColor(level: StrengthLevel): string {
 
 /**
  * Get background color for strength level badge
- * Very light pastel colors matching the Dashboard chip aesthetic (#EDE0FF)
+ * Light pastel colors with more saturation
  */
 export function getLevelBadgeColor(level: StrengthLevel): string {
   switch (level) {
     case 'Beginner':
-      return 'bg-gray-50 dark:bg-gray-700';
+      return 'bg-gray-200 dark:bg-gray-700';
     case 'Novice':
-      return 'bg-blue-50 dark:bg-blue-900';
+      return 'bg-blue-200 dark:bg-blue-900';
     case 'Intermediate':
-      return 'bg-green-50 dark:bg-green-900';
+      return 'bg-green-200 dark:bg-green-900';
     case 'Advanced':
-      return 'bg-yellow-50 dark:bg-yellow-900';
+      return 'bg-yellow-200 dark:bg-yellow-900';
     case 'Elite':
-      return 'bg-purple-50 dark:bg-purple-900';
+      return 'bg-purple-200 dark:bg-purple-900';
+    case 'World Class':
+      return 'bg-orange-200 dark:bg-orange-900';
     default:
-      return 'bg-gray-50 dark:bg-gray-700';
+      return 'bg-gray-200 dark:bg-gray-700';
   }
 }
 
@@ -311,6 +368,31 @@ export function getLevelBadgeColorHex(level: StrengthLevel): string {
       return '#FEF08A'; // Light yellow (yellow-200)
     case 'Elite':
       return '#E9D5FF'; // Light purple (purple-200)
+    case 'World Class':
+      return '#FED7AA'; // Light orange (orange-200)
+    default:
+      return '#E5E7EB';
+  }
+}
+
+/**
+ * Get background color hex for strength level badge
+ * Light pastel colors with more saturation for better visibility
+ */
+export function getLevelBadgeColorHex(level: StrengthLevel): string {
+  switch (level) {
+    case 'Beginner':
+      return '#E5E7EB'; // Light gray (gray-200)
+    case 'Novice':
+      return '#BFDBFE'; // Light blue (blue-200)
+    case 'Intermediate':
+      return '#BBF7D0'; // Light green (green-200)
+    case 'Advanced':
+      return '#FEF08A'; // Light yellow (yellow-200)
+    case 'Elite':
+      return '#E9D5FF'; // Light purple (purple-200)
+    case 'World Class':
+      return '#FED7AA'; // Light orange (orange-200)
     default:
       return '#E5E7EB';
   }
