@@ -263,9 +263,17 @@ export function calculateStrengthLevel(
 
   // Get current level threshold for percentile calculation
   const currentLevelIndex = LEVEL_ORDER.indexOf(level);
-  const currentLevelRatio = currentLevelIndex === 0
-    ? 0
-    : exerciseStandards[level.toLowerCase().replace(' ', '') as keyof typeof exerciseStandards] as number;
+  let currentLevelRatio = 0;
+
+  if (currentLevelIndex === 0) {
+    currentLevelRatio = 0;
+  } else {
+    // Map level name to standard property key
+    const levelKey = level === 'World Class'
+      ? 'worldClass'
+      : level.toLowerCase().replace(' ', '') as keyof typeof exerciseStandards;
+    currentLevelRatio = exerciseStandards[levelKey] as number;
+  }
 
   // Calculate progress to next level
   let percentage = 0;
