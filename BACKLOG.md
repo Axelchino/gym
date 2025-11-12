@@ -1,6 +1,6 @@
 # GymTracker Pro - Development Backlog
 
-**Last Updated:** 2025-11-09
+**Last Updated:** 2025-11-12
 **Current Phase:** Phase 5 Complete, Phase 5.5 Next
 **Version:** v0.5.0
 
@@ -19,11 +19,13 @@
   - [ ] Fix any hardcoded color values in Recharts components
   - [ ] Ensure consistent borders, hover states, and contrast ratios
 
-- [ ] **Strength Standards - Complete UX/UI Overhaul** (In Progress - Awaiting Review)
-  - [ ] **Persistence Issues:**
-    - [ ] Bodyweight and sex not persisting across devices/refreshes (uses local state) → IMPLEMENTED (needs testing)
-    - [ ] Move bodyweight and sex to user profile (database-backed) → IMPLEMENTED (needs testing)
-    - [ ] Sync settings everywhere (Strength Standards, Profile) → IMPLEMENTED (needs testing)
+- [x] **Strength Standards - Complete UX/UI Overhaul** ✅ COMPLETE (2025-11-12)
+  - [x] **Persistence Issues:**
+    - [x] Bodyweight and sex not persisting across devices/refreshes → FIXED (Supabase cloud storage)
+    - [x] Move bodyweight and sex to user profile (database-backed) → IMPLEMENTED (Supabase profiles table)
+    - [x] Sync settings everywhere (Strength Standards, Profile) → IMPLEMENTED (useUserSettings hook fixed)
+    - [x] Unit conversion (kg/lbs) display issues → FIXED (proper conversion in display layer)
+    - [x] Unit preference not loading correctly → FIXED (useUserSettings now uses authenticated user ID)
   - [ ] **Design/Styling Issues:**
     - [ ] UX doesn't correlate with rest of program → FIXED (removed settings panel, using theme-aware card styling)
     - [ ] Level chips (badges) are hard to read → FIXED (solid colors with high contrast, light/dark mode support)

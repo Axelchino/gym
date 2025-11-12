@@ -1,9 +1,9 @@
 # GymTracker Pro - Development Progress Report
 
-**Last Updated:** 2025-11-09
-**Current Version:** v0.5.0
+**Last Updated:** 2025-11-12
+**Current Version:** v0.5.1
 **Deployed:** https://gym-tracker-five-kappa.vercel.app
-**Development Timeline:** 14 weeks (October 1 - November 9, 2025)
+**Development Timeline:** 14 weeks (October 1 - November 12, 2025)
 
 ---
 
@@ -1134,6 +1134,29 @@ User wanted to experiment with colors, shadows, and borders without changing hex
 - ✅ Removed phone-first features
 - ✅ Apple-style minimal aesthetic
 
+#### 2025-11-12: Strength Standards Persistence & Unit Conversion Fix
+- ✅ Fixed user profile data persistence (weight, sex, unit preference)
+- ✅ Migrated profile storage from IndexedDB to Supabase cloud database
+- ✅ Fixed unit conversion display issues in Strength Standards component
+- ✅ Fixed useUserSettings hook to read from authenticated user ID
+- ✅ Added sex field support to Supabase profile service
+- ✅ Profile data now survives cache resets and syncs across devices
+- ✅ Analytics page UX refresh with new stat card design
+- ✅ Added guest mode empty states with call-to-action
+
+**Technical Details:**
+- `useUserSettings` hook was reading from hardcoded 'default-user' ID instead of authenticated user
+- Profile page was only saving to IndexedDB (local), not Supabase (cloud)
+- Unit conversion logic added to display layer (divide by 2.20462 for kg)
+- Supabase `getUserProfile()` and `updateUserProfile()` now handle all profile fields
+- Profile.tsx updated to use Supabase as source of truth with IndexedDB cache fallback
+
+**Bug Fixes:**
+- Unit preference not persisting across sessions → FIXED
+- Weight and sex resetting on cache clear → FIXED
+- Displayed weights not converting between kg/lbs → FIXED
+- Different user IDs for reading/writing preferences → FIXED
+
 ---
 
 ## Current Production Status
@@ -1159,7 +1182,7 @@ User wanted to experiment with colors, shadows, and borders without changing hex
 
 ### Known Issues (In BACKLOG.md)
 - [ ] Recent Activity card styling inconsistencies
-- [ ] Strength Standards resetting when profile changes
+- [x] Strength Standards resetting when profile changes → FIXED (2025-11-12)
 - [ ] Analytics charts not using CSS variable theming
 - [ ] CSV export/import outdated for new exercise database
 
