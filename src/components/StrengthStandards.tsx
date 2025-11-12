@@ -229,7 +229,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                             color: '#111216'
                           }}
                         >
-                          Top {generalLevel.percentile}%
+                          Top {generalLevel.percentile.toFixed(1)}%
                         </span>
                       </div>
                       <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
@@ -266,7 +266,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                               color: '#111216'
                             }}
                           >
-                            Top {powerliftingLevel.percentile}%
+                            Top {powerliftingLevel.percentile.toFixed(1)}%
                           </span>
                         </div>
                         <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>

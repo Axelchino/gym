@@ -163,29 +163,39 @@ const LEVEL_ORDER: StrengthLevel[] = ['Beginner', 'Novice', 'Intermediate', 'Adv
 /**
  * Map strength level to percentile rank (1-100, lower = better)
  * Based on research: Elite = top 2.5%, Novice = stronger than ~20%
+ * Returns granular percentile within tier based on progress through that tier
  */
-function getPercentileFromLevel(level: StrengthLevel, ratio: number, threshold: number): number {
+function getPercentileFromLevel(
+  level: StrengthLevel,
+  ratio: number,
+  currentLevelThreshold: number,
+  nextLevelThreshold: number
+): number {
+  // Calculate progress through current tier (0-1)
+  const tierProgress = (ratio - currentLevelThreshold) / (nextLevelThreshold - currentLevelThreshold);
+  const clampedProgress = Math.max(0, Math.min(1, tierProgress));
+
   switch (level) {
     case 'World Class':
-      // Top 1-1.5%, map 1.0-1.5 based on how far above threshold
-      return 1.0;
+      // Top 1.0-1.5%, interpolate within range
+      return 1.5 - (clampedProgress * 0.5);
     case 'Elite':
-      // Top 1.6-9%, map based on progress through Elite range
-      return 2.5;
+      // Top 1.6-9%, interpolate within range
+      return 9.0 - (clampedProgress * 7.4);
     case 'Advanced':
-      // Top 10-29%
-      return 15;
+      // Top 10-29%, interpolate within range
+      return 29.0 - (clampedProgress * 19.0);
     case 'Intermediate':
-      // Top 30-49%
-      return 40;
+      // Top 30-49%, interpolate within range
+      return 49.0 - (clampedProgress * 19.0);
     case 'Novice':
-      // Top 50-79%
-      return 65;
+      // Top 50-79%, interpolate within range
+      return 79.0 - (clampedProgress * 29.0);
     case 'Beginner':
-      // Bottom 80-100%
-      return 90;
+      // Bottom 80-100%, interpolate within range
+      return 100.0 - (clampedProgress * 20.0);
     default:
-      return 90;
+      return 95.0;
   }
 }
 
@@ -242,22 +252,23 @@ export function calculateStrengthLevel(
     nextLevelRatio = exerciseStandards.novice;
   }
 
+  // Get current level threshold for percentile calculation
+  const currentLevelIndex = LEVEL_ORDER.indexOf(level);
+  const currentLevelRatio = currentLevelIndex === 0
+    ? 0
+    : exerciseStandards[level.toLowerCase().replace(' ', '') as keyof typeof exerciseStandards] as number;
+
   // Calculate progress to next level
   let percentage = 0;
   if (level === 'World Class') {
     percentage = 100;
   } else {
-    const currentLevelIndex = LEVEL_ORDER.indexOf(level);
-    const currentLevelRatio = currentLevelIndex === 0
-      ? 0
-      : exerciseStandards[level.toLowerCase().replace(' ', '') as keyof typeof exerciseStandards];
-
     percentage = ((ratio - currentLevelRatio) / (nextLevelRatio - currentLevelRatio)) * 100;
     percentage = Math.min(100, Math.max(0, percentage));
   }
 
-  // Calculate percentile rank
-  const percentile = getPercentileFromLevel(level, ratio, nextLevelRatio);
+  // Calculate percentile rank with granular interpolation
+  const percentile = getPercentileFromLevel(level, ratio, currentLevelRatio, nextLevelRatio);
 
   const nextLevelWeight = nextLevelRatio * bodyweight;
 
