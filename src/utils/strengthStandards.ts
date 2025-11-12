@@ -174,12 +174,13 @@ function getPercentileFromLevel(
   // Special handling for World Class (no next level)
   if (level === 'World Class') {
     // Already at max tier - show top 1.0% baseline
-    // If significantly beyond threshold, show 0.1%
+    // If significantly beyond threshold (20%+ stronger), show 0.1%
     const percentBeyond = ((ratio - currentLevelThreshold) / currentLevelThreshold) * 100;
-    if (percentBeyond > 10) {
-      return 0.1; // Exceptional, way beyond standards
+    if (percentBeyond >= 20) {
+      return 0.1; // Exceptional, way beyond World Class standards
     }
-    return 1.0; // Top tier
+    // Interpolate between 1.0% and 1.5% for those just at World Class
+    return Math.max(1.0, 1.5 - (percentBeyond / 20) * 0.5);
   }
 
   // Calculate progress through current tier (0-1)
