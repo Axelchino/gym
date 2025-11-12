@@ -176,6 +176,7 @@ function getPercentileFromLevel(
     // Already at max tier - show top 1.0% baseline
     // If significantly beyond threshold (20%+ stronger), show 0.1%
     const percentBeyond = ((ratio - currentLevelThreshold) / currentLevelThreshold) * 100;
+
     if (percentBeyond >= 20) {
       return 0.1; // Exceptional, way beyond World Class standards
     }
