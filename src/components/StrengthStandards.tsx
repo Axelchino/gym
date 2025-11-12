@@ -207,10 +207,10 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                   <div className="mb-4">
                     <div className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Best Lift</div>
                     <div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {stats.bestWeight.toFixed(1)} {weightUnit} × {stats.bestReps}
+                      {(weightUnit === 'kg' ? stats.bestWeight / 2.20462 : stats.bestWeight).toFixed(1)} {weightUnit} × {stats.bestReps}
                     </div>
                     <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                      Est. 1RM: {stats.best1RM.toFixed(1)} {weightUnit} ({generalLevel.currentRatio.toFixed(2)}x BW)
+                      Est. 1RM: {(weightUnit === 'kg' ? stats.best1RM / 2.20462 : stats.best1RM).toFixed(1)} {weightUnit} ({generalLevel.currentRatio.toFixed(2)}x BW)
                     </div>
                   </div>
 
@@ -247,7 +247,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                       </div>
                       {generalLevel.level !== 'World Class' && (
                         <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                          Next: {generalLevel.nextLevelWeight.toFixed(0)} {weightUnit}
+                          Next: {(weightUnit === 'kg' ? generalLevel.nextLevelWeight / 2.20462 : generalLevel.nextLevelWeight).toFixed(0)} {weightUnit}
                         </div>
                       )}
                     </div>
@@ -284,7 +284,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                         </div>
                         {powerliftingLevel.level !== 'World Class' && (
                           <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                            Next: {powerliftingLevel.nextLevelWeight.toFixed(0)} {weightUnit}
+                            Next: {(weightUnit === 'kg' ? powerliftingLevel.nextLevelWeight / 2.20462 : powerliftingLevel.nextLevelWeight).toFixed(0)} {weightUnit}
                           </div>
                         )}
                       </div>
