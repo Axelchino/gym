@@ -195,10 +195,10 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
   }[selectedPeriod];
 
   const ChangeIndicator = ({ value }: { value: number }) => {
-    if (value === 0) return <span className="text-gray-500 text-sm">No change</span>;
+    if (value === 0) return <span className="text-muted text-sm">No change</span>;
     const isPositive = value > 0;
     return (
-      <div className={`flex items-center gap-1 text-sm ${isPositive ? 'text-primary-green' : 'text-red-400'}`}>
+      <div className={`flex items-center gap-1 text-sm`} style={{ color: isPositive ? '#B482FF' : '#FF6B6B' }}>
         {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
         <span>{isPositive ? '+' : ''}{value.toFixed(0)}%</span>
       </div>
@@ -209,11 +209,11 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
     <div className="card-elevated">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">
-            <BarChart3 className="text-primary-blue" size={28} />
+          <h2 className="text-xl font-bold text-primary mb-1 flex items-center gap-2">
+            <BarChart3 size={22} style={{ color: '#B482FF' }} strokeWidth={1.5} />
             Progress Report
           </h2>
-          <p className="text-sm text-gray-400">Summary of your training progress</p>
+          <p className="text-sm text-secondary">Summary of your training progress</p>
         </div>
 
         {/* Period Selector */}
@@ -222,11 +222,22 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedPeriod === period
-                  ? 'bg-primary-blue text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
+              className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+              style={{
+                backgroundColor: selectedPeriod === period ? '#EDE0FF' : 'transparent',
+                color: selectedPeriod === period ? '#7E29FF' : 'var(--text-secondary)',
+                border: `1px solid ${selectedPeriod === period ? '#D7BDFF' : 'var(--border-subtle)'}`,
+              }}
+              onMouseEnter={(e) => {
+                if (selectedPeriod !== period) {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedPeriod !== period) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
             >
               {period.charAt(0).toUpperCase() + period.slice(1)}
             </button>
@@ -236,73 +247,88 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
 
       {/* Summary Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2 text-gray-400">
-            <Calendar size={18} />
-            <span className="text-sm font-medium">Workouts</span>
-          </div>
-          <p className="text-3xl font-bold mb-1">{reportData.current.totalWorkouts}</p>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">{previousPeriodLabel}</span>
-            <ChangeIndicator value={reportData.changes.workouts} />
-          </div>
-        </div>
-
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2 text-gray-400">
-            <Dumbbell size={18} />
+        <div className="rounded-lg p-4" style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <div className="flex items-center gap-2 mb-2 text-muted">
+            <Dumbbell size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Total Volume</span>
           </div>
-          <p className="text-3xl font-bold mb-1">{reportData.current.totalVolume.toFixed(0)}</p>
+          <p className="text-3xl font-bold text-primary mb-1">{reportData.current.totalVolume.toFixed(0)}</p>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">{weightUnit}</span>
+            <span className="text-xs text-muted">{weightUnit}</span>
             <ChangeIndicator value={reportData.changes.volume} />
           </div>
         </div>
 
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2 text-gray-400">
-            <Clock size={18} />
+        <div className="rounded-lg p-4" style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <div className="flex items-center gap-2 mb-2 text-muted">
+            <Calendar size={18} strokeWidth={1.5} />
+            <span className="text-sm font-medium">Workouts</span>
+          </div>
+          <p className="text-3xl font-bold text-primary mb-1">{reportData.current.totalWorkouts}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted">{previousPeriodLabel}</span>
+            <ChangeIndicator value={reportData.changes.workouts} />
+          </div>
+        </div>
+
+        <div className="rounded-lg p-4" style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <div className="flex items-center gap-2 mb-2 text-muted">
+            <Clock size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Training Time</span>
           </div>
-          <p className="text-3xl font-bold mb-1">{Math.round(reportData.current.totalTime / 60)}</p>
+          <p className="text-3xl font-bold text-primary mb-1">{Math.round(reportData.current.totalTime / 60)}</p>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">hours</span>
+            <span className="text-xs text-muted">hours</span>
             <ChangeIndicator value={reportData.changes.time} />
           </div>
         </div>
 
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2 text-gray-400">
-            <Target size={18} />
+        <div className="rounded-lg p-4" style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <div className="flex items-center gap-2 mb-2 text-muted">
+            <Target size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Total Sets</span>
           </div>
-          <p className="text-3xl font-bold mb-1">{reportData.current.totalSets}</p>
+          <p className="text-3xl font-bold text-primary mb-1">{reportData.current.totalSets}</p>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">{previousPeriodLabel}</span>
+            <span className="text-xs text-muted">{previousPeriodLabel}</span>
             <ChangeIndicator value={reportData.changes.sets} />
           </div>
         </div>
       </div>
 
       {/* Training Frequency Chart */}
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 mb-6">
-        <h3 className="text-lg font-semibold mb-4">Training Frequency - {periodLabel}</h3>
+      <div className="rounded-lg p-4 mb-6" style={{
+        backgroundColor: 'var(--surface-accent)',
+        border: '1px solid var(--border-subtle)',
+      }}>
+        <h3 className="text-lg font-semibold text-primary mb-4">Training Frequency - {periodLabel}</h3>
         {reportData.frequencyData.length > 0 ? (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={reportData.frequencyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="label" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-              <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+              <XAxis dataKey="label" stroke="var(--text-muted)" style={{ fontSize: '12px' }} />
+              <YAxis stroke="var(--text-muted)" style={{ fontSize: '12px' }} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
-                labelStyle={{ color: '#F9FAFB' }}
+                contentStyle={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                labelStyle={{ color: 'var(--text-primary)' }}
               />
-              <Bar dataKey="workouts" fill="#3B82F6" name="Workouts" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="workouts" fill="#B482FF" name="Workouts" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-48 flex items-center justify-center text-gray-500">
+          <div className="h-48 flex items-center justify-center text-muted">
             No training data for this period
           </div>
         )}
@@ -311,38 +337,78 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Exercises */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Trophy className="text-primary-yellow" size={20} />
+        <div className="rounded-lg p-4" style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+            <Trophy size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
             Top Exercises
           </h3>
           {reportData.topExercises.length > 0 ? (
             <div className="space-y-3">
-              {reportData.topExercises.map((ex, idx) => (
-                <div key={idx} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                      idx === 0 ? 'bg-primary-yellow/20 text-primary-yellow' :
-                      idx === 1 ? 'bg-gray-400/20 text-gray-400' :
-                      idx === 2 ? 'bg-yellow-700/20 text-yellow-700' :
-                      'bg-gray-700 text-gray-400'
-                    } font-bold text-sm`}>
-                      {idx + 1}
+              {reportData.topExercises.map((ex, idx) => {
+                // Medal colors for top 3
+                const getMedalStyle = (index: number) => {
+                  if (index === 0) {
+                    return {
+                      backgroundColor: '#FEF3C7',
+                      color: '#92400E',
+                      border: '1px solid #FCD34D',
+                      setColor: '#F59E0B',
+                    };
+                  } else if (index === 1) {
+                    return {
+                      backgroundColor: '#F3F4F6',
+                      color: '#374151',
+                      border: '1px solid #D1D5DB',
+                      setColor: '#6B7280',
+                    };
+                  } else if (index === 2) {
+                    return {
+                      backgroundColor: '#FED7AA',
+                      color: '#7C2D12',
+                      border: '1px solid #FDBA74',
+                      setColor: '#F97316',
+                    };
+                  } else {
+                    return {
+                      backgroundColor: 'rgba(180, 130, 255, 0.15)',
+                      color: '#7E29FF',
+                      border: '1px solid #B482FF40',
+                      setColor: '#B482FF',
+                    };
+                  }
+                };
+
+                const style = getMedalStyle(idx);
+
+                return (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm`}
+                        style={{
+                          backgroundColor: style.backgroundColor,
+                          color: style.color,
+                          border: style.border,
+                        }}>
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-primary truncate">{ex.name}</p>
+                        <p className="text-xs text-muted">{ex.volume.toFixed(0)} {weightUnit} total</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{ex.name}</p>
-                      <p className="text-xs text-gray-500">{ex.volume.toFixed(0)} {weightUnit} total</p>
+                    <div className="text-right ml-4">
+                      <p className="text-lg font-bold" style={{ color: style.setColor }}>{ex.sets}</p>
+                      <p className="text-xs text-muted">sets</p>
                     </div>
                   </div>
-                  <div className="text-right ml-4">
-                    <p className="text-lg font-bold text-primary-blue">{ex.sets}</p>
-                    <p className="text-xs text-gray-500">sets</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
-            <div className="py-8 text-center text-gray-500">
+            <div className="py-8 text-center text-muted">
               <Dumbbell size={32} className="mx-auto mb-2 opacity-30" />
               <p className="text-sm">No exercises tracked this {selectedPeriod}</p>
             </div>
@@ -350,26 +416,29 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
         </div>
 
         {/* PR Highlights */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Award className="text-primary-green" size={20} />
+        <div className="rounded-lg p-4" style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+            <Award size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
             PR Highlights
           </h3>
           {reportData.currentPRs.length > 0 ? (
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {reportData.currentPRs.slice(0, 10).map((pr, idx) => (
-                <div key={idx} className="bg-gray-900/50 rounded-lg p-3">
+                <div key={idx} className="rounded-lg p-3" style={{ backgroundColor: 'var(--surface)' }}>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{pr.exerciseName}</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="font-medium text-sm text-primary truncate">{pr.exerciseName}</p>
+                      <p className="text-xs text-secondary mt-1">
                         {pr.type === 'weight' && `${pr.weight}${weightUnit} × ${pr.reps} reps`}
                         {pr.type === 'reps' && `${pr.reps} reps at ${pr.weight}${weightUnit}`}
                         {pr.type === 'volume' && `${pr.value.toFixed(0)} ${weightUnit} volume`}
                         {pr.type === '1rm' && `${pr.value.toFixed(1)}${weightUnit} est. 1RM`}
                       </p>
                     </div>
-                    <div className="text-xs text-gray-500 whitespace-nowrap">
+                    <div className="text-xs text-muted whitespace-nowrap">
                       {new Date(pr.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </div>
                   </div>
@@ -377,7 +446,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-gray-500">
+            <div className="py-8 text-center text-muted">
               <Trophy size={32} className="mx-auto mb-2 opacity-30" />
               <p className="text-sm">No PRs achieved this {selectedPeriod}</p>
               <p className="text-xs mt-1">Keep training hard to set new records!</p>

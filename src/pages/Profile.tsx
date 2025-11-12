@@ -325,6 +325,8 @@ function EditProfileModal({
     name: profile.name,
     goal: profile.goal,
     experienceLevel: profile.experienceLevel,
+    currentWeight: profile.currentWeight,
+    sex: profile.sex,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -377,6 +379,42 @@ function EditProfileModal({
               <option value="intermediate">Intermediate</option>
               <option value="advanced">Advanced</option>
             </select>
+          </div>
+
+          {/* Bodyweight */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Bodyweight (optional)
+              <span className="text-xs text-gray-400 ml-2">Used for strength standards</span>
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              value={formData.currentWeight || ''}
+              onChange={(e) => setFormData({ ...formData, currentWeight: e.target.value ? parseFloat(e.target.value) : undefined })}
+              placeholder={profile.unitPreference === 'imperial' ? 'lbs' : 'kg'}
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+            />
+          </div>
+
+          {/* Sex */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Sex (optional)
+              <span className="text-xs text-gray-400 ml-2">Used for strength standards</span>
+            </label>
+            <select
+              value={formData.sex || 'prefer-not-to-say'}
+              onChange={(e) => setFormData({ ...formData, sex: e.target.value as any })}
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+            >
+              <option value="prefer-not-to-say">Prefer not to say</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              We respect your privacy. This data stays on your device and is only used for personalized strength comparisons.
+            </p>
           </div>
 
           {/* Buttons */}

@@ -327,3 +327,34 @@ export function getExerciseProgression(
     })
     .filter(data => data !== null) as ExerciseProgression[];
 }
+
+export function getExerciseProgressionByName(
+  exerciseName: string,
+  workouts: WorkoutLog[]
+): ExerciseProgression[] {
+  return workouts
+    .filter(w => w.exercises.some(ex => ex.exerciseName === exerciseName))
+    .map(workout => {
+      const exercise = workout.exercises.find(ex => ex.exerciseName === exerciseName)!;
+      const workingSets = exercise.sets.filter(s => !s.isWarmup && s.completed);
+
+      if (workingSets.length === 0) {
+        return null;
+      }
+
+      const bestSet = workingSets.reduce((best, set) =>
+        (set.weight > best.weight || (set.weight === best.weight && set.reps > best.reps))
+          ? set
+          : best
+      );
+
+      return {
+        date: workout.date,
+        bestSet,
+        estimated1RM: calculate1RM(bestSet.weight, bestSet.reps),
+        totalVolume: exercise.totalVolume,
+        sets: workingSets.length,
+      };
+    })
+    .filter(data => data !== null) as ExerciseProgression[];
+}
