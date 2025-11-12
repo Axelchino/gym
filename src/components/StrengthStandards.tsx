@@ -234,7 +234,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                             generalLevel.level === 'Novice' ? 'bg-blue-400' :
                             'bg-gray-400'
                           }`}
-                          style={{ width: `${Math.min(100, generalLevel.percentage)}%` }}
+                          style={{ width: `${100 - generalLevel.percentile}%` }}
                         ></div>
                       </div>
                       {generalLevel.level !== 'World Class' && (
@@ -263,7 +263,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                               powerliftingLevel.level === 'Novice' ? 'bg-blue-400' :
                               'bg-gray-400'
                             }`}
-                            style={{ width: `${Math.min(100, powerliftingLevel.percentage)}%` }}
+                            style={{ width: `${100 - powerliftingLevel.percentile}%` }}
                           ></div>
                         </div>
                         {powerliftingLevel.level !== 'World Class' && (
