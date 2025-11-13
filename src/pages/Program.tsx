@@ -709,13 +709,14 @@ export function Program() {
       {showTemplateBrowser && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div
-            className="rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            className="rounded-lg max-w-2xl w-full max-h-[80vh] flex flex-col"
             style={{
-              backgroundColor: 'var(--surface-primary)',
+              backgroundColor: 'var(--surface-elevated)',
               border: '1px solid var(--border-subtle)'
             }}
           >
-            <div className="flex items-center justify-between mb-4">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
               <h2 className="text-2xl font-bold text-primary">Program Templates</h2>
               <button
                 onClick={() => {
@@ -735,6 +736,8 @@ export function Program() {
               </button>
             </div>
 
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
             {/* Quick link to custom builder */}
             <div
               className="mb-6 pb-4"
@@ -808,8 +811,10 @@ export function Program() {
                 </div>
               ))}
             </div>
+            </div>
 
-            <div className="mt-6 flex gap-3">
+            {/* Sticky Footer Actions */}
+            <div className="flex gap-3 p-6 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
               <button
                 onClick={() => {
                   setShowTemplateBrowser(false);
@@ -835,19 +840,19 @@ export function Program() {
                 disabled={!selectedTemplate}
                 className="flex-1 py-2 rounded-md font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  backgroundColor: !selectedTemplate ? '#7E29FF' : '#7E29FF',
-                  color: '#FFFFFF',
-                  border: '1px solid #B482FF',
+                  backgroundColor: '#EDE0FF',
+                  color: '#7E29FF',
+                  border: '1px solid #D7BDFF',
                   opacity: !selectedTemplate ? 0.5 : 1,
                 }}
                 onMouseEnter={(e) => {
                   if (selectedTemplate) {
-                    e.currentTarget.style.backgroundColor = '#6A23D9';
+                    e.currentTarget.style.backgroundColor = '#E4D2FF';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedTemplate) {
-                    e.currentTarget.style.backgroundColor = '#7E29FF';
+                    e.currentTarget.style.backgroundColor = '#EDE0FF';
                   }
                 }}
               >

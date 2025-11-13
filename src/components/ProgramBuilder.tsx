@@ -190,10 +190,15 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
   const currentWeekData = weeks[currentWeek - 1];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+      <div className="rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col"
+        style={{
+          backgroundColor: 'var(--surface-elevated)',
+          border: '1.5px solid var(--border-subtle)'
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between p-6 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
             <Calendar style={{ color: '#B482FF' }} />
             Create Custom Program
@@ -213,10 +218,12 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
           </button>
         </div>
 
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
         {/* Program Details */}
-        <div className="space-y-4 mb-6 pb-6 border-b border-gray-700">
+        <div className="space-y-4 mb-6 pb-6" style={{ borderBottom: '1.5px solid var(--border-subtle)' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium mb-2 text-primary">
               Program Name *
             </label>
             <input
@@ -239,7 +246,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium mb-2 text-primary">
               Description (optional)
             </label>
             <textarea
@@ -263,7 +270,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2 text-primary">
                 Duration (weeks)
               </label>
               <input
@@ -287,7 +294,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-primary mb-2">
                 Goal
               </label>
               <select
@@ -356,7 +363,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
             {/* Week Details */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Week Name (optional)
                 </label>
                 <input
@@ -378,7 +385,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-primary mb-2">
                   Week Notes (optional)
                 </label>
                 <input
@@ -404,8 +411,8 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
             {/* Day Schedule */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-300">Weekly Schedule</h3>
-                <p className="text-xs text-gray-500 italic">Days without workouts = Rest Days</p>
+                <h3 className="text-sm font-semibold text-primary">Weekly Schedule</h3>
+                <p className="text-xs text-muted italic">Days without workouts = Rest Days</p>
               </div>
               <div className="grid grid-cols-1 gap-2">
                 {DAY_NAMES.map((dayName, dayOfWeek) => {
@@ -414,9 +421,13 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   return (
                     <div
                       key={dayOfWeek}
-                      className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700"
+                      className="flex items-center gap-3 p-3 rounded-lg"
+                      style={{
+                        backgroundColor: 'var(--surface-accent)',
+                        border: '1px solid var(--border-subtle)'
+                      }}
                     >
-                      <div className="w-24 text-sm font-medium text-gray-300">
+                      <div className="w-24 text-sm font-semibold text-primary">
                         {dayName}
                       </div>
 
@@ -554,35 +565,63 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
           </button>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 border-t border-gray-700">
+        {/* Helper Text */}
+        {templates.length === 0 && (
+          <p className="mt-4 text-sm text-muted text-center">
+            You need to create workout templates first before building a program.
+          </p>
+        )}
+        </div>
+
+        {/* Sticky Footer Actions */}
+        <div className="flex gap-3 p-6 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
           <button
             onClick={onClose}
-            className="flex-1 btn-secondary py-2"
+            className="flex-1 py-2 rounded-md font-semibold transition-all"
+            style={{
+              backgroundColor: 'var(--surface-accent)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-subtle)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+            }}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 btn-primary py-2 flex items-center justify-center gap-2"
+            className="flex-1 py-2 rounded-md font-semibold transition-all flex items-center justify-center gap-2"
+            style={{
+              backgroundColor: '#EDE0FF',
+              color: '#7E29FF',
+              border: '1px solid #D7BDFF'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#E4D2FF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#EDE0FF';
+            }}
           >
             <Save size={18} />
             Save Program
           </button>
         </div>
-
-        {/* Helper Text */}
-        {templates.length === 0 && (
-          <p className="mt-4 text-sm text-gray-500 text-center">
-            You need to create workout templates first before building a program.
-          </p>
-        )}
       </div>
 
       {/* Copy to Multiple Weeks Modal */}
       {showCopyModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            style={{
+              backgroundColor: 'var(--surface-primary)',
+              border: '1px solid var(--border-subtle)'
+            }}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
                 <Copy style={{ color: '#B482FF' }} />
@@ -606,37 +645,81 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               </button>
             </div>
 
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-secondary mb-4">
               Select which weeks you want to copy Week {currentWeek}'s schedule to.
               This will overwrite any existing workouts in the selected weeks.
             </p>
 
             {/* Quick Range Selectors */}
-            <div className="mb-4 pb-4 border-b border-gray-700">
-              <p className="text-xs text-gray-500 mb-2">Quick Select:</p>
+            <div className="mb-4 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+              <p className="text-xs text-muted mb-2">Quick Select:</p>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => selectWeekRange(currentWeek + 1, Math.min(currentWeek + 3, weeks.length))}
-                  className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                  className="text-xs px-3 py-1 rounded transition-colors"
+                  style={{
+                    backgroundColor: 'var(--surface-accent)',
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                  }}
                 >
                   Next 3 Weeks
                 </button>
                 <button
                   onClick={() => selectWeekRange(currentWeek + 1, weeks.length)}
-                  className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                  className="text-xs px-3 py-1 rounded transition-colors"
+                  style={{
+                    backgroundColor: 'var(--surface-accent)',
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                  }}
                 >
                   All Remaining Weeks
                 </button>
                 <button
                   onClick={() => selectWeekRange(1, currentWeek - 1)}
                   disabled={currentWeek === 1}
-                  className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="text-xs px-3 py-1 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundColor: currentWeek === 1 ? 'var(--surface-accent)' : 'var(--surface-accent)',
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentWeek !== 1) {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentWeek !== 1) {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                    }
+                  }}
                 >
                   All Previous Weeks
                 </button>
                 <button
                   onClick={() => setSelectedWeeksToCopy([])}
-                  className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                  className="text-xs px-3 py-1 rounded transition-colors"
+                  style={{
+                    backgroundColor: 'var(--surface-accent)',
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                  }}
                 >
                   Clear Selection
                 </button>
@@ -696,10 +779,15 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
             </div>
 
             {/* Selection Summary */}
-            <div className="mb-4 p-3 bg-gray-900/50 rounded border border-gray-700">
+            <div className="mb-4 p-3 rounded"
+              style={{
+                backgroundColor: 'var(--surface-accent)',
+                border: '1px solid var(--border-subtle)'
+              }}
+            >
               <p className="text-sm">
-                <span className="text-gray-400">Selected weeks: </span>
-                <span className="text-white font-medium">
+                <span className="text-secondary">Selected weeks: </span>
+                <span className="text-primary font-medium">
                   {selectedWeeksToCopy.length === 0
                     ? 'None'
                     : selectedWeeksToCopy.sort((a, b) => a - b).join(', ')
@@ -715,14 +803,41 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   setShowCopyModal(false);
                   setSelectedWeeksToCopy([]);
                 }}
-                className="flex-1 btn-secondary py-2"
+                className="flex-1 py-2 rounded-md font-semibold transition-all"
+                style={{
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={copyCurrentWeekToSelected}
                 disabled={selectedWeeksToCopy.length === 0}
-                className="flex-1 btn-primary py-2 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 rounded-md font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: '#EDE0FF',
+                  color: '#7E29FF',
+                  border: '1px solid #D7BDFF',
+                  opacity: selectedWeeksToCopy.length === 0 ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedWeeksToCopy.length > 0) {
+                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedWeeksToCopy.length > 0) {
+                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                  }
+                }}
               >
                 <Copy size={18} />
                 Copy to {selectedWeeksToCopy.length} Week{selectedWeeksToCopy.length !== 1 ? 's' : ''}

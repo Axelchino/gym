@@ -1,6 +1,6 @@
 # GymTracker Pro - Development Backlog
 
-**Last Updated:** 2025-11-12
+**Last Updated:** 2025-11-13
 **Current Phase:** Phase 5 Complete, Phase 5.5 Next
 **Version:** v0.5.0
 
@@ -18,6 +18,14 @@
   - [ ] Test chart colors/text/axis labels across all themes
   - [ ] Fix any hardcoded color values in Recharts components
   - [ ] Ensure consistent borders, hover states, and contrast ratios
+  - [x] **Program Tab Modals - Light Theme Polish** ✅ COMPLETE (2025-11-13)
+    - [x] Fixed "Create Custom" modal UX issues
+    - [x] Fixed "From Template" modal UX issues
+    - [x] Improved text readability (labels now use `text-primary` for high contrast)
+    - [x] Added sticky footer buttons (always visible, no scrolling needed)
+    - [x] Fixed transparent backgrounds (`var(--surface-elevated)` instead of `var(--surface-primary)`)
+    - [x] Updated button colors to match app design system (light purple: #EDE0FF)
+    - [x] All changes fully theme-aware (work across Light/Dark/AMOLED themes)
 
 - [x] **Strength Standards - Complete UX/UI Overhaul** ✅ COMPLETE (2025-11-12)
   - [x] **Persistence Issues:**
