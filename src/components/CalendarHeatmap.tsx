@@ -75,10 +75,11 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
     const totalVolume = workouts.reduce((sum, w) => sum + w.totalVolume, 0);
     const intensity = totalVolume / maxVolume;
 
-    if (intensity > 0.75) return 'bg-primary-blue';
-    if (intensity > 0.5) return 'bg-primary-blue/80';
-    if (intensity > 0.25) return 'bg-primary-blue/60';
-    return 'bg-primary-blue/40';
+    // Purple intensity colors
+    if (intensity > 0.75) return '#7E29FF'; // Dark purple - highest intensity
+    if (intensity > 0.5) return 'rgba(180, 130, 255, 0.8)';
+    if (intensity > 0.25) return 'rgba(180, 130, 255, 0.6)';
+    return 'rgba(180, 130, 255, 0.4)'; // Light purple - lowest intensity
   };
 
   const handleDayClick = (day: number) => {
@@ -109,27 +110,51 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
     <div className="card-elevated">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Calendar size={24} className="text-primary-blue" />
+        <h2 className="text-xl font-semibold flex items-center gap-2 text-primary">
+          <Calendar size={24} style={{ color: '#B482FF' }} />
           Training Calendar
         </h2>
         <div className="flex items-center gap-2">
           <button
             onClick={goToPreviousMonth}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ backgroundColor: 'var(--surface-accent)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+            }}
             aria-label="Previous month"
           >
             <ChevronLeft size={20} />
           </button>
           <button
             onClick={goToToday}
-            className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            className="px-3 py-1 text-sm rounded-lg transition-colors"
+            style={{
+              backgroundColor: '#EDE0FF',
+              color: '#7E29FF'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#E4D2FF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#EDE0FF';
+            }}
           >
             Today
           </button>
           <button
             onClick={goToNextMonth}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ backgroundColor: 'var(--surface-accent)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+            }}
             aria-label="Next month"
           >
             <ChevronRight size={20} />
@@ -145,7 +170,7 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
       {/* Day names */}
       <div className="grid grid-cols-7 gap-2 mb-2">
         {dayNames.map(name => (
-          <div key={name} className="text-center text-xs text-gray-500 font-medium py-1">
+          <div key={name} className="text-center text-xs font-medium py-1 text-secondary">
             {name}
           </div>
         ))}
@@ -169,17 +194,36 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
               key={day}
               onClick={() => handleDayClick(day)}
               disabled={!hasWorkout}
-              className={`
-                aspect-square rounded-lg flex flex-col items-center justify-center
-                text-sm font-medium transition-all relative
-                ${hasWorkout
-                  ? `${intensityColor} hover:scale-105 cursor-pointer text-white`
+              className="aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-medium transition-all relative"
+              style={{
+                backgroundColor: hasWorkout
+                  ? intensityColor
                   : future
-                    ? 'bg-gray-800/30 text-gray-600 cursor-default'
-                    : 'bg-gray-800 text-gray-400 cursor-default hover:bg-gray-700'
+                    ? 'rgba(31, 41, 55, 0.3)'
+                    : 'var(--surface-accent)',
+                color: hasWorkout
+                  ? '#FFFFFF'
+                  : future
+                    ? 'var(--text-muted)'
+                    : 'var(--text-secondary)',
+                cursor: hasWorkout ? 'pointer' : 'default',
+                boxShadow: today ? '0 0 0 2px #B482FF' : 'none',
+                transform: 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (hasWorkout) {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                } else if (!future) {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
                 }
-                ${today ? 'ring-2 ring-primary-yellow' : ''}
-              `}
+              }}
+              onMouseLeave={(e) => {
+                if (hasWorkout) {
+                  e.currentTarget.style.transform = 'scale(1)';
+                } else if (!future) {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }
+              }}
             >
               <span>{day}</span>
               {hasWorkout && (
@@ -195,19 +239,19 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
       </div>
 
       {/* Legend */}
-      <div className="mt-4 pt-4 border-t border-gray-700">
-        <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <div className="flex items-center justify-between text-xs text-secondary">
           <span>Less</span>
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded bg-gray-800" />
-            <div className="w-4 h-4 rounded bg-primary-blue/40" />
-            <div className="w-4 h-4 rounded bg-primary-blue/60" />
-            <div className="w-4 h-4 rounded bg-primary-blue/80" />
-            <div className="w-4 h-4 rounded bg-primary-blue" />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--surface-accent)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(180, 130, 255, 0.4)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(180, 130, 255, 0.6)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(180, 130, 255, 0.8)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#7E29FF' }} />
           </div>
           <span>More</span>
         </div>
-        <p className="text-xs text-gray-500 text-center mt-2">
+        <p className="text-xs text-center mt-2" style={{ color: 'var(--text-muted)' }}>
           Color intensity = workout volume
         </p>
       </div>
