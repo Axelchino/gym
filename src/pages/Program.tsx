@@ -294,42 +294,60 @@ export function Program() {
     <div className="space-y-6 pb-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Program & Schedule</h1>
-        <p className="text-gray-400">Plan your training program and schedule workouts</p>
+        <h1 className="text-3xl font-bold mb-2 text-primary">Program & Schedule</h1>
+        <p className="text-sm text-secondary">Plan your training program and schedule workouts</p>
       </div>
 
       {/* Active Program Card */}
       {activeProgram ? (
-        <div className="card-elevated bg-gradient-to-r from-primary-blue/10 to-primary-green/10 border-2 border-primary-blue/30">
+        <div className="card-elevated" style={{
+          background: 'linear-gradient(135deg, rgba(180, 130, 255, 0.08) 0%, rgba(126, 41, 255, 0.12) 100%)',
+          border: '1px solid rgba(180, 130, 255, 0.3)'
+        }}>
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-xl font-bold text-primary-blue">{activeProgram.name}</h2>
-                <span className="text-xs px-2 py-1 rounded-full bg-primary-green/20 text-primary-green border border-primary-green/50">
+                <h2 className="text-xl font-bold" style={{ color: '#B482FF' }}>{activeProgram.name}</h2>
+                <span className="text-xs px-2 py-1 rounded-full font-medium" style={{
+                  backgroundColor: 'rgba(180, 130, 255, 0.2)',
+                  color: '#B482FF',
+                  border: '1px solid rgba(180, 130, 255, 0.4)'
+                }}>
                   Active
                 </span>
               </div>
-              <p className="text-sm text-gray-300 mb-3">{activeProgram.description}</p>
+              <p className="text-sm text-secondary mb-3">{activeProgram.description}</p>
 
               <div className="flex flex-wrap gap-4 text-sm">
                 <div>
-                  <span className="text-gray-400">Duration:</span>{' '}
-                  <span className="font-semibold">{activeProgram.duration} weeks</span>
+                  <span className="text-muted">Duration:</span>{' '}
+                  <span className="font-semibold text-primary">{activeProgram.duration} weeks</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Days/Week:</span>{' '}
-                  <span className="font-semibold">{activeProgram.daysPerWeek}</span>
+                  <span className="text-muted">Days/Week:</span>{' '}
+                  <span className="font-semibold text-primary">{activeProgram.daysPerWeek}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Goal:</span>{' '}
-                  <span className="font-semibold capitalize">{activeProgram.goal}</span>
+                  <span className="text-muted">Goal:</span>{' '}
+                  <span className="font-semibold text-primary capitalize">{activeProgram.goal}</span>
                 </div>
               </div>
             </div>
 
             <button
               onClick={() => handleDeactivateProgram(activeProgram.id)}
-              className="text-sm text-red-400 hover:text-red-300 transition-colors"
+              className="text-sm transition-colors px-3 py-1.5 rounded-md"
+              style={{
+                color: '#EF4444',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+              }}
             >
               Deactivate
             </button>
@@ -338,48 +356,75 @@ export function Program() {
           {/* Progress Bar */}
           <div className="mb-2">
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-gray-400">Program Progress</span>
-              <span className="text-primary-blue font-semibold">{calculateProgress().toFixed(0)}%</span>
+              <span className="text-muted">Program Progress</span>
+              <span className="font-semibold" style={{ color: '#B482FF' }}>{calculateProgress().toFixed(0)}%</span>
             </div>
-            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--surface-accent)' }}>
               <div
-                className="h-full bg-primary-blue transition-all duration-500"
-                style={{ width: `${calculateProgress()}%` }}
+                className="h-full transition-all duration-500"
+                style={{
+                  width: `${calculateProgress()}%`,
+                  backgroundColor: '#B482FF'
+                }}
               ></div>
             </div>
           </div>
 
           {/* Adherence Stats */}
-          <div className="flex items-center gap-4 text-sm pt-2 border-t border-gray-700/50">
+          <div className="flex items-center gap-4 text-sm pt-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
             <div>
-              <span className="text-gray-400">Adherence:</span>{' '}
-              <span className={`font-semibold ${
-                calculateAdherence().percentage >= 80 ? 'text-primary-green' :
-                calculateAdherence().percentage >= 60 ? 'text-primary-yellow' :
-                'text-red-400'
-              }`}>
+              <span className="text-muted">Adherence:</span>{' '}
+              <span className={`font-semibold`} style={{
+                color: calculateAdherence().percentage >= 80 ? '#10B981' :
+                       calculateAdherence().percentage >= 60 ? '#F59E0B' :
+                       '#EF4444'
+              }}>
                 {calculateAdherence().percentage.toFixed(0)}%
               </span>
             </div>
-            <div className="text-gray-400">
-              <span className="text-white font-semibold">{calculateAdherence().completed}</span> / {calculateAdherence().scheduled} workouts completed
+            <div className="text-muted">
+              <span className="text-primary font-semibold">{calculateAdherence().completed}</span> / {calculateAdherence().scheduled} workouts completed
             </div>
           </div>
         </div>
       ) : (
-        <div className="card-elevated border-2 border-dashed border-gray-700 text-center py-8">
-          <h3 className="text-lg font-semibold mb-2">No Active Program</h3>
-          <p className="text-sm text-gray-400 mb-4">Choose a program template or create your own custom program</p>
+        <div className="card-elevated text-center py-8" style={{
+          border: '2px dashed var(--border-subtle)'
+        }}>
+          <h3 className="text-lg font-semibold mb-2 text-primary">No Active Program</h3>
+          <p className="text-sm text-secondary mb-4">Choose a program template or create your own custom program</p>
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => setShowTemplateBrowser(true)}
-              className="btn-primary px-6 py-2"
+              className="px-6 py-2 rounded-md text-sm font-semibold transition-all"
+              style={{
+                backgroundColor: '#EDE0FF',
+                color: '#7E29FF',
+                border: '1px solid #D7BDFF'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#E4D2FF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#EDE0FF';
+              }}
             >
               Browse Templates
             </button>
             <button
               onClick={() => setShowProgramBuilder(true)}
-              className="btn-secondary px-6 py-2 flex items-center gap-2"
+              className="px-6 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-subtle)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <Wrench size={18} />
               Create Custom
@@ -391,21 +436,35 @@ export function Program() {
       {/* Calendar */}
       <div className="card-elevated">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Calendar size={24} className="text-primary-blue" />
+          <h2 className="text-xl font-semibold flex items-center gap-2 text-primary">
+            <Calendar size={24} style={{ color: '#B482FF' }} />
             {activeProgram ? 'Training Calendar' : 'Calendar Preview'}
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={previousMonth}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--surface-accent)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+              }}
             >
               <ChevronLeft size={20} />
             </button>
-            <span className="text-sm px-3 min-w-[160px] text-center">{monthName}</span>
+            <span className="text-sm px-3 min-w-[160px] text-center text-primary">{monthName}</span>
             <button
               onClick={nextMonth}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--surface-accent)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+              }}
             >
               <ChevronRight size={20} />
             </button>
@@ -415,7 +474,7 @@ export function Program() {
         {/* Day names */}
         <div className="grid grid-cols-7 gap-2 mb-2">
           {dayNames.map(name => (
-            <div key={name} className="text-center text-xs text-gray-500 font-medium py-2">
+            <div key={name} className="text-center text-xs font-medium py-2 text-secondary">
               {name}
             </div>
           ))}
@@ -436,36 +495,63 @@ export function Program() {
             return (
               <div
                 key={day}
-                className={`
-                  aspect-square rounded-lg flex flex-col items-start justify-start p-2
-                  text-sm transition-all relative
-                  ${scheduledWorkout
+                className="aspect-square rounded-lg flex flex-col items-start justify-start p-2 text-sm transition-all relative cursor-pointer"
+                style={{
+                  backgroundColor: scheduledWorkout
                     ? completed
-                      ? 'bg-primary-green/20 border border-primary-green/50 cursor-pointer hover:scale-105'
-                      : 'bg-primary-blue/20 border border-primary-blue/50 cursor-pointer hover:scale-105 hover:bg-primary-blue/30'
-                    : 'bg-gray-800 border border-gray-700'
+                      ? 'rgba(126, 41, 255, 0.15)'
+                      : 'rgba(180, 130, 255, 0.12)'
+                    : 'var(--surface-accent)',
+                  border: scheduledWorkout
+                    ? completed
+                      ? '1px solid rgba(126, 41, 255, 0.5)'
+                      : '1px solid rgba(180, 130, 255, 0.4)'
+                    : '1px solid var(--border-subtle)',
+                  boxShadow: today ? '0 0 0 2px #B482FF' : 'none',
+                  opacity: past && !scheduledWorkout ? 0.5 : 1,
+                  transform: 'scale(1)',
+                }}
+                onMouseEnter={(e) => {
+                  if (scheduledWorkout) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    if (!completed) {
+                      e.currentTarget.style.backgroundColor = 'rgba(180, 130, 255, 0.18)';
+                    }
                   }
-                  ${today ? 'ring-2 ring-primary-yellow' : ''}
-                  ${past && !scheduledWorkout ? 'opacity-50' : ''}
-                `}
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  if (scheduledWorkout && !completed) {
+                    e.currentTarget.style.backgroundColor = 'rgba(180, 130, 255, 0.12)';
+                  }
+                }}
                 onClick={() => scheduledWorkout && handleStartWorkout(scheduledWorkout.templateId, scheduledWorkout.templateName)}
               >
-                <span className={`text-xs ${scheduledWorkout ? 'font-bold text-primary-blue' : 'text-gray-400'}`}>
+                <span
+                  className="text-xs"
+                  style={{
+                    fontWeight: scheduledWorkout ? 'bold' : 'normal',
+                    color: scheduledWorkout ? '#B482FF' : 'var(--text-muted)',
+                  }}
+                >
                   {day}
                 </span>
                 {scheduledWorkout && (
                   <>
-                    <span className={`text-xs font-medium mt-1 leading-tight line-clamp-2 ${completed ? 'text-primary-green' : 'text-white'}`}>
+                    <span
+                      className="text-xs font-medium mt-1 leading-tight line-clamp-2"
+                      style={{ color: completed ? '#B482FF' : 'var(--text-primary)' }}
+                    >
                       {scheduledWorkout.templateName}
                     </span>
                     {completed && (
                       <div className="absolute bottom-1 right-1">
-                        <CheckCircle2 size={14} className="text-primary-green" />
+                        <CheckCircle2 size={14} style={{ color: '#7E29FF' }} />
                       </div>
                     )}
                     {today && !completed && (
                       <div className="absolute bottom-1 right-1">
-                        <Play size={12} className="text-primary-yellow" />
+                        <Play size={12} style={{ color: '#B482FF' }} />
                       </div>
                     )}
                   </>
@@ -476,7 +562,7 @@ export function Program() {
         </div>
 
         {!activeProgram && (
-          <div className="mt-4 text-center text-sm text-gray-500">
+          <div className="mt-4 text-center text-sm text-secondary">
             Activate a program to see your scheduled workouts
           </div>
         )}
@@ -485,18 +571,32 @@ export function Program() {
       {/* My Programs List */}
       <div className="card-elevated">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">My Programs</h2>
+          <h2 className="text-xl font-semibold text-primary">My Programs</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowProgramBuilder(true)}
-              className="text-sm text-primary-green hover:text-primary-green/80 transition-colors flex items-center gap-1"
+              className="text-sm transition-colors flex items-center gap-1"
+              style={{ color: '#B482FF' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#9B6DFF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#B482FF';
+              }}
             >
               <Wrench size={16} />
               Create Custom
             </button>
             <button
               onClick={() => setShowTemplateBrowser(true)}
-              className="text-sm text-primary-blue hover:text-primary-blue/80 transition-colors flex items-center gap-1"
+              className="text-sm transition-colors flex items-center gap-1"
+              style={{ color: '#B482FF' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#9B6DFF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#B482FF';
+              }}
             >
               <Plus size={16} />
               From Template
@@ -509,24 +609,44 @@ export function Program() {
             {programs.map(program => (
               <div
                 key={program.id}
-                className={`p-4 rounded-lg border transition-colors ${
-                  program.isActive
-                    ? 'bg-primary-blue/10 border-primary-blue/50'
-                    : 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
-                }`}
+                className="p-4 rounded-lg border transition-colors"
+                style={{
+                  backgroundColor: program.isActive
+                    ? 'rgba(180, 130, 255, 0.08)'
+                    : 'var(--surface-accent)',
+                  borderColor: program.isActive
+                    ? 'rgba(180, 130, 255, 0.4)'
+                    : 'var(--border-subtle)',
+                }}
+                onMouseEnter={(e) => {
+                  if (!program.isActive) {
+                    e.currentTarget.style.borderColor = 'var(--border-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!program.isActive) {
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                  }
+                }}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{program.name}</h3>
+                      <h3 className="font-semibold text-primary">{program.name}</h3>
                       {program.isActive && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary-green/20 text-primary-green">
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: 'rgba(180, 130, 255, 0.2)',
+                            color: '#B482FF'
+                          }}
+                        >
                           Active
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-400 mb-2">{program.description}</p>
-                    <div className="flex gap-3 text-xs text-gray-500">
+                    <p className="text-xs text-secondary mb-2">{program.description}</p>
+                    <div className="flex gap-3 text-xs text-secondary">
                       <span>{program.duration} weeks</span>
                       <span>•</span>
                       <span>{program.daysPerWeek} days/week</span>
@@ -539,14 +659,34 @@ export function Program() {
                     {!program.isActive && (
                       <button
                         onClick={() => handleActivateProgram(program.id)}
-                        className="text-xs btn-secondary px-3 py-1"
+                        className="text-xs px-3 py-1 rounded-md font-semibold transition-all"
+                        style={{
+                          backgroundColor: '#EDE0FF',
+                          color: '#7E29FF',
+                          border: '1px solid #D7BDFF'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#E4D2FF';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#EDE0FF';
+                        }}
                       >
                         Activate
                       </button>
                     )}
                     <button
                       onClick={() => handleDeleteProgram(program.id)}
-                      className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-red-400 hover:text-red-300"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: '#EF4444' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                        e.currentTarget.style.color = '#FCA5A5';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#EF4444';
+                      }}
                       title="Delete program"
                     >
                       <Trash2 size={16} />
@@ -557,7 +697,7 @@ export function Program() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-secondary">
             <TrendingUp size={32} className="mx-auto mb-2 opacity-30" />
             <p className="text-sm">No programs yet</p>
             <p className="text-xs mt-1">Browse templates to get started</p>
@@ -568,23 +708,39 @@ export function Program() {
       {/* Template Browser Modal */}
       {showTemplateBrowser && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div
+            className="rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            style={{
+              backgroundColor: 'var(--surface-primary)',
+              border: '1px solid var(--border-subtle)'
+            }}
+          >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Program Templates</h2>
+              <h2 className="text-2xl font-bold text-primary">Program Templates</h2>
               <button
                 onClick={() => {
                   setShowTemplateBrowser(false);
                   setSelectedTemplate(null);
                 }}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--surface-accent)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }}
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Quick link to custom builder */}
-            <div className="mb-6 pb-4 border-b border-gray-700">
-              <p className="text-sm text-gray-400 mb-2">
+            <div
+              className="mb-6 pb-4"
+              style={{ borderBottom: '1px solid var(--border-subtle)' }}
+            >
+              <p className="text-sm text-secondary mb-2">
                 Or build your own program from your workout templates:
               </p>
               <button
@@ -592,7 +748,14 @@ export function Program() {
                   setShowTemplateBrowser(false);
                   setShowProgramBuilder(true);
                 }}
-                className="text-sm text-primary-green hover:text-primary-green/80 transition-colors flex items-center gap-1"
+                className="text-sm transition-colors flex items-center gap-1"
+                style={{ color: '#B482FF' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#9B6DFF';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#B482FF';
+                }}
               >
                 <Wrench size={16} />
                 Create Custom Program
@@ -603,25 +766,39 @@ export function Program() {
               {PROGRAM_TEMPLATES.map(template => (
                 <div
                   key={template.id}
-                  className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                    selectedTemplate === template.id
-                      ? 'bg-primary-blue/20 border-primary-blue'
-                      : 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                  }`}
+                  className="p-4 rounded-lg border cursor-pointer transition-all"
+                  style={{
+                    backgroundColor: selectedTemplate === template.id
+                      ? 'rgba(180, 130, 255, 0.12)'
+                      : 'var(--surface-accent)',
+                    borderColor: selectedTemplate === template.id
+                      ? '#B482FF'
+                      : 'var(--border-subtle)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedTemplate !== template.id) {
+                      e.currentTarget.style.borderColor = 'var(--border-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedTemplate !== template.id) {
+                      e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    }
+                  }}
                   onClick={() => setSelectedTemplate(template.id)}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-lg">{template.name}</h3>
+                    <h3 className="font-semibold text-lg text-primary">{template.name}</h3>
                     {selectedTemplate === template.id && (
-                      <Check size={20} className="text-primary-green" />
+                      <Check size={20} style={{ color: '#B482FF' }} />
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-300 mb-3">
+                  <p className="text-sm text-secondary mb-3">
                     {template.factory('temp').description}
                   </p>
 
-                  <div className="flex gap-3 text-xs text-gray-400">
+                  <div className="flex gap-3 text-xs text-secondary">
                     <span>{template.factory('temp').duration} weeks</span>
                     <span>•</span>
                     <span>{template.factory('temp').daysPerWeek} days/week</span>
@@ -638,14 +815,41 @@ export function Program() {
                   setShowTemplateBrowser(false);
                   setSelectedTemplate(null);
                 }}
-                className="flex-1 btn-secondary py-2"
+                className="flex-1 py-2 rounded-md font-semibold transition-all"
+                style={{
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => selectedTemplate && handleActivateTemplate(selectedTemplate)}
                 disabled={!selectedTemplate}
-                className="flex-1 btn-primary py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 rounded-md font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: !selectedTemplate ? '#7E29FF' : '#7E29FF',
+                  color: '#FFFFFF',
+                  border: '1px solid #B482FF',
+                  opacity: !selectedTemplate ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedTemplate) {
+                    e.currentTarget.style.backgroundColor = '#6A23D9';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedTemplate) {
+                    e.currentTarget.style.backgroundColor = '#7E29FF';
+                  }
+                }}
               >
                 Activate Program
               </button>

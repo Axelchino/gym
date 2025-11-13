@@ -194,13 +194,20 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
       <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Calendar className="text-primary-blue" />
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
+            <Calendar style={{ color: '#B482FF' }} />
             Create Custom Program
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ backgroundColor: 'var(--surface-accent)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+            }}
           >
             <X size={20} />
           </button>
@@ -217,7 +224,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               value={programName}
               onChange={(e) => setProgramName(e.target.value)}
               placeholder="e.g., My Custom PPL"
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-blue"
+              className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all text-primary"
+              style={{
+                backgroundColor: 'var(--surface-accent)',
+                border: '1px solid var(--border-subtle)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
           </div>
 
@@ -230,7 +247,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe your program..."
               rows={2}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-blue resize-none"
+              className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all resize-none text-primary"
+              style={{
+                backgroundColor: 'var(--surface-accent)',
+                border: '1px solid var(--border-subtle)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
           </div>
 
@@ -245,7 +272,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                 max="52"
                 value={duration}
                 onChange={(e) => handleDurationChange(parseInt(e.target.value) || 1)}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-blue"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all text-primary"
+                style={{
+                  backgroundColor: 'var(--surface-accent)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               />
             </div>
 
@@ -256,7 +293,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               <select
                 value={goal}
                 onChange={(e) => setGoal(e.target.value as ProgramGoal)}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-blue"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all text-primary"
+                style={{
+                  backgroundColor: 'var(--surface-accent)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               >
                 <option value="strength">Strength</option>
                 <option value="hypertrophy">Hypertrophy</option>
@@ -274,11 +321,25 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               <button
                 key={week.weekNumber}
                 onClick={() => setCurrentWeek(week.weekNumber)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                  currentWeek === week.weekNumber
-                    ? 'bg-primary-blue text-white'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
+                className="px-4 py-2 rounded-lg whitespace-nowrap transition-all"
+                style={{
+                  backgroundColor: currentWeek === week.weekNumber
+                    ? '#B482FF'
+                    : 'var(--surface-accent)',
+                  color: currentWeek === week.weekNumber
+                    ? '#FFFFFF'
+                    : 'var(--text-secondary)',
+                }}
+                onMouseEnter={(e) => {
+                  if (currentWeek !== week.weekNumber) {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentWeek !== week.weekNumber) {
+                    e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                  }
+                }}
               >
                 Week {week.weekNumber}
                 {week.workouts.length > 0 && (
@@ -303,7 +364,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   value={currentWeekData.name || ''}
                   onChange={(e) => updateWeekDetails(currentWeek - 1, 'name', e.target.value)}
                   placeholder="e.g., Deload Week"
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-blue text-sm"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all text-sm text-primary"
+                  style={{
+                    backgroundColor: 'var(--surface-accent)',
+                    border: '1px solid var(--border-subtle)'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
               <div>
@@ -315,7 +386,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   value={currentWeekData.notes || ''}
                   onChange={(e) => updateWeekDetails(currentWeek - 1, 'notes', e.target.value)}
                   placeholder="e.g., Reduce weight by 20%"
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary-blue text-sm"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all text-sm text-primary"
+                  style={{
+                    backgroundColor: 'var(--surface-accent)',
+                    border: '1px solid var(--border-subtle)'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
             </div>
@@ -340,20 +421,33 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                       </div>
 
                       {workout ? (
-                        <div className="flex-1 flex items-center justify-between bg-primary-blue/20 border border-primary-blue/50 rounded px-3 py-2">
-                          <span className="text-sm font-medium text-white">
+                        <div
+                          className="flex-1 flex items-center justify-between rounded px-3 py-2"
+                          style={{
+                            backgroundColor: 'rgba(180, 130, 255, 0.12)',
+                            border: '1px solid rgba(180, 130, 255, 0.4)'
+                          }}
+                        >
+                          <span className="text-sm font-medium text-primary">
                             {workout.templateName}
                           </span>
                           <button
                             onClick={() => removeWorkoutFromDay(currentWeek - 1, dayOfWeek)}
-                            className="p-1 hover:bg-red-500/20 rounded transition-colors"
+                            className="p-1 rounded transition-colors"
+                            style={{ color: '#EF4444' }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
                           >
-                            <Trash2 size={16} className="text-red-400" />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       ) : (
                         <div className="flex-1 flex items-center gap-2">
-                          <span className="text-sm text-gray-500 italic px-3">Rest Day</span>
+                          <span className="text-sm text-secondary italic px-3">Rest Day</span>
                           <select
                             onChange={(e) => {
                               if (e.target.value) {
@@ -361,7 +455,17 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                                 e.target.value = ''; // Reset select
                               }
                             }}
-                            className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-primary-blue"
+                            className="flex-1 px-3 py-2 rounded text-sm focus:outline-none focus:ring-2 transition-all text-primary"
+                            style={{
+                              backgroundColor: 'var(--surface-hover)',
+                              border: '1px solid var(--border-subtle)'
+                            }}
+                            onFocus={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                            }}
+                            onBlur={(e) => {
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
                           >
                             <option value="">+ Add Workout</option>
                             {(() => {
@@ -414,18 +518,36 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               }
             }}
             disabled={currentWeek >= weeks.length}
-            className="text-sm text-primary-blue hover:text-primary-blue/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className="text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            style={{ color: currentWeek >= weeks.length ? 'var(--text-muted)' : '#B482FF' }}
+            onMouseEnter={(e) => {
+              if (currentWeek < weeks.length) {
+                e.currentTarget.style.color = '#9B6DFF';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentWeek < weeks.length) {
+                e.currentTarget.style.color = '#B482FF';
+              }
+            }}
           >
             <Copy size={14} />
             Quick Copy to Week {currentWeek + 1}
           </button>
-          <span className="text-gray-600">|</span>
+          <span className="text-secondary">|</span>
           <button
             onClick={() => {
               setSelectedWeeksToCopy([]);
               setShowCopyModal(true);
             }}
-            className="text-sm text-primary-green hover:text-primary-green/80 transition-colors flex items-center gap-1"
+            className="text-sm transition-colors flex items-center gap-1"
+            style={{ color: '#B482FF' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#9B6DFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#B482FF';
+            }}
           >
             <Copy size={14} />
             Copy to Multiple Weeks...
@@ -462,8 +584,8 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold flex items-center gap-2">
-                <Copy className="text-primary-green" />
+              <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
+                <Copy style={{ color: '#B482FF' }} />
                 Copy Week {currentWeek} to Other Weeks
               </h3>
               <button
@@ -471,7 +593,14 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   setShowCopyModal(false);
                   setSelectedWeeksToCopy([]);
                 }}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--surface-accent)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }}
               >
                 <X size={20} />
               </button>
@@ -526,15 +655,33 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                     key={weekNum}
                     onClick={() => !isCurrentWeek && toggleWeekSelection(weekNum)}
                     disabled={isCurrentWeek}
-                    className={`
-                      p-3 rounded-lg text-sm font-medium transition-all
-                      ${isCurrentWeek
-                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    className="p-3 rounded-lg text-sm font-medium transition-all"
+                    style={{
+                      backgroundColor: isCurrentWeek
+                        ? 'var(--surface-hover)'
                         : isSelected
-                          ? 'bg-primary-green text-white border-2 border-primary-green'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-2 border-transparent'
+                          ? '#B482FF'
+                          : 'var(--surface-hover)',
+                      color: isCurrentWeek
+                        ? 'var(--text-muted)'
+                        : isSelected
+                          ? '#FFFFFF'
+                          : 'var(--text-secondary)',
+                      border: isSelected
+                        ? '2px solid #B482FF'
+                        : '2px solid transparent',
+                      cursor: isCurrentWeek ? 'not-allowed' : 'pointer',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isCurrentWeek && !isSelected) {
+                        e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
                       }
-                    `}
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isCurrentWeek && !isSelected) {
+                        e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                      }
+                    }}
                   >
                     <div className="text-xs opacity-75">Week</div>
                     <div className="text-lg">{weekNum}</div>
