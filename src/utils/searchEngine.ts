@@ -250,14 +250,14 @@ function applyFilters(
   filters: SearchFilters
 ): SearchResult[] {
   return results.filter(({ exercise }) => {
-    // Muscle group filter (OR logic within, AND across filters)
+    // Muscle group filter (AND logic - exercise must work ALL selected muscles)
     if (filters.muscleGroups && filters.muscleGroups.length > 0) {
-      const hasMatch = filters.muscleGroups.some(muscle => {
+      const hasAllMuscles = filters.muscleGroups.every(muscle => {
         const muscleLower = muscle.toLowerCase();
         return exercise.primaryMuscles.some(m => m.toLowerCase().includes(muscleLower)) ||
                exercise.secondaryMuscles.some(m => m.toLowerCase().includes(muscleLower));
       });
-      if (!hasMatch) return false;
+      if (!hasAllMuscles) return false;
     }
 
     // Equipment filter (OR logic)
