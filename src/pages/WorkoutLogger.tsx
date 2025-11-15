@@ -14,6 +14,7 @@ import type { Exercise } from '../types/exercise';
 import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
 import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile } from '../utils/csvExport';
 import { BUILTIN_WORKOUT_TEMPLATES, isBuiltinTemplate } from '../data/workoutTemplates';
+import { findExerciseByName } from '../utils/exerciseNameMatcher';
 import {
   getWorkoutTemplates,
   getWorkoutLogs,
@@ -261,13 +262,13 @@ export function WorkoutLogger() {
       const templateEx = template.exercises[i];
 
       // For built-in templates, exerciseId is actually the exercise name
-      // We need to look it up by name
+      // We need to look it up by name using fuzzy matching
       let exercise;
       if (isBuiltinTemplate(template.id)) {
         const allExercises = await db.exercises.toArray();
-        exercise = allExercises.find(ex => ex.name === templateEx.exerciseId);
+        exercise = findExerciseByName(templateEx.exerciseId, allExercises);
         if (!exercise) {
-          console.warn(`Built-in template exercise "${templateEx.exerciseId}" not found in database`);
+          console.warn(`Built-in template exercise "${templateEx.exerciseId}" not found in database even with fuzzy matching`);
           continue; // Skip this exercise
         }
       } else {
@@ -478,25 +479,37 @@ export function WorkoutLogger() {
   // If no active workout, show start screen
   if (!isWorkoutActive || !activeWorkout) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Start Workout</h1>
-          <p className="text-gray-400">Choose a template or start a blank workout</p>
+          <h1 className="text-3xl font-bold mb-2 text-primary">Start Workout</h1>
+          <p className="text-sm text-secondary">Choose a template or start a blank workout</p>
         </div>
 
         {/* Quick Start */}
         <button
           onClick={handleStartWorkout}
-          className="w-full card-elevated hover:border-primary-blue transition-colors flex items-center justify-center gap-3 py-6"
+          className="w-full rounded-lg transition-all flex items-center justify-center gap-3 py-6"
+          style={{
+            backgroundColor: 'var(--surface-elevated)',
+            border: '1px solid var(--border-subtle)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#B482FF';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
         >
-          <Play className="text-primary-blue" size={24} />
-          <span className="text-lg font-semibold">Start Empty Workout</span>
+          <Play style={{ color: '#B482FF' }} size={24} />
+          <span className="text-lg font-semibold text-primary">Start Empty Workout</span>
         </button>
 
         {/* Templates Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Workout Templates</h2>
+            <h2 className="text-xl font-semibold text-primary">Workout Templates</h2>
             <div className="flex items-center gap-3">
               {/* Template management buttons - only for authenticated users */}
               {user && (
@@ -560,23 +573,29 @@ export function WorkoutLogger() {
           />
 
           {templates.length === 0 && BUILTIN_WORKOUT_TEMPLATES.length === 0 ? (
-            <div className="card text-center py-12 text-gray-400">
-              <p>No templates yet</p>
-              <p className="text-sm mt-2">Create your first workout template to get started faster</p>
+            <div
+              className="rounded-lg text-center py-12"
+              style={{
+                backgroundColor: 'var(--surface-elevated)',
+                border: '2px dashed var(--border-subtle)'
+              }}
+            >
+              <p className="text-primary">No templates yet</p>
+              <p className="text-sm mt-2 text-secondary">Create your first workout template to get started faster</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* User Templates */}
               {templates.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">Your Templates</h3>
+                  <h3 className="text-sm font-semibold text-secondary mb-3 uppercase tracking-wide">Your Templates</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {templates.map((template) => (
                       <div key={template.id} className="card-elevated">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-lg">{template.name}</h3>
-                            <p className="text-sm text-gray-400 mt-1">
+                            <h3 className="font-semibold text-lg text-primary">{template.name}</h3>
+                            <p className="text-sm text-secondary mt-1">
                               {template.exercises.length} exercises
                             </p>
                           </div>
@@ -588,14 +607,28 @@ export function WorkoutLogger() {
                                   setEditingTemplate(template);
                                   setShowTemplateBuilder(true);
                                 }}
-                                className="text-gray-400 hover:text-primary-blue transition-colors"
+                                className="transition-colors"
+                                style={{ color: 'var(--text-muted)' }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.color = '#B482FF';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.color = 'var(--text-muted)';
+                                }}
                                 title="Edit template"
                               >
                                 <Edit size={18} />
                               </button>
                               <button
                                 onClick={() => handleDeleteTemplate(template.id)}
-                                className="text-gray-400 hover:text-red-400 transition-colors"
+                                className="transition-colors"
+                                style={{ color: 'var(--text-muted)' }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.color = '#DC2626';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.color = 'var(--text-muted)';
+                                }}
                                 title="Delete template"
                               >
                                 <Trash2 size={18} />
@@ -609,7 +642,7 @@ export function WorkoutLogger() {
                           {template.exercises.slice(0, 3).map((ex, idx) => {
                             const exerciseName = templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...';
                             return (
-                              <div key={idx} className="text-xs text-gray-400 flex items-center gap-2">
+                              <div key={idx} className="text-xs text-secondary flex items-center gap-2">
                                 <Dumbbell size={12} className="flex-shrink-0" />
                                 <span className="truncate">
                                   {exerciseName} - {ex.targetSets}x{ex.targetReps}
@@ -619,7 +652,14 @@ export function WorkoutLogger() {
                           })}
                           {template.exercises.length > 3 && (
                             <div
-                              className="text-xs text-gray-500 hover:text-gray-300 cursor-help transition-colors"
+                              className="text-xs cursor-help transition-colors"
+                              style={{ color: 'var(--text-muted)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = 'var(--text-secondary)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--text-muted)';
+                              }}
                               title={template.exercises.slice(3).map(ex =>
                                 templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...'
                               ).join(', ')}
@@ -646,10 +686,10 @@ export function WorkoutLogger() {
               {templates.length > 0 && BUILTIN_WORKOUT_TEMPLATES.length > 0 && (
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-800"></div>
+                    <div className="w-full" style={{ borderTop: '1px solid var(--border-subtle)' }}></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-dark-bg px-4 text-xs text-gray-500 uppercase tracking-wide">
+                    <span className="px-4 text-xs uppercase tracking-wide" style={{ backgroundColor: 'var(--surface-primary)', color: 'var(--text-muted)' }}>
                       Built-in Templates
                     </span>
                   </div>
@@ -660,21 +700,21 @@ export function WorkoutLogger() {
               {BUILTIN_WORKOUT_TEMPLATES.length > 0 && (
                 <div>
                   {templates.length === 0 && (
-                    <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">Built-in Templates</h3>
+                    <h3 className="text-sm font-semibold text-secondary mb-3 uppercase tracking-wide">Built-in Templates</h3>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {BUILTIN_WORKOUT_TEMPLATES.map((template) => (
-                      <div key={template.id} className="card-elevated border-gray-800/50">
+                      <div key={template.id} className="card-elevated" style={{ borderColor: 'var(--border-subtle)' }}>
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-lg">{template.name}</h3>
-                              <span className="text-[10px] bg-primary-blue/20 text-primary-blue px-2 py-0.5 rounded uppercase tracking-wide">
+                              <h3 className="font-semibold text-lg text-primary">{template.name}</h3>
+                              <span className="text-[10px] px-2 py-0.5 rounded uppercase tracking-wide" style={{ backgroundColor: 'rgba(180, 130, 255, 0.2)', color: '#B482FF' }}>
                                 Built-in
                               </span>
                             </div>
-                            <p className="text-sm text-gray-400 mt-1">{template.description}</p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-sm text-secondary mt-1">{template.description}</p>
+                            <p className="text-xs text-muted mt-1">
                               {template.exercises.length} exercises
                             </p>
                           </div>
@@ -685,7 +725,14 @@ export function WorkoutLogger() {
                                 setEditingTemplate(template as any);
                                 setShowTemplateBuilder(true);
                               }}
-                              className="text-gray-400 hover:text-primary-blue transition-colors"
+                              className="transition-colors"
+                              style={{ color: 'var(--text-muted)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = '#B482FF';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--text-muted)';
+                              }}
                               title="Copy & modify template"
                             >
                               <Edit size={18} />
@@ -696,7 +743,7 @@ export function WorkoutLogger() {
                         {/* Exercise Preview */}
                         <div className="space-y-1 mb-4">
                           {template.exercises.slice(0, 3).map((ex, idx) => (
-                            <div key={idx} className="text-xs text-gray-400 flex items-center gap-2">
+                            <div key={idx} className="text-xs text-secondary flex items-center gap-2">
                               <Dumbbell size={12} className="flex-shrink-0" />
                               <span className="truncate">
                                 {ex.exerciseId} - {ex.targetSets}x{ex.targetReps}
@@ -704,7 +751,7 @@ export function WorkoutLogger() {
                             </div>
                           ))}
                           {template.exercises.length > 3 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-muted">
                               +{template.exercises.length - 3} more
                             </div>
                           )}
@@ -785,11 +832,11 @@ export function WorkoutLogger() {
       )}
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-dark-bg/95 backdrop-blur-sm pb-4 border-b border-gray-800">
+      <div className="sticky top-0 z-10 backdrop-blur-sm pb-4" style={{ backgroundColor: 'var(--surface-primary-translucent, var(--surface-primary))', borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-2xl font-bold">{activeWorkout.name}</h1>
-            <p className="text-sm text-gray-400 flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-primary">{activeWorkout.name}</h1>
+            <p className="text-sm text-secondary flex items-center gap-2">
               <Clock size={14} />
               {stats.duration} min
             </p>
@@ -797,33 +844,85 @@ export function WorkoutLogger() {
           <div className="flex gap-2">
             <button
               onClick={toggleUnit}
-              className="btn-secondary px-3 py-2 text-xs font-mono"
+              className="px-3 py-2 text-xs font-mono rounded-lg transition-colors"
+              style={{
+                backgroundColor: 'var(--surface-accent)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-subtle)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+              }}
               title="Toggle units"
             >
               {weightUnit}
             </button>
             <button
               onClick={() => setShowTimer(!showTimer)}
-              className={`px-3 py-2 text-xs rounded transition-colors ${
-                showTimer ? 'bg-primary-blue text-white' : 'btn-secondary'
-              }`}
+              className="px-3 py-2 text-xs rounded-lg transition-all"
+              style={{
+                backgroundColor: showTimer ? '#B482FF' : 'var(--surface-accent)',
+                color: showTimer ? 'white' : 'var(--text-primary)',
+                border: showTimer ? '1px solid #B482FF' : '1px solid var(--border-subtle)'
+              }}
+              onMouseEnter={(e) => {
+                if (!showTimer) {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!showTimer) {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }
+              }}
               title="Toggle timer"
             >
               <Timer size={16} />
             </button>
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="btn-secondary px-4 py-2 text-sm"
+              className="px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
+              style={{
+                backgroundColor: 'var(--surface-accent)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-subtle)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+              }}
             >
-              <X size={16} className="inline mr-1" />
+              <X size={16} />
               Cancel
             </button>
             <button
               onClick={() => setShowSaveConfirm(true)}
-              className="btn-primary px-4 py-2 text-sm"
+              className="px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
+              style={{
+                backgroundColor: stats.completedSets === 0 || isSaving ? 'var(--surface-accent)' : '#EDE0FF',
+                color: stats.completedSets === 0 || isSaving ? 'var(--text-muted)' : '#7E29FF',
+                border: stats.completedSets === 0 || isSaving ? '1px solid var(--border-subtle)' : '1px solid #D7BDFF',
+                cursor: stats.completedSets === 0 || isSaving ? 'not-allowed' : 'pointer',
+                opacity: stats.completedSets === 0 || isSaving ? 0.5 : 1
+              }}
+              onMouseEnter={(e) => {
+                if (stats.completedSets > 0 && !isSaving) {
+                  e.currentTarget.style.backgroundColor = '#E4D2FF';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (stats.completedSets > 0 && !isSaving) {
+                  e.currentTarget.style.backgroundColor = '#EDE0FF';
+                }
+              }}
               disabled={stats.completedSets === 0 || isSaving}
             >
-              <Save size={16} className="inline mr-1" />
+              <Save size={16} />
               {isSaving ? 'Saving...' : 'Finish'}
             </button>
           </div>
@@ -831,26 +930,26 @@ export function WorkoutLogger() {
 
         {/* Timer (collapsible) */}
         {showTimer && (
-          <div className="mb-3 p-3 bg-gray-800 rounded-lg">
+          <div className="mb-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-accent)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 mb-1">Rest Timer</p>
-                <p className={`text-2xl font-bold font-mono ${timeRemaining <= 10 && timerIsRunning ? 'text-red-400 animate-pulse' : ''}`}>
+                <p className="text-xs text-secondary mb-1">Rest Timer</p>
+                <p className={`text-2xl font-bold font-mono ${timeRemaining <= 10 && timerIsRunning ? 'text-red-400 animate-pulse' : 'text-primary'}`}>
                   {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
                 </p>
               </div>
               <div className="flex gap-2">
                 {!timerIsRunning ? (
-                  <button onClick={() => startTimer(90)} className="bg-primary-blue hover:bg-primary-blue/80 text-white rounded px-4 py-2 text-sm">
+                  <button onClick={() => startTimer(90)} className="rounded px-4 py-2 text-sm transition-colors" style={{ backgroundColor: '#B482FF', color: 'white' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#A372EF'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#B482FF'}>
                     Start
                   </button>
                 ) : (
-                  <button onClick={pauseTimer} className="bg-primary-yellow hover:bg-primary-yellow/80 text-white rounded px-4 py-2 text-sm">
+                  <button onClick={pauseTimer} className="rounded px-4 py-2 text-sm transition-colors" style={{ backgroundColor: '#FFA500', color: 'white' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FF8C00'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFA500'}>
                     Pause
                   </button>
                 )}
-                <button onClick={resetTimer} className="btn-secondary px-3 py-2 text-sm">Reset</button>
-                <button onClick={skipTimer} className="btn-secondary px-3 py-2 text-sm">Skip</button>
+                <button onClick={resetTimer} className="px-3 py-2 text-sm rounded transition-colors" style={{ backgroundColor: 'var(--surface-accent)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-accent)'}>Reset</button>
+                <button onClick={skipTimer} className="px-3 py-2 text-sm rounded transition-colors" style={{ backgroundColor: 'var(--surface-accent)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--surface-accent)'}>Skip</button>
               </div>
             </div>
           </div>
@@ -858,21 +957,21 @@ export function WorkoutLogger() {
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2">
-          <div className="bg-gray-800 rounded p-2 text-center">
-            <p className="text-xs text-gray-400">Exercises</p>
-            <p className="text-lg font-bold">{stats.exerciseCount}</p>
+          <div className="rounded p-2 text-center" style={{ backgroundColor: 'var(--surface-accent)' }}>
+            <p className="text-xs text-secondary">Exercises</p>
+            <p className="text-lg font-bold text-primary">{stats.exerciseCount}</p>
           </div>
-          <div className="bg-gray-800 rounded p-2 text-center">
-            <p className="text-xs text-gray-400">Sets</p>
-            <p className="text-lg font-bold">{stats.completedSets}/{stats.totalSets}</p>
+          <div className="rounded p-2 text-center" style={{ backgroundColor: 'var(--surface-accent)' }}>
+            <p className="text-xs text-secondary">Sets</p>
+            <p className="text-lg font-bold text-primary">{stats.completedSets}/{stats.totalSets}</p>
           </div>
-          <div className="bg-gray-800 rounded p-2 text-center">
-            <p className="text-xs text-gray-400">Volume</p>
-            <p className="text-lg font-bold">{stats.totalVolume.toFixed(0)} {weightUnit}</p>
+          <div className="rounded p-2 text-center" style={{ backgroundColor: 'var(--surface-accent)' }}>
+            <p className="text-xs text-secondary">Volume</p>
+            <p className="text-lg font-bold text-primary">{stats.totalVolume.toFixed(0)} {weightUnit}</p>
           </div>
-          <div className="bg-gray-800 rounded p-2 text-center">
-            <p className="text-xs text-gray-400">Duration</p>
-            <p className="text-lg font-bold">{stats.duration}m</p>
+          <div className="rounded p-2 text-center" style={{ backgroundColor: 'var(--surface-accent)' }}>
+            <p className="text-xs text-secondary">Duration</p>
+            <p className="text-lg font-bold text-primary">{stats.duration}m</p>
           </div>
         </div>
       </div>
@@ -884,9 +983,9 @@ export function WorkoutLogger() {
             {/* Exercise Header */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex-1">
-                <h3 className="font-semibold text-lg">{exercise.exerciseName}</h3>
+                <h3 className="font-semibold text-lg text-primary">{exercise.exerciseName}</h3>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-400">
+                  <span className="text-secondary">
                     {exercise.totalVolume.toFixed(0)} {weightUnit} volume
                   </span>
                   {previousWorkoutData.has(exercise.exerciseId) && (() => {
@@ -897,7 +996,7 @@ export function WorkoutLogger() {
                         (set.weight > best.weight || (set.weight === best.weight && set.reps > best.reps)) ? set : best
                       , prevSets[0]);
                     return (
-                      <span className="text-primary-blue text-xs">
+                      <span className="text-xs" style={{ color: '#B482FF' }}>
                         Last: {bestPrevSet.weight}{weightUnit} × {bestPrevSet.reps}
                       </span>
                     );
@@ -906,14 +1005,21 @@ export function WorkoutLogger() {
               </div>
               <button
                 onClick={() => removeExercise(exercise.exerciseId)}
-                className="text-gray-400 hover:text-red-400 transition-colors"
+                className="transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#DC2626';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                }}
               >
                 <Trash2 size={18} />
               </button>
             </div>
 
             {/* Set Headers */}
-            <div className="grid grid-cols-[minmax(2.5rem,auto),minmax(2rem,auto),minmax(4rem,1fr),minmax(4rem,1fr),minmax(3.5rem,1fr),minmax(2.5rem,auto),minmax(2.5rem,auto)] gap-1.5 sm:gap-2 px-2 pb-2 text-xs text-gray-400 font-medium">
+            <div className="grid grid-cols-[minmax(2.5rem,auto),minmax(2rem,auto),minmax(4rem,1fr),minmax(4rem,1fr),minmax(3.5rem,1fr),minmax(2.5rem,auto),minmax(2.5rem,auto)] gap-1.5 sm:gap-2 px-2 pb-2 text-xs font-medium text-secondary">
               <div className="text-center">Type</div>
               <div className="text-center">Set</div>
               <div className="text-center">{weightUnit}</div>
@@ -946,7 +1052,18 @@ export function WorkoutLogger() {
             {/* Add Set Button */}
             <button
               onClick={() => addSet(exercise.exerciseId)}
-              className="w-full mt-3 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2 rounded transition-colors flex items-center justify-center gap-2"
+              className="w-full mt-3 py-2 rounded-lg transition-all flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: 'var(--surface-accent)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-subtle)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+              }}
             >
               <Plus size={16} />
               Add Set
@@ -958,10 +1075,22 @@ export function WorkoutLogger() {
       {/* Add Exercise Button */}
       <button
         onClick={() => setShowExerciseSelector(true)}
-        className="w-full card-elevated hover:border-primary-blue transition-colors flex items-center justify-center gap-3 py-4"
+        className="w-full rounded-lg transition-all flex items-center justify-center gap-3 py-4"
+        style={{
+          backgroundColor: 'var(--surface-elevated)',
+          border: '1px solid var(--border-subtle)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#B482FF';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'var(--border-subtle)';
+          e.currentTarget.style.transform = 'translateY(0)';
+        }}
       >
-        <Plus className="text-primary-blue" size={20} />
-        <span className="font-semibold">Add Exercise</span>
+        <Plus style={{ color: '#B482FF' }} size={20} />
+        <span className="font-semibold text-primary">Add Exercise</span>
       </button>
 
       {/* Exercise Selector Modal */}
@@ -987,30 +1116,30 @@ export function WorkoutLogger() {
 
         return (
           <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-            <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full">
-              <h2 className="text-xl font-bold mb-4">Finish Workout?</h2>
-              <p className="text-gray-400 mb-4">
+            <div className="rounded-lg p-6 max-w-md w-full" style={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)' }}>
+              <h2 className="text-xl font-bold mb-4 text-primary">Finish Workout?</h2>
+              <p className="text-secondary mb-4">
                 Save this workout with {stats.completedSets} completed sets and {stats.totalVolume.toFixed(0)} {weightUnit} total volume?
               </p>
 
               {/* Warning for incomplete sets */}
               {hasIncompleteSets && (
-                <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-4">
+                <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: 'rgba(255, 165, 0, 0.1)', border: '1px solid rgba(255, 165, 0, 0.3)' }}>
                   <div className="flex items-start gap-2">
-                    <div className="text-orange-400 mt-0.5">⚠️</div>
+                    <div className="mt-0.5" style={{ color: '#FFA500' }}>⚠️</div>
                     <div className="flex-1">
-                      <p className="text-orange-400 font-semibold text-sm mb-2">
+                      <p className="font-semibold text-sm mb-2" style={{ color: '#FFA500' }}>
                         Warning: {incompleteSets.length} uncompleted set{incompleteSets.length !== 1 ? 's' : ''}
                       </p>
-                      <p className="text-orange-300 text-xs mb-2">
+                      <p className="text-xs mb-2" style={{ color: '#FFB84D' }}>
                         These sets won't count toward your volume:
                       </p>
-                      <ul className="text-orange-300 text-xs list-disc list-inside space-y-1">
+                      <ul className="text-xs list-disc list-inside space-y-1" style={{ color: '#FFB84D' }}>
                         {exercisesWithIncomplete.map((name, idx) => (
                           <li key={idx}>{name}</li>
                         ))}
                       </ul>
-                      <p className="text-orange-300 text-xs mt-2 italic">
+                      <p className="text-xs mt-2 italic" style={{ color: '#FFB84D' }}>
                         Click the checkmark (✓) on each set to mark it complete.
                       </p>
                     </div>
@@ -1021,14 +1150,48 @@ export function WorkoutLogger() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowSaveConfirm(false)}
-                  className="flex-1 btn-secondary"
+                  className="flex-1 py-2 rounded-lg font-semibold transition-all"
+                  style={{
+                    backgroundColor: 'var(--surface-accent)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    opacity: isSaving ? 0.5 : 1,
+                    cursor: isSaving ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSaving) {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSaving) {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                    }
+                  }}
                   disabled={isSaving}
                 >
                   Keep Working
                 </button>
                 <button
                   onClick={handleSaveWorkout}
-                  className="flex-1 btn-primary"
+                  className="flex-1 py-2 rounded-lg font-semibold transition-all"
+                  style={{
+                    backgroundColor: isSaving ? 'var(--surface-accent)' : '#EDE0FF',
+                    color: isSaving ? 'var(--text-muted)' : '#7E29FF',
+                    border: isSaving ? '1px solid var(--border-subtle)' : '1px solid #D7BDFF',
+                    opacity: isSaving ? 0.5 : 1,
+                    cursor: isSaving ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSaving) {
+                      e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSaving) {
+                      e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    }
+                  }}
                   disabled={isSaving}
                 >
                   {isSaving ? 'Saving...' : 'Save & Finish'}
@@ -1042,21 +1205,39 @@ export function WorkoutLogger() {
       {/* Cancel Confirmation Modal */}
       {showCancelConfirm && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full">
+          <div className="rounded-lg p-6 max-w-md w-full" style={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)' }}>
             <h2 className="text-xl font-bold mb-4 text-red-400">Cancel Workout?</h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-secondary mb-6">
               This will discard your workout with {stats.completedSets} completed sets. This cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="flex-1 btn-secondary"
+                className="flex-1 py-2 rounded-lg font-semibold transition-all"
+                style={{
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
+                }}
               >
                 Keep Workout
               </button>
               <button
                 onClick={handleCancelWorkout}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded py-2 transition-colors"
+                className="flex-1 py-2 rounded-lg font-semibold transition-colors"
+                style={{ backgroundColor: '#DC2626', color: 'white' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#B91C1C';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#DC2626';
+                }}
               >
                 Discard
               </button>

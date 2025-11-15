@@ -178,6 +178,41 @@ This is a personal project with zero monetization requirements, laser-focused on
 - Rapid prototyping without context switching
 - Production builds purge unused styles (tiny bundles)
 
+### Theme System Architecture
+
+**Decision:** Hybrid theming system combining CSS variables with TypeScript design tokens.
+
+**Why this matters:**
+- Users expect seamless theme switching (Light/Dark/AMOLED)
+- Each theme has distinct design philosophies (not just color swaps)
+- AMOLED mode uses brutalist grayscale aesthetic (no purple, gold accents only)
+- Dark mode uses different brand colors than light mode (`#8B42FF` vs `#B482FF`)
+- Need type-safe access to theme values while maintaining performance
+
+**Inspiration:**
+- **Discord:** Hybrid CSS variables + JavaScript theme objects for complex logic
+- **GitHub:** Design tokens with semantic naming (surface, text, border, brand)
+- **Slack:** Component-based theming with mode-specific variants
+- Adapted industry best practices to our three-theme system
+
+**Implementation approach:**
+1. **CSS Variables (Performance Layer):** Fast runtime switching without React re-renders
+2. **TypeScript Tokens (Type Safety Layer):** Prevent invalid color references, enable autocomplete
+3. **Theme Context (State Layer):** React context manages active theme with localStorage persistence
+4. **Utility Helpers (Logic Layer):** Handle complex conditional logic (e.g., AMOLED uses gold for streaks, other themes use purple)
+
+**When to use each approach:**
+- CSS Variables → Simple color swaps, text/background/borders
+- TypeScript Tokens → Complex conditionals, component-specific theme variations
+- Reusable UI Components → Shared patterns like `<Chip>`, `<StatCard>`, `<Button>`
+
+**Design philosophy per theme:**
+- **Light Mode:** Clean, professional, Apple-inspired (white cards, purple accents)
+- **Dark Mode:** Rich, theatrical, confident (dark blue-gray surfaces, purple + gold accents)
+- **AMOLED Mode:** Minimal, brutalist, battery-saving (pure black, grayscale + gold micro-accents)
+
+**Documentation:** See `THEME_SYSTEM.md` for complete architecture details and implementation guidelines.
+
 ### Backend Strategy: Offline-First
 
 - **Primary:** Local-first with IndexedDB (works without internet)
@@ -797,6 +832,12 @@ Build the gym app that data-minded lifters would create for themselves. Simple t
 - [Material Design](https://m3.material.io/) - Component patterns
 - [Lucide Icons](https://lucide.dev/) - Icon system
 
+### Theme System & Design Tokens
+- [Discord Design System](https://discord.com/branding) - Hybrid CSS + JS theming approach
+- [GitHub Primer](https://primer.style/) - Design token architecture and semantic naming
+- [Slack Design](https://slack.design/) - Component-based theming patterns
+- **THEME_SYSTEM.md:** Complete documentation of our hybrid theming architecture
+
 ### Research & Data
 - **Compass Artifact 1:** Comprehensive fitness app market analysis
 - **ProgTracking.pdf:** Progressive tracking research (why streaks and standards matter)
@@ -806,9 +847,12 @@ Build the gym app that data-minded lifters would create for themselves. Simple t
 
 ## Changelog
 
-**Last updated:** 2025-11-09
+**Last updated:** 2025-11-14
 
 **Recent milestones:**
+- 2025-11-14: Theme system foundation implemented (TypeScript tokens, `<Chip>` component, Dashboard migration)
+- 2025-11-14: Theme system architecture documented (THEME_SYSTEM.md created, ROADMAP updated)
+- 2025-11-13: Exercise Library UX overhaul completed (theme-aware, filter modal)
 - 2025-10-23: Phase 5 completed and deployed to production
 - 2025-10-21: Phase 3.5 completed (enhanced analytics & engagement)
 - 2025-10-18: Phase 4 completed (programming & scheduling)
@@ -818,6 +862,7 @@ Build the gym app that data-minded lifters would create for themselves. Simple t
 - 2025-10-01: Phase 0 completed (foundation & setup)
 
 **Next up:**
+- Theme system implementation (TypeScript tokens, UI component library)
 - Phase 5.5: Migration strategy (import from Strong/Hevy)
 
 ---

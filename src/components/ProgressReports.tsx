@@ -1,5 +1,15 @@
 import { useState, useMemo } from 'react';
-import { TrendingUp, TrendingDown, Calendar, Clock, Dumbbell, Trophy, Target, BarChart3, Award } from 'lucide-react';
+import {
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Clock,
+  Dumbbell,
+  Trophy,
+  Target,
+  BarChart3,
+  Award,
+} from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { WorkoutLog } from '../types/workout';
 import type { PersonalRecord } from '../utils/analytics';
@@ -55,8 +65,8 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
     const { currentStart, previousStart, previousEnd } = getDateRanges();
 
     // Filter workouts for current and previous periods
-    const currentWorkouts = workouts.filter(w => new Date(w.date) >= currentStart);
-    const previousWorkouts = workouts.filter(w => {
+    const currentWorkouts = workouts.filter((w) => new Date(w.date) >= currentStart);
+    const previousWorkouts = workouts.filter((w) => {
       const date = new Date(w.date);
       return date >= previousStart && date < previousEnd;
     });
@@ -66,10 +76,14 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       totalWorkouts: currentWorkouts.length,
       totalVolume: currentWorkouts.reduce((sum, w) => sum + w.totalVolume, 0),
       totalTime: currentWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0),
-      totalSets: currentWorkouts.reduce((sum, w) =>
-        sum + w.exercises.reduce((exSum, ex) =>
-          exSum + ex.sets.filter(s => !s.isWarmup && s.completed).length, 0
-        ), 0
+      totalSets: currentWorkouts.reduce(
+        (sum, w) =>
+          sum +
+          w.exercises.reduce(
+            (exSum, ex) => exSum + ex.sets.filter((s) => !s.isWarmup && s.completed).length,
+            0
+          ),
+        0
       ),
     };
 
@@ -77,10 +91,14 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       totalWorkouts: previousWorkouts.length,
       totalVolume: previousWorkouts.reduce((sum, w) => sum + w.totalVolume, 0),
       totalTime: previousWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0),
-      totalSets: previousWorkouts.reduce((sum, w) =>
-        sum + w.exercises.reduce((exSum, ex) =>
-          exSum + ex.sets.filter(s => !s.isWarmup && s.completed).length, 0
-        ), 0
+      totalSets: previousWorkouts.reduce(
+        (sum, w) =>
+          sum +
+          w.exercises.reduce(
+            (exSum, ex) => exSum + ex.sets.filter((s) => !s.isWarmup && s.completed).length,
+            0
+          ),
+        0
       ),
     };
 
@@ -99,12 +117,16 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
 
     // Top exercises by set count
     const exerciseSetCounts = new Map<string, { name: string; sets: number; volume: number }>();
-    currentWorkouts.forEach(workout => {
-      workout.exercises.forEach(ex => {
-        const existing = exerciseSetCounts.get(ex.exerciseId) || { name: ex.exerciseName, sets: 0, volume: 0 };
-        const workingSets = ex.sets.filter(s => !s.isWarmup && s.completed);
+    currentWorkouts.forEach((workout) => {
+      workout.exercises.forEach((ex) => {
+        const existing = exerciseSetCounts.get(ex.exerciseId) || {
+          name: ex.exerciseName,
+          sets: 0,
+          volume: 0,
+        };
+        const workingSets = ex.sets.filter((s) => !s.isWarmup && s.completed);
         existing.sets += workingSets.length;
-        existing.volume += workingSets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
+        existing.volume += workingSets.reduce((sum, s) => sum + s.weight * s.reps, 0);
         exerciseSetCounts.set(ex.exerciseId, existing);
       });
     });
@@ -114,7 +136,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       .slice(0, 5);
 
     // PRs achieved in current period
-    const currentPRs = allPRs.filter(pr => new Date(pr.date) >= currentStart);
+    const currentPRs = allPRs.filter((pr) => new Date(pr.date) >= currentStart);
 
     // Frequency chart data (group by week or month depending on period)
     const frequencyData = [];
@@ -124,7 +146,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         date.setHours(0, 0, 0, 0);
-        const dayWorkouts = currentWorkouts.filter(w => {
+        const dayWorkouts = currentWorkouts.filter((w) => {
           const wDate = new Date(w.date);
           wDate.setHours(0, 0, 0, 0);
           return wDate.getTime() === date.getTime();
@@ -140,10 +162,10 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       const weeksCount = 4;
       for (let i = weeksCount - 1; i >= 0; i--) {
         const weekEnd = new Date();
-        weekEnd.setDate(weekEnd.getDate() - (i * 7));
+        weekEnd.setDate(weekEnd.getDate() - i * 7);
         const weekStart = new Date(weekEnd);
         weekStart.setDate(weekStart.getDate() - 7);
-        const weekWorkouts = currentWorkouts.filter(w => {
+        const weekWorkouts = currentWorkouts.filter((w) => {
           const wDate = new Date(w.date);
           return wDate >= weekStart && wDate < weekEnd;
         });
@@ -160,7 +182,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
         monthDate.setMonth(monthDate.getMonth() - i);
         const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
         const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
-        const monthWorkouts = currentWorkouts.filter(w => {
+        const monthWorkouts = currentWorkouts.filter((w) => {
           const wDate = new Date(w.date);
           return wDate >= monthStart && wDate <= monthEnd;
         });
@@ -198,9 +220,15 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
     if (value === 0) return <span className="text-muted text-sm">No change</span>;
     const isPositive = value > 0;
     return (
-      <div className={`flex items-center gap-1 text-sm`} style={{ color: isPositive ? '#B482FF' : '#FF6B6B' }}>
+      <div
+        className={`flex items-center gap-1 text-sm`}
+        style={{ color: isPositive ? '#B482FF' : '#FF6B6B' }}
+      >
         {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-        <span>{isPositive ? '+' : ''}{value.toFixed(0)}%</span>
+        <span>
+          {isPositive ? '+' : ''}
+          {value.toFixed(0)}%
+        </span>
       </div>
     );
   };
@@ -218,7 +246,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
 
         {/* Period Selector */}
         <div className="flex gap-2">
-          {(['week', 'month', 'year'] as TimePeriod[]).map(period => (
+          {(['week', 'month', 'year'] as TimePeriod[]).map((period) => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
@@ -247,25 +275,33 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
 
       {/* Summary Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="rounded-lg p-4" style={{
-          backgroundColor: 'var(--surface-accent)',
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           <div className="flex items-center gap-2 mb-2 text-muted">
             <Dumbbell size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Total Volume</span>
           </div>
-          <p className="text-3xl font-bold text-primary mb-1">{reportData.current.totalVolume.toFixed(0)}</p>
+          <p className="text-3xl font-bold text-primary mb-1">
+            {reportData.current.totalVolume.toFixed(0)}
+          </p>
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted">{weightUnit}</span>
             <ChangeIndicator value={reportData.changes.volume} />
           </div>
         </div>
 
-        <div className="rounded-lg p-4" style={{
-          backgroundColor: 'var(--surface-accent)',
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           <div className="flex items-center gap-2 mb-2 text-muted">
             <Calendar size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Workouts</span>
@@ -277,25 +313,33 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
           </div>
         </div>
 
-        <div className="rounded-lg p-4" style={{
-          backgroundColor: 'var(--surface-accent)',
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           <div className="flex items-center gap-2 mb-2 text-muted">
             <Clock size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Training Time</span>
           </div>
-          <p className="text-3xl font-bold text-primary mb-1">{Math.round(reportData.current.totalTime / 60)}</p>
+          <p className="text-3xl font-bold text-primary mb-1">
+            {Math.round(reportData.current.totalTime / 60)}
+          </p>
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted">hours</span>
             <ChangeIndicator value={reportData.changes.time} />
           </div>
         </div>
 
-        <div className="rounded-lg p-4" style={{
-          backgroundColor: 'var(--surface-accent)',
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           <div className="flex items-center gap-2 mb-2 text-muted">
             <Target size={18} strokeWidth={1.5} />
             <span className="text-sm font-medium">Total Sets</span>
@@ -309,11 +353,16 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       </div>
 
       {/* Training Frequency Chart */}
-      <div className="rounded-lg p-4 mb-6" style={{
-        backgroundColor: 'var(--surface-accent)',
-        border: '1px solid var(--border-subtle)',
-      }}>
-        <h3 className="text-lg font-semibold text-primary mb-4">Training Frequency - {periodLabel}</h3>
+      <div
+        className="rounded-lg p-4 mb-6"
+        style={{
+          backgroundColor: 'var(--surface-accent)',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        <h3 className="text-lg font-semibold text-primary mb-4">
+          Training Frequency - {periodLabel}
+        </h3>
         {reportData.frequencyData.length > 0 ? (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={reportData.frequencyData}>
@@ -321,7 +370,11 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
               <XAxis dataKey="label" stroke="var(--text-muted)" style={{ fontSize: '12px' }} />
               <YAxis stroke="var(--text-muted)" style={{ fontSize: '12px' }} />
               <Tooltip
-                contentStyle={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                contentStyle={{
+                  backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                }}
                 labelStyle={{ color: 'var(--text-primary)' }}
               />
               <Bar dataKey="workouts" fill="#B482FF" name="Workouts" radius={[4, 4, 0, 0]} />
@@ -337,10 +390,13 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Exercises */}
-        <div className="rounded-lg p-4" style={{
-          backgroundColor: 'var(--surface-accent)',
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
             <Trophy size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
             Top Exercises
@@ -386,21 +442,27 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
                 return (
                   <div key={idx} className="flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm`}
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm`}
                         style={{
                           backgroundColor: style.backgroundColor,
                           color: style.color,
                           border: style.border,
-                        }}>
+                        }}
+                      >
                         {idx + 1}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-primary truncate">{ex.name}</p>
-                        <p className="text-xs text-muted">{ex.volume.toFixed(0)} {weightUnit} total</p>
+                        <p className="text-xs text-muted">
+                          {ex.volume.toFixed(0)} {weightUnit} total
+                        </p>
                       </div>
                     </div>
                     <div className="text-right ml-4">
-                      <p className="text-lg font-bold" style={{ color: style.setColor }}>{ex.sets}</p>
+                      <p className="text-lg font-bold" style={{ color: style.setColor }}>
+                        {ex.sets}
+                      </p>
                       <p className="text-xs text-muted">sets</p>
                     </div>
                   </div>
@@ -416,10 +478,13 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
         </div>
 
         {/* PR Highlights */}
-        <div className="rounded-lg p-4" style={{
-          backgroundColor: 'var(--surface-accent)',
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
             <Award size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
             PR Highlights
@@ -427,7 +492,11 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
           {reportData.currentPRs.length > 0 ? (
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {reportData.currentPRs.slice(0, 10).map((pr, idx) => (
-                <div key={idx} className="rounded-lg p-3" style={{ backgroundColor: 'var(--surface)' }}>
+                <div
+                  key={idx}
+                  className="rounded-lg p-3"
+                  style={{ backgroundColor: 'var(--surface)' }}
+                >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm text-primary truncate">{pr.exerciseName}</p>
@@ -439,7 +508,10 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
                       </p>
                     </div>
                     <div className="text-xs text-muted whitespace-nowrap">
-                      {new Date(pr.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(pr.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
                     </div>
                   </div>
                 </div>

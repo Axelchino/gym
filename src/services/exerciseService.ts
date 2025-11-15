@@ -1,6 +1,7 @@
 import { db } from './database';
 import type { Exercise, ExerciseSearchParams } from '../types/exercise';
 import { v4 as uuidv4 } from 'uuid';
+import { findExerciseByName, batchMatchExerciseNames } from '../utils/exerciseNameMatcher';
 
 export class ExerciseService {
   // Create a new exercise
@@ -109,6 +110,24 @@ export class ExerciseService {
   // Get exercise count
   async getCount(): Promise<number> {
     return await db.exercises.count();
+  }
+
+  // Find exercise by exact name match (original behavior preserved)
+  async findByName(name: string): Promise<Exercise | undefined> {
+    const exercises = await db.exercises.toArray();
+    return exercises.find(ex => ex.name.toLowerCase() === name.toLowerCase());
+  }
+
+  // Find exercise with fuzzy matching (new behavior - handles variations)
+  async findByNameFuzzy(name: string): Promise<Exercise | null> {
+    const exercises = await db.exercises.toArray();
+    return findExerciseByName(name, exercises);
+  }
+
+  // Match exercise names to IDs for builtin templates (uses fuzzy matching)
+  async matchExerciseNamesToIds(exerciseNames: string[]): Promise<Map<string, string>> {
+    const exercises = await db.exercises.toArray();
+    return batchMatchExerciseNames(exerciseNames, exercises);
   }
 }
 

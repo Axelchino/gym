@@ -1,6 +1,6 @@
 # GymTracker Pro - Development Backlog
 
-**Last Updated:** 2025-11-13
+**Last Updated:** 2025-11-14
 **Current Phase:** Phase 5 Complete, Phase 5.5 Next
 **Version:** v0.5.0
 
@@ -9,23 +9,60 @@
 ## 🎯 Current Sprint (What's Next Immediately)
 
 ### Critical Bug Fixes & Polish
+
 **Priority:** HIGH - Polish before public release
 
-- [ ] **Theme System - UX Issues Across Light/Dark/AMOLED**
-  - [ ] Verify all components look correct in all 3 themes
-  - [ ] Check Recent Activity cards styling across themes
+- [ ] **Theme System - Architecture & Implementation** (2025-11-14)
+  - [x] **Documentation & Architecture Planning**
+    - [x] Created THEME_SYSTEM.md with comprehensive architecture documentation
+    - [x] Documented hybrid approach (CSS variables + TypeScript tokens)
+    - [x] Explained design philosophy for each theme (Light/Dark/AMOLED)
+    - [x] Cited industry inspiration (Discord, GitHub, Slack)
+    - [x] Created implementation guidelines and testing checklist
+    - [x] Defined when to use CSS vs TypeScript approach
+  - [x] **Theme System Implementation - Foundation Complete** (2025-11-14)
+    - [x] Created `src/theme/tokens.ts` with TypeScript design tokens for all 3 themes
+    - [x] Created `src/utils/themeHelpers.ts` utility functions
+    - [x] Implemented `useThemeTokens()` hook for component access
+    - [x] Created reusable UI components (`src/components/ui/`)
+      - [x] `<Chip>` component with variant support (default | streak)
+    - [x] Migrated Dashboard to use `<Chip>` component
+    - [x] Fixed chip colors per ThreeModesDemo reference:
+      - [x] Light: Purple chips (rgba purple bg + purple text)
+      - [x] Dark: Blue chips (`#006DD4` bg + white text)
+      - [x] AMOLED: Grayscale chips (`#1A1A1A` bg + `#C8C8C8` text)
+  - [ ] **Dashboard/Front Page - Theme Polish Needed**
+    - [x] Migrated stat card chips and exercise tags to `<Chip>` component
+    - [ ] REMAINING: Many theme tweaks needed across all 3 modes
+    - [ ] Test and polish Light mode (currently closest to correct)
+    - [ ] Test and polish Dark mode (chip colors now correct, other elements TBD)
+    - [ ] Test and polish AMOLED mode (chip colors now correct, other elements TBD)
   - [ ] Update Analytics chart components to use CSS variables (`--chart-primary`, `--chart-secondary`)
   - [ ] Test chart colors/text/axis labels across all themes
   - [ ] Fix any hardcoded color values in Recharts components
   - [ ] Ensure consistent borders, hover states, and contrast ratios
-  - [x] **Program Tab Modals - Light Theme Polish** ✅ COMPLETE (2025-11-13)
-    - [x] Fixed "Create Custom" modal UX issues
-    - [x] Fixed "From Template" modal UX issues
-    - [x] Improved text readability (labels now use `text-primary` for high contrast)
+  - [ ] **Start Workout Tab - Theme Polish** (Code updated, NEEDS TESTING across all 3 themes)
+    - [x] Fixed "Start Empty Workout" button UX with hover effects
+    - [x] Updated header text colors (text-primary, text-secondary)
+    - [x] Fixed template card styling (user templates and builtin templates)
+    - [x] Updated divider line between user and builtin templates (theme-aware)
+    - [x] Polished active workout header buttons (Cancel/Finish) with proper colors
+    - [x] Fixed timer section styling (theme-aware background and text)
+    - [x] Updated stats cards (Exercises/Sets/Volume/Duration) with CSS variables
+    - [x] Fixed exercise cards in active workout (headers, buttons, "Add Set")
+    - [x] Updated all modals (Cancel Workout, Finish Workout) with consistent design
+    - [x] Fixed "Add Exercise" button with purple accent and hover effects
+    - [x] Updated ExerciseSelector modal with theme-aware styling
+    - [x] Polished exercise list items with hover effects and purple muscle tags
+    - [x] Replaced all hardcoded colors (bg-gray-800, text-gray-400) with CSS variables
+  - [ ] **Program Tab Modals - Light Mode Polish** (ONLY tested in light mode)
+    - [x] Fixed "Create Custom" modal UX issues (light mode only)
+    - [x] Fixed "From Template" modal UX issues (light mode only)
+    - [x] Improved text readability for light mode (labels use `text-primary`)
     - [x] Added sticky footer buttons (always visible, no scrolling needed)
-    - [x] Fixed transparent backgrounds (`var(--surface-elevated)` instead of `var(--surface-primary)`)
-    - [x] Updated button colors to match app design system (light purple: #EDE0FF)
-    - [x] All changes fully theme-aware (work across Light/Dark/AMOLED themes)
+    - [x] Fixed transparent backgrounds (`var(--surface-elevated)`)
+    - [x] Updated button colors for light mode (light purple: #EDE0FF)
+    - [ ] NEEDS TESTING in Dark and AMOLED themes
 
 - [x] **Strength Standards - Complete UX/UI Overhaul** ✅ COMPLETE (2025-11-12)
   - [x] **Persistence Issues:**
@@ -126,6 +163,21 @@
   - [ ] Add touch-optimized input fields with larger tap targets
   - [ ] Optimize set logging to <3 seconds consistently
 
+- [x] **Exercise Name Matching System** ✅ COMPLETE (2025-11-14)
+  - [x] Created comprehensive fuzzy matching system for exercise names
+  - [x] Implemented 4-tier matching algorithm:
+    - Tier 1: Exact match (fastest)
+    - Tier 2: Normalized match (remove "Barbell", "Dumbbell", lowercase)
+    - Tier 3: Partial/contains match (shortest match wins)
+    - Tier 4: Levenshtein distance for typo tolerance (up to 2 edits)
+  - [x] Created `src/utils/exerciseNameMatcher.ts` utility
+  - [x] Updated `WorkoutLogger.tsx` line 269 to use fuzzy matching
+  - [x] Added `findByNameFuzzy()` method to `exerciseService.ts`
+  - [x] Updated `matchExerciseNamesToIds()` to use batch fuzzy matching
+  - [x] Created comprehensive documentation in `data/template_archives/EXERCISE_NAME_MATCHING_SYSTEM.md`
+  - [x] **RESULT:** Builtin templates now show all exercises (3/3 for StrongLifts vs previous 1/3)
+  - [x] **BENEFIT:** Prepares for Phase 5.5 Strong/Hevy CSV imports with name variations
+
 - [ ] **Template System Polish**
   - [x] **FEATURE: Save completed workout as template** ✅
     - [x] Add "Save as Template" button on workout completion screen (PR celebration modal)
@@ -140,16 +192,19 @@
 ---
 
 ## 📋 Phase 5.5: Migration Strategy - The Trojan Horse
+
 **Timeline:** 1 week sprint
 **Status:** Not Started
 **Priority:** CRITICAL - This is the user acquisition strategy
 
 ### Core Strategy
+
 Lower switching cost to ZERO. Let product quality speak for itself.
 
 **The Pitch:** "Strong has ugly UI. Hevy has aggressive paywalls. I built something better. Bring your data, try it for free, see the difference. If you don't like it, your original data is still there. Zero risk."
 
 ### 1. Strong App Import
+
 **Technical Requirements:**
 
 - [ ] **CSV Parser for Strong Format**
@@ -179,6 +234,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Preserve Strong's muscle group categorizations
 
 ### 2. Hevy Import
+
 **Technical Requirements:**
 
 - [ ] **CSV Parser for Hevy Format**
@@ -204,6 +260,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Import summary screen
 
 ### 3. Onboarding Flow for Existing Users
+
 **UI/UX Components:**
 
 - [ ] **Welcome Screen with Import Option**
@@ -242,6 +299,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Secondary CTA: "Start New Workout"
 
 ### 4. Import Analytics Dashboard (Internal)
+
 **Tracking & Metrics:**
 
 - [ ] **User Import Metrics**
@@ -262,6 +320,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Track conversion rates
 
 ### 5. Landing Page Messaging (Marketing)
+
 **Content Strategy:**
 
 - [ ] **Hero Section Rewrite**
@@ -290,6 +349,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Visual flow diagram
 
 ### 6. Reddit/Forum Launch Strategy
+
 **Community Outreach:**
 
 - [ ] **Launch Post Structure**
@@ -315,6 +375,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Have bug fix pipeline ready
 
 ### Success Metrics
+
 - **Week 1:** 10+ users import their data
 - **Week 2:** 50+ users, 20% retention after 7 days
 - **Week 4:** 200+ users, users posting screenshots on Reddit
@@ -322,6 +383,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
 - **Month 3:** First "I switched from Hevy" post appears organically
 
 ### Deliverables
+
 - [ ] Strong CSV import (tested with 1000+ workout files)
 - [ ] Hevy CSV import (tested with 1000+ workout files)
 - [ ] Onboarding flow for import vs fresh start
@@ -332,14 +394,17 @@ Lower switching cost to ZERO. Let product quality speak for itself.
 ---
 
 ## 🎮 Phase 6: Gamification & Social Features
+
 **Timeline:** Weeks 16-19
 **Status:** Not Started
 **Priority:** HIGH
 
 ### 1. Gamification & Quest System (Duolingo-Inspired)
+
 **Honor System Approach - No Anti-Cheat**
 
 #### Daily Quests
+
 - [ ] **Quest Types:**
   - [ ] "Complete 3 sets of any exercise"
   - [ ] "Hit a new PR today"
@@ -360,6 +425,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Variety algorithm (don't repeat same quest 3 days in a row)
 
 #### Weekly Quests
+
 - [ ] **Quest Types:**
   - [ ] "Train 4 times this week"
   - [ ] "Hit 5 PRs this week"
@@ -373,6 +439,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Notification when close to completion
 
 #### Monthly Challenges
+
 - [ ] **Challenge Types:**
   - [ ] "Complete 16 workouts this month"
   - [ ] "Hit 10 PRs this month"
@@ -386,6 +453,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Shareable completion cards
 
 #### Rewards System (Honor System)
+
 - [ ] **XP/Points System:**
   - [ ] XP for completing quests (Daily: 10XP, Weekly: 50XP, Monthly: 200XP)
   - [ ] XP for PRs (varies by type)
@@ -409,9 +477,11 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Streak milestone rewards
 
 ### 2. Social Features for Workout Buddies
+
 **Privacy-First, Opt-In Only**
 
 #### Friend System
+
 - [ ] **Friend Management:**
   - [ ] Add friends by username/friend code
   - [ ] Friend requests and approvals
@@ -432,9 +502,11 @@ Lower switching cost to ZERO. Let product quality speak for itself.
   - [ ] Side-by-side progress comparison
 
 #### Template & Workout Sharing System
+
 **Database-Backed Short URLs (NOT Encoded Strings)**
 
 **Why Database Approach:**
+
 - Clean, shareable links: `gymtracker.app/shared/abc123`
 - Can revoke/disable shares without deleting content
 - Track views and analytics
@@ -443,6 +515,7 @@ Lower switching cost to ZERO. Let product quality speak for itself.
 - Scalable: 10,000 shared links = 2MB storage
 
 **Database Schema:**
+
 ```sql
 shared_workouts:
   - id (short code: "abc123")
@@ -484,6 +557,7 @@ shared_templates:
   - [ ] Search community templates
 
 #### Challenges with Friends
+
 - [ ] **Group Challenges:**
   - [ ] Create private group challenges
   - [ ] "Who can hit more PRs this week?"
@@ -498,6 +572,7 @@ shared_templates:
   - [ ] Challenge completion celebrations
 
 #### Workout Comparisons
+
 - [ ] **Side-by-Side Stats:**
   - [ ] Compare total volume with friends
   - [ ] Compare PRs per exercise
@@ -510,6 +585,7 @@ shared_templates:
   - [ ] Consistency comparison
 
 #### Motivation Features
+
 - [ ] **Encouragement System:**
   - [ ] Send encouragement messages to friends
   - [ ] Pre-written encouragement templates
@@ -522,9 +598,11 @@ shared_templates:
   - [ ] Opt-in/opt-out for all notifications
 
 ### 3. Achievement System
+
 **Milestone-Based Gamification**
 
 #### Achievement Types
+
 - [ ] **Workout Milestones:**
   - [ ] First workout, 10, 50, 100, 250, 500, 1000 workouts
   - [ ] Badge designs for each tier
@@ -557,6 +635,7 @@ shared_templates:
   - [ ] Community contributor badges
 
 #### Achievement UI
+
 - [ ] **Achievement Detection:**
   - [ ] Real-time achievement detection on workout save
   - [ ] Background achievement scanning (weekly cron)
@@ -579,9 +658,11 @@ shared_templates:
   - [ ] Share to friend's activity feed
 
 ### 4. Video Demonstrations
+
 **Exercise Form Guidance**
 
 #### Video Sourcing
+
 - [ ] **Content Strategy:**
   - [ ] Partner with fitness content creators
   - [ ] OR source public domain/Creative Commons videos
@@ -595,6 +676,7 @@ shared_templates:
   - [ ] Consistent lighting and framing
 
 #### Video Infrastructure
+
 - [ ] **Video Hosting:**
   - [ ] YouTube embed (free, reliable)
   - [ ] OR Cloudflare Stream (paid, better control)
@@ -612,6 +694,7 @@ shared_templates:
   - [ ] Adaptive streaming (quality based on connection)
 
 #### Video Features
+
 - [ ] **Multiple Angles (Optional):**
   - [ ] Angle selector (front/side/top)
   - [ ] Synchronized playback
@@ -623,9 +706,11 @@ shared_templates:
   - [ ] Common mistakes section
 
 ### 5. Body Measurements Tracking
+
 **Physique Progress Monitoring**
 
 #### Data Model
+
 ```typescript
 interface BodyMeasurement {
   id: string;
@@ -649,6 +734,7 @@ interface BodyMeasurement {
 ```
 
 #### Measurement Input
+
 - [ ] **Input Form:**
   - [ ] Date picker (default: today)
   - [ ] Weight input (with unit toggle)
@@ -669,6 +755,7 @@ interface BodyMeasurement {
   - [ ] Measurement history calendar
 
 #### Measurement Analytics
+
 - [ ] **Measurement History:**
   - [ ] Timeline view of all measurements
   - [ ] Edit/delete past measurements
@@ -691,9 +778,11 @@ interface BodyMeasurement {
   - [ ] Visual body diagram with changes
 
 ### 6. UI/UX Polish
+
 **Final Touches for Public Release**
 
 #### Loading States & Feedback
+
 - [ ] **Loading Skeletons:**
   - [ ] Dashboard skeleton (stat cards, activity feed)
   - [ ] Analytics page skeleton (charts)
@@ -707,6 +796,7 @@ interface BodyMeasurement {
   - [ ] Positioning and animation
 
 #### Error Handling
+
 - [ ] **Error Boundaries:**
   - [ ] Page-level error boundaries
   - [ ] Component-level error boundaries
@@ -720,6 +810,7 @@ interface BodyMeasurement {
   - [ ] User-friendly error messages
 
 #### Empty States
+
 - [ ] **New User Empty States:**
   - [ ] Dashboard: "Start your first workout!"
   - [ ] Analytics: "Log workouts to see your progress"
@@ -732,6 +823,7 @@ interface BodyMeasurement {
   - [ ] Quick tips for new users
 
 #### Onboarding
+
 - [ ] **First-Time User Flow:**
   - [ ] Welcome tour (optional skip)
   - [ ] Interactive tooltips on key features
@@ -743,6 +835,7 @@ interface BodyMeasurement {
   - [ ] Dismissable and remembers state
 
 #### Animations & Transitions
+
 - [x] **Smooth Transitions:** ✅ COMPLETE
   - [x] Page transitions
   - [x] Modal open/close animations
@@ -755,6 +848,7 @@ interface BodyMeasurement {
   - [ ] Form input focus states
 
 #### Mobile Optimization
+
 - [ ] **Touch Gestures:**
   - [ ] Swipe to delete (workout history, templates)
   - [ ] Pull to refresh (activity feed)
@@ -768,6 +862,7 @@ interface BodyMeasurement {
   - [ ] Reduce tap-to-action time
 
 #### Keyboard Shortcuts
+
 - [ ] **Shortcuts Documentation:**
   - [ ] Create shortcuts reference page
   - [ ] Add "?" key to show shortcuts modal
@@ -782,9 +877,11 @@ interface BodyMeasurement {
   - [ ] Arrow keys - Navigate lists
 
 ### 7. Data Export Enhancement
+
 **Complete Backup & Export System**
 
 #### CSV Export
+
 - [ ] **Export All Data Types:**
   - [ ] Workout history (already implemented, needs update for new exercise DB)
   - [ ] Templates (already implemented, needs update for new exercise DB)
@@ -801,6 +898,7 @@ interface BodyMeasurement {
   - [ ] Download as single file or separate files
 
 #### JSON Export
+
 - [ ] **Complete Backup:**
   - [ ] Export entire database as JSON
   - [ ] Include all user data, settings, preferences
@@ -814,6 +912,7 @@ interface BodyMeasurement {
   - [ ] Cloud backup to Google Drive/Dropbox (optional)
 
 #### PDF Workout Reports (Optional)
+
 - [ ] **Report Generation:**
   - [ ] Weekly workout summary PDF
   - [ ] Monthly progress report PDF
@@ -826,6 +925,7 @@ interface BodyMeasurement {
   - [ ] Print-friendly formatting
 
 #### Export Analytics Charts as Images
+
 - [ ] **Chart Export:**
   - [ ] Export any chart as PNG/SVG
   - [ ] High-resolution (2x for retina)
@@ -838,6 +938,7 @@ interface BodyMeasurement {
   - [ ] Download chart for reports
 
 #### Export Scheduling
+
 - [ ] **Automatic Exports:**
   - [ ] Schedule weekly/monthly exports
   - [ ] Email exports to user
@@ -847,11 +948,13 @@ interface BodyMeasurement {
 ---
 
 ## 🚀 Phase 7: Optimization & Low-Priority Features
+
 **Timeline:** Weeks 20-22
 **Status:** Not Started
 **Priority:** MODERATE
 
 ### 1. RPE/RIR Tracking
+
 **Rate of Perceived Exertion & Reps in Reserve**
 
 - [ ] **RPE Scale UI (1-10):**
@@ -877,9 +980,11 @@ interface BodyMeasurement {
   - [ ] Progressive overload with RPE guidance
 
 ### 2. Progressive Overload Suggestions (Low Priority)
+
 **Smart Training Recommendations**
 
 #### Stagnation Detection
+
 - [ ] **Analysis Algorithm:**
   - [ ] Detect same weight for 3+ weeks
   - [ ] Identify rep consistency
@@ -893,6 +998,7 @@ interface BodyMeasurement {
   - [ ] Deload suggestion: "Consider a deload week after 6 weeks of progression."
 
 #### Suggestion UI
+
 - [ ] **Contextual Suggestions:**
   - [ ] Show suggestions in active workout
   - [ ] "Try This" button to apply suggestion
@@ -910,6 +1016,7 @@ interface BodyMeasurement {
   - [ ] Customize suggestion frequency
 
 #### Progressive Overload Calculator
+
 - [ ] **Calculation Logic:**
   - [ ] Suggested weight increase (2.5-5% based on lift)
   - [ ] Suggested rep increase (1-3 reps)
@@ -922,9 +1029,11 @@ interface BodyMeasurement {
   - [ ] Factor in training age and goals
 
 ### 3. Performance Optimization
+
 **Speed & Efficiency Improvements**
 
 #### Bundle Size Optimization
+
 - [ ] **Code Splitting:**
   - [ ] Lazy load route components
   - [ ] Split vendor bundles
@@ -943,6 +1052,7 @@ interface BodyMeasurement {
   - [ ] Document remaining opportunities
 
 #### Database Query Optimization
+
 - [ ] **Index Analysis:**
   - [ ] Add indexes for frequently queried fields
   - [ ] Composite indexes for common queries
@@ -955,6 +1065,7 @@ interface BodyMeasurement {
   - [ ] Cache frequent queries
 
 #### Virtual Scrolling
+
 - [ ] **Long Lists:**
   - [ ] Implement react-window for workout history
   - [ ] Virtual scroll for exercise library (1000+ exercises)
@@ -966,6 +1077,7 @@ interface BodyMeasurement {
   - [ ] Load more on scroll threshold
 
 #### Image Optimization
+
 - [ ] **Exercise Images:**
   - [ ] Optimize image sizes (WebP format)
   - [ ] Serve responsive images (srcset)
@@ -978,6 +1090,7 @@ interface BodyMeasurement {
   - [ ] Automatic format conversion (WebP/AVIF)
 
 #### API Response Caching
+
 - [ ] **Client-Side Caching:**
   - [ ] Cache exercise library in IndexedDB
   - [ ] Cache user profile and settings
@@ -990,6 +1103,7 @@ interface BodyMeasurement {
   - [ ] Update cache on new version
 
 #### React Performance
+
 - [ ] **Re-Render Optimization:**
   - [ ] Use React.memo for expensive components
   - [ ] Use useMemo for expensive calculations
@@ -1003,9 +1117,11 @@ interface BodyMeasurement {
   - [ ] Reduce state updates
 
 ### 4. Accessibility (A11y)
+
 **WCAG 2.1 AA Compliance**
 
 #### ARIA Labels
+
 - [ ] **Interactive Elements:**
   - [ ] Add aria-label to icon buttons
   - [ ] Add aria-describedby for form fields
@@ -1018,6 +1134,7 @@ interface BodyMeasurement {
   - [ ] Announce page changes to screen readers
 
 #### Keyboard Navigation
+
 - [ ] **Focus Management:**
   - [ ] Visible focus indicators (outline)
   - [ ] Focus trap in modals
@@ -1030,6 +1147,7 @@ interface BodyMeasurement {
   - [ ] All interactive elements reachable
 
 #### Screen Reader Support
+
 - [ ] **Testing:**
   - [ ] Test with NVDA (Windows)
   - [ ] Test with JAWS (Windows)
@@ -1043,6 +1161,7 @@ interface BodyMeasurement {
   - [ ] Descriptive link text
 
 #### Accessibility Tools
+
 - [ ] **Automated Testing:**
   - [ ] Run axe DevTools
   - [ ] Run WAVE accessibility checker
@@ -1056,6 +1175,7 @@ interface BodyMeasurement {
   - [ ] Test with zoom (200%+)
 
 #### High Contrast Mode
+
 - [ ] **Color Contrast:**
   - [ ] Ensure 4.5:1 contrast for text
   - [ ] Ensure 3:1 contrast for UI elements
@@ -1068,9 +1188,11 @@ interface BodyMeasurement {
   - [ ] Ensure interactive elements are distinguishable
 
 ### 5. PWA Enhancements
+
 **Progressive Web App Features**
 
 #### Service Worker
+
 - [ ] **Offline Caching:**
   - [ ] Cache app shell (HTML, CSS, JS)
   - [ ] Cache static assets (fonts, images)
@@ -1083,6 +1205,7 @@ interface BodyMeasurement {
   - [ ] Clear old caches on update
 
 #### Add to Home Screen
+
 - [ ] **Install Prompt:**
   - [ ] Detect beforeinstallprompt event
   - [ ] Show custom install banner
@@ -1096,12 +1219,14 @@ interface BodyMeasurement {
   - [ ] Apple touch icons for iOS
 
 #### Splash Screens
+
 - [ ] **Generate Splash Screens:**
   - [ ] Create splash screens for iOS (multiple sizes)
   - [ ] Use brand colors and logo
   - [ ] Test on various devices
 
 #### Background Sync
+
 - [ ] **Offline Changes:**
   - [ ] Queue workout saves when offline
   - [ ] Sync when connection restored
@@ -1114,6 +1239,7 @@ interface BodyMeasurement {
   - [ ] Fetch new achievements
 
 #### Push Notifications (Optional)
+
 - [ ] **Notification Types:**
   - [ ] Workout reminders
   - [ ] Friend activity
@@ -1137,6 +1263,7 @@ interface BodyMeasurement {
 ## 🐛 Known Issues & Tech Debt
 
 ### Critical Bugs
+
 1. **Recent Activity Card Styling**
    - Some cards not rendering correctly with theme system
    - Need to investigate and apply proper CSS variables
@@ -1153,6 +1280,7 @@ interface BodyMeasurement {
    - Need to update to respect theme colors
 
 ### Data Integrity Issues
+
 - [ ] **CSV Export/Import Outdated**
   - Current implementation doesn't account for new 1,146 exercise database
   - Exercise name mapping broken
@@ -1164,6 +1292,7 @@ interface BodyMeasurement {
   - Preserve workout history during migration
 
 ### Performance Issues
+
 - [ ] **Exercise Library Pagination**
   - Currently loads all 1,146 exercises at once
   - Should implement virtual scrolling or pagination
@@ -1180,6 +1309,7 @@ interface BodyMeasurement {
   - Limit initial query to last 30 days
 
 ### UX Debt
+
 - [ ] **No Loading States on Forms**
   - Form submissions have no loading feedback
   - Should add spinners/disabled states during save
@@ -1196,6 +1326,7 @@ interface BodyMeasurement {
   - Consider undo/restore functionality
 
 ### Code Quality Issues
+
 - [ ] **Duplicate Code in Analytics Calculations**
   - Volume calculations scattered across multiple files
   - Should centralize in analytics service
@@ -1212,6 +1343,7 @@ interface BodyMeasurement {
   - Should add stricter TypeScript config
 
 ### Database Schema Issues
+
 - [ ] **No Soft Deletes**
   - Deleted workouts/templates are hard deleted
   - Should implement `deleted_at` column
@@ -1228,6 +1360,7 @@ interface BodyMeasurement {
   - Version all database schemas
 
 ### Security Concerns
+
 - [ ] **No Rate Limiting on API Calls**
   - Supabase calls not rate-limited
   - Could lead to abuse or accidental overuse
@@ -1244,6 +1377,7 @@ interface BodyMeasurement {
   - Add DOMPurify or similar library
 
 ### Accessibility Gaps
+
 - [ ] **No Skip to Main Content Link**
   - Keyboard users have to tab through header
   - Should add skip link at top
@@ -1257,6 +1391,7 @@ interface BodyMeasurement {
   - Should add descriptive alt text
 
 ### Documentation Debt
+
 - [ ] **No API Documentation**
   - Database schema not documented
   - Service functions not documented
@@ -1277,6 +1412,7 @@ interface BodyMeasurement {
 ## 🔮 Future Backlog (Post-v1.0 Items)
 
 ### Advanced Programming Features
+
 - [ ] Auto-regulation based on RPE/RIR
 - [ ] Periodization support (linear, undulating, block)
 - [ ] Deload week automation
@@ -1284,6 +1420,7 @@ interface BodyMeasurement {
 - [ ] AI-generated program recommendations
 
 ### Advanced Analytics
+
 - [ ] Muscle SRA (Stimulus-Recovery-Adaptation) tracking
 - [ ] Fatigue management scores
 - [ ] Volume landmarks (MEV, MRV)
@@ -1292,6 +1429,7 @@ interface BodyMeasurement {
 - [ ] Provide progressive overload readiness score
 
 ### AI/ML Features
+
 - [ ] Form analysis via computer vision (analyze uploaded videos)
 - [ ] Injury risk prediction based on volume/frequency
 - [ ] Personalized program recommendations
@@ -1299,6 +1437,7 @@ interface BodyMeasurement {
 - [ ] Smart warmup suggestions
 
 ### Integrations
+
 - [ ] Wearable devices (Apple Watch, Garmin)
 - [ ] Nutrition apps (MyFitnessPal integration)
 - [ ] Fitness communities (Strava integration)
@@ -1306,6 +1445,7 @@ interface BodyMeasurement {
 - [ ] Spotify workout playlists
 
 ### Progress Photos
+
 - [ ] Upload progress photos
 - [ ] Photo timeline with date labels
 - [ ] Side-by-side comparisons
@@ -1313,6 +1453,7 @@ interface BodyMeasurement {
 - [ ] Photo grid view
 
 ### Advanced Social Features
+
 - [ ] Public profile pages
 - [ ] Follow/followers system
 - [ ] Global leaderboards (opt-in)
@@ -1320,6 +1461,7 @@ interface BodyMeasurement {
 - [ ] Fitness influencer partnerships
 
 ### Mobile Apps
+
 - [ ] Native iOS app (React Native or Swift)
 - [ ] Native Android app (React Native or Kotlin)
 - [ ] Apple Watch companion app
@@ -1327,6 +1469,7 @@ interface BodyMeasurement {
 - [ ] Offline-first mobile experience
 
 ### Premium Features (If Monetization Considered)
+
 - [ ] Advanced analytics reports
 - [ ] AI coaching
 - [ ] Unlimited cloud storage
@@ -1341,6 +1484,7 @@ interface BodyMeasurement {
 ### Data Models for Phase 6
 
 #### Quest System
+
 ```typescript
 interface Quest {
   id: string;
@@ -1373,6 +1517,7 @@ interface UserLevel {
 ```
 
 #### Friend System
+
 ```typescript
 interface Friend {
   id: string;
@@ -1412,6 +1557,7 @@ interface Challenge {
 ```
 
 #### Shared Content
+
 ```typescript
 interface SharedWorkout {
   id: string; // Short code: "abc123"
@@ -1437,6 +1583,7 @@ interface SharedTemplate {
 ```
 
 #### Body Measurements
+
 ```typescript
 interface BodyMeasurement {
   id: string;
@@ -1466,6 +1613,7 @@ interface BodyMeasurement {
 ### API Specifications for Phase 5.5
 
 #### Strong Import API
+
 ```typescript
 // POST /api/import/strong
 interface StrongImportRequest {
@@ -1493,6 +1641,7 @@ interface StrongImportResponse {
 ```
 
 #### Hevy Import API
+
 ```typescript
 // POST /api/import/hevy
 interface HevyImportRequest {
@@ -1521,6 +1670,7 @@ interface HevyImportResponse {
 ### Component Architecture for Unbuilt Features
 
 #### Phase 5.5: Import Components
+
 ```
 src/components/import/
 ├── ImportWelcome.tsx        # Choose Strong/Hevy/Start Fresh
@@ -1533,6 +1683,7 @@ src/components/import/
 ```
 
 #### Phase 6: Gamification Components
+
 ```
 src/components/gamification/
 ├── QuestTracker.tsx         # Daily quest widget
@@ -1546,6 +1697,7 @@ src/components/gamification/
 ```
 
 #### Phase 6: Social Components
+
 ```
 src/components/social/
 ├── FriendList.tsx           # Friend management
@@ -1561,6 +1713,7 @@ src/components/social/
 ```
 
 #### Phase 6: Measurements Components
+
 ```
 src/components/measurements/
 ├── MeasurementForm.tsx      # Input measurements
@@ -1575,17 +1728,20 @@ src/components/measurements/
 ## 🎯 Priority Order Summary
 
 ### Immediate (This Week)
+
 1. Fix theme system bugs (Recent Activity, Strength Standards)
 2. Update CSV export/import for new exercise database
 3. Exercise Library filters and detail modal
 
 ### Next 2 Weeks (Phase 5.5 Critical)
+
 1. Strong/Hevy import system (CRITICAL for user acquisition)
 2. Onboarding flow for import vs fresh start
 3. Landing page rewrite (migration-focused)
 4. Reddit launch preparation
 
 ### Following Month (Phase 6 High-Priority)
+
 1. Achievement system (workout milestones, streaks, PRs)
 2. Quest system (daily/weekly/monthly challenges)
 3. Friend system and activity feed
@@ -1593,11 +1749,13 @@ src/components/measurements/
 5. Body measurements tracking
 
 ### Later (Phase 6 Moderate-Priority)
+
 1. Video demonstrations (50+ exercises)
 2. Advanced data export (JSON, PDF)
 3. UI/UX polish (loading states, animations, empty states)
 
 ### Eventually (Phase 7)
+
 1. RPE/RIR tracking
 2. Progressive overload suggestions
 3. Performance optimization (Lighthouse 90+)

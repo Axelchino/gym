@@ -1,7 +1,6 @@
 interface StreakVisualizationProps {
   currentStreak: number;
   workoutDates?: Date[]; // All workout dates to determine holds vs active days
-  totalDays?: number;
   animate?: boolean;
   simulatedToday?: Date; // For testing: simulate a different "today"
 }
@@ -9,7 +8,6 @@ interface StreakVisualizationProps {
 export function StreakVisualization({
   currentStreak,
   workoutDates = [],
-  totalDays = 7,
   animate = true,
   simulatedToday,
 }: StreakVisualizationProps) {
@@ -116,7 +114,9 @@ export function StreakVisualization({
                         ? 'rgba(107, 114, 128, 0.3)'
                         : '#6B7280'
                 }`,
-                boxShadow: isToday ? '0 0 0 3px rgba(180, 130, 255, 0.5), 0 0 8px rgba(180, 130, 255, 0.6)' : 'none',
+                boxShadow: isToday
+                  ? '0 0 0 3px rgba(180, 130, 255, 0.5), 0 0 8px rgba(180, 130, 255, 0.6)'
+                  : 'none',
                 color:
                   state === 'active'
                     ? '#FFFFFF'

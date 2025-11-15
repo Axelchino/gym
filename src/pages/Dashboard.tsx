@@ -11,6 +11,7 @@ import type { WorkoutLog } from '../types/workout';
 import { getWorkoutLogs, getPersonalRecords, createWorkoutTemplate } from '../services/supabaseDataService';
 import { SaveTemplateModal } from '../components/SaveTemplateModal';
 import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
+import { Chip } from '../components/ui';
 
 interface DashboardStats {
   workoutsLast7Days: number;
@@ -306,10 +307,10 @@ export function Dashboard() {
 
           {/* Number - slightly offset */}
           <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+            <p className="text-5xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedVolume).toLocaleString()}
             </p>
-            {!isLoading && <span className="text-base tabular-nums ml-2" style={{ color: '#6B7280' }}>{weightUnit}</span>}
+            {!isLoading && <span className="text-base tabular-nums ml-2 text-secondary">{weightUnit}</span>}
           </div>
 
           {/* Sparkline + Delta */}
@@ -344,10 +345,7 @@ export function Dashboard() {
 
           {/* Label chip - bottom anchor */}
           <div>
-            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-              backgroundColor: '#EDE0FF',
-              color: '#111216'
-            }}>Last 7 days</span>
+            <Chip>Last 7 days</Chip>
           </div>
         </div>
 
@@ -363,7 +361,7 @@ export function Dashboard() {
 
           {/* Number - slightly offset */}
           <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+            <p className="text-5xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedWorkouts)}
             </p>
           </div>
@@ -373,10 +371,7 @@ export function Dashboard() {
 
           {/* Label chip - bottom anchor */}
           <div>
-            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-              backgroundColor: '#EDE0FF',
-              color: '#111216'
-            }}>Last 7 days</span>
+            <Chip>Last 7 days</Chip>
           </div>
         </div>
 
@@ -395,7 +390,7 @@ export function Dashboard() {
 
           {/* Number - slightly offset */}
           <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+            <p className="text-5xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedPRs)}
             </p>
           </div>
@@ -405,10 +400,7 @@ export function Dashboard() {
 
           {/* Label chip - bottom anchor */}
           <div>
-            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-              backgroundColor: '#EDE0FF',
-              color: '#111216'
-            }}>Last 30 days</span>
+            <Chip>Last 30 days</Chip>
           </div>
         </div>
 
@@ -429,7 +421,7 @@ export function Dashboard() {
 
           {/* Number - slightly offset */}
           <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+            <p className="text-5xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedStreak)}
             </p>
           </div>
@@ -448,10 +440,7 @@ export function Dashboard() {
 
           {/* Label chip - bottom anchor */}
           <div>
-            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-              backgroundColor: '#EDE0FF',
-              color: '#111216'
-            }}>Weekly</span>
+            <Chip variant="streak">Weekly</Chip>
           </div>
         </div>
       </div>
@@ -612,16 +601,9 @@ export function Dashboard() {
                       {/* Line 2: Exercise tags */}
                       <div className="flex items-center gap-2 flex-wrap">
                         {firstFourExercises.map((exercise, idx) => (
-                          <span
-                            key={idx}
-                            className="inline-block px-2 py-0.5 text-xs rounded"
-                            style={{
-                              backgroundColor: idx < 4 ? '#EDE0FF' : '#F5F5F5',
-                              color: '#111216'
-                            }}
-                          >
+                          <Chip key={idx}>
                             {exercise.exerciseName}
-                          </span>
+                          </Chip>
                         ))}
                         {remainingCount > 0 && !isExpanded && (
                           <button
@@ -653,16 +635,9 @@ export function Dashboard() {
                       {isExpanded && workout.exercises.length > 4 && (
                         <div className="flex items-center gap-2 flex-wrap pt-1">
                           {workout.exercises.slice(4).map((exercise, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-block px-2 py-0.5 text-xs rounded"
-                              style={{
-                                backgroundColor: '#F5F5F5',
-                                color: '#111216'
-                              }}
-                            >
+                            <Chip key={idx}>
                               {exercise.exerciseName}
-                            </span>
+                            </Chip>
                           ))}
                         </div>
                       )}
