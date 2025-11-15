@@ -49,11 +49,19 @@ export const themeTokens = {
       border: 'rgba(180, 130, 255, 0.3)',       // Purple border
     },
 
+    chipGold: {
+      background: 'rgba(180, 130, 255, 0.15)',  // Same as regular chip in light mode
+      text: '#B482FF',
+      border: 'rgba(180, 130, 255, 0.3)',
+    },
+
     statCard: {
       background: '#FFFFFF',
       border: '#E6E7EF',
       accentPurple: '#B482FF',
       accentBlue: '#0090CC',
+      accentGold: '#E1BB62',    // Not used in light mode, but needed for type consistency
+      accentGray: '#6B7280',     // Not used in light mode, but needed for type consistency
     },
 
     button: {
@@ -61,10 +69,12 @@ export const themeTokens = {
       primaryHover: '#C596FF',
       primaryActive: '#9D6EE8',
       primaryText: '#FFFFFF',
+      primaryBorder: 'none',          // Light mode has no border on primary buttons
       secondaryBg: 'transparent',
       secondaryBorder: '#D1D5DB',
       secondaryText: '#0F131A',
       secondaryHoverBg: '#F5F5F5',
+      secondaryHoverBorder: '#D1D5DB',  // Same as regular border in light mode
     },
   },
 
@@ -126,6 +136,8 @@ export const themeTokens = {
       border: '#2A2A3E',
       accentPurple: '#8B42FF',
       accentGold: '#E1BB62',  // For streaks
+      accentBlue: '#0084FF',   // Not used but needed for type consistency
+      accentGray: '#B8B8C8',   // Not used but needed for type consistency
     },
 
     button: {
@@ -133,9 +145,11 @@ export const themeTokens = {
       primaryHover: '#A56BFF',
       primaryActive: '#7433CC',
       primaryText: '#FFFFFF',
+      primaryBorder: 'none',
       secondaryBg: '#1A1A2E',
       secondaryBorder: '#3A3A4E',
       secondaryText: '#E0E0EC',
+      secondaryHoverBg: '#2A2A3E',
       secondaryHoverBorder: '#4A4A5E',
     },
   },
@@ -187,10 +201,12 @@ export const themeTokens = {
     },
 
     statCard: {
-      background: '#000000',   // Pure black
-      border: '#1A1A1A',       // Subtle border
-      accentGold: '#E1BB62',   // ONLY for streaks
-      accentGray: '#D8D8D8',   // For regular stats
+      background: '#000000',      // Pure black
+      border: '#1A1A1A',          // Subtle border
+      accentGold: '#E1BB62',      // ONLY for streaks
+      accentGray: '#D8D8D8',      // For regular stats
+      accentPurple: '#D8D8D8',    // Not used (AMOLED is grayscale), but needed for type consistency
+      accentBlue: '#D8D8D8',      // Not used (AMOLED is grayscale), but needed for type consistency
     },
 
     button: {
@@ -202,6 +218,7 @@ export const themeTokens = {
       secondaryBg: '#000000',
       secondaryBorder: '#3A3A3A',
       secondaryText: '#D8D8D8',
+      secondaryHoverBg: '#1A1A1A',
       secondaryHoverBorder: '#4A4A4A',
     },
   },
