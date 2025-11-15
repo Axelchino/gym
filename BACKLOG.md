@@ -20,19 +20,23 @@
     - [x] Cited industry inspiration (Discord, GitHub, Slack)
     - [x] Created implementation guidelines and testing checklist
     - [x] Defined when to use CSS vs TypeScript approach
-  - [x] **Theme System Implementation - Foundation Complete** (2025-11-14)
+  - [ ] **Theme System Implementation** (IN PROGRESS - Started 2025-11-14)
     - [x] Created `src/theme/tokens.ts` with TypeScript design tokens for all 3 themes
     - [x] Created `src/utils/themeHelpers.ts` utility functions
     - [x] Implemented `useThemeTokens()` hook for component access
-    - [x] Created reusable UI components (`src/components/ui/`)
-      - [x] `<Chip>` component with variant support (default | streak)
-    - [x] Migrated Dashboard to use `<Chip>` component
+    - [x] Created `src/components/ui/Chip.tsx` with variant support (default | streak)
+    - [ ] Expand `src/styles/themes.css` with missing CSS variables (NOT DONE YET)
+    - [ ] Create remaining UI components (`src/components/ui/`) - ONLY Chip done so far:
+      - [x] `<Chip>` component ✅ COMPLETE
+      - [ ] `<StatCard>` component with accent colors (NOT STARTED)
+      - [ ] `<Button>` component with theme-aware styles (NOT STARTED)
+      - [ ] `<Card>` component with proper borders (NOT STARTED)
+  - [ ] **Dashboard/Front Page - Partial Migration Complete**
+    - [x] Migrated stat card chips and exercise tags to `<Chip>` component
     - [x] Fixed chip colors per ThreeModesDemo reference:
       - [x] Light: Purple chips (rgba purple bg + purple text)
       - [x] Dark: Blue chips (`#006DD4` bg + white text)
       - [x] AMOLED: Grayscale chips (`#1A1A1A` bg + `#C8C8C8` text)
-  - [ ] **Dashboard/Front Page - Theme Polish Needed**
-    - [x] Migrated stat card chips and exercise tags to `<Chip>` component
     - [ ] REMAINING: Many theme tweaks needed across all 3 modes
     - [ ] Test and polish Light mode (currently closest to correct)
     - [ ] Test and polish Dark mode (chip colors now correct, other elements TBD)
