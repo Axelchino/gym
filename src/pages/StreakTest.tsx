@@ -108,7 +108,6 @@ export function StreakTest() {
               <StreakVisualization
                 currentStreak={scenario.streak}
                 workoutDates={scenario.workoutDates}
-                totalDays={7}
                 animate={false}
                 simulatedToday={simulatedFriday}
               />

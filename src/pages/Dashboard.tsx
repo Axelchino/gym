@@ -432,7 +432,6 @@ export function Dashboard() {
               <StreakVisualization
                 currentStreak={stats.currentStreak}
                 workoutDates={stats.allWorkouts.map(w => w.date)}
-                totalDays={7}
                 animate={true}
               />
             )}
