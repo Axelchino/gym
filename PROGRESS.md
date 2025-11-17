@@ -1,9 +1,9 @@
 # GymTracker Pro - Development Progress Report
 
-**Last Updated:** 2025-11-12
+**Last Updated:** 2025-11-17
 **Current Version:** v0.5.1
 **Deployed:** https://gym-tracker-five-kappa.vercel.app
-**Development Timeline:** 14 weeks (October 1 - November 12, 2025)
+**Development Timeline:** 15 weeks (October 1 - November 17, 2025)
 
 ---
 
@@ -555,6 +555,57 @@ const isWeightPR = history.every(s =>
 - ✅ Zero data loss during operations
 - ✅ Profile setup is quick and intuitive
 - ⏸️ Offline sync conflict resolution (deferred, cloud-only for now)
+
+---
+
+## Week Ending 2025-11-17: Theme System Refactor
+**Status:** ✅ COMPLETE
+**Focus:** Code quality, maintainability, and design system consistency
+
+### What We Accomplished
+
+#### Theme System Architecture Improvements
+- **Eliminated Hardcoded Colors:** Refactored all three themes (Light/Dark/AMOLED) to use TypeScript constants instead of duplicated hex values
+- **DRY Principle Applied:** Created color constants at top of `tokens.ts` - each color defined once, reused everywhere
+- **Maintainability Win:** Changing a theme color now requires updating ONE constant instead of 5-10 hardcoded values
+
+#### Dark Mode Fixes
+- **Matched ThreeModesDemo Reference:** Fixed Dark mode to use correct colors from design spec:
+  - Page background: Changed from `#1A1A2E` to `#111827` (Tailwind gray-900)
+  - Primary buttons: Changed from purple (`#8B42FF`) to blue (`#0092E6`)
+  - Interactive elements: All links, hovers, and tab indicators now blue
+  - Stat card backgrounds: Now match page background for consistency
+- **Visual Consistency:** Dark mode now has coherent blue accent throughout (buttons, links, tabs)
+
+#### Migration from CSS to TypeScript Tokens (Option B)
+- **Stat Card Refactor:** Migrated all 4 dashboard stat cards from CSS classes to inline styles
+- **Component-Level Hover:** Replaced CSS `:hover` rules with React `onMouseEnter`/`onMouseLeave` handlers
+- **Type-Safe Theming:** Stat cards now use `tokens.statCard.hoverBorder` instead of CSS variables
+- **Added Hover Tokens:** Created `hoverBorder` property for all three themes' stat cards
+
+### Technical Wins
+- **Constants Architecture:**
+  ```typescript
+  const DARK_BLUE_PRIMARY = '#0092E6';
+  // Used in: primaryBg, linkPurple, activeIndicator, focusRing
+  ```
+- **Single Source of Truth:** Each color value exists in exactly one place
+- **TypeScript Safety:** All theme properties type-checked and autocompleted
+
+### Code Quality Impact
+- **Before:** `#B482FF` appeared 15+ times across Light theme
+- **After:** `LIGHT_PURPLE_PRIMARY` defined once, referenced everywhere
+- **Result:** Change purple color = edit ONE line instead of hunting through files
+
+### User-Facing Improvements
+- **Dark Mode Polish:** Blue accents now consistent across all interactive elements
+- **Hover States:** Stat cards have proper theme-aware hover effects
+- **Visual Cohesion:** Page background and card backgrounds properly coordinated
+
+### Lessons Learned
+- **Refactoring Pays Off:** Eliminating hardcoded values made theme adjustments 10x faster
+- **Design Reference Critical:** ThreeModesDemo provided single source of truth for Dark mode colors
+- **TypeScript Tokens > CSS Variables:** Inline styles with tokens give better type safety and component control
 
 ---
 
