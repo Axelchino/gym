@@ -12,6 +12,7 @@ import { getWorkoutLogs, getPersonalRecords, createWorkoutTemplate } from '../se
 import { SaveTemplateModal } from '../components/SaveTemplateModal';
 import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 import { Chip } from '../components/ui';
+import { useThemeTokens } from '../utils/themeHelpers';
 
 interface DashboardStats {
   workoutsLast7Days: number;
@@ -28,6 +29,7 @@ interface DashboardStats {
 export function Dashboard() {
   const { weightUnit } = useUserSettings();
   const { user } = useAuth();
+  const tokens = useThemeTokens();
   const [stats, setStats] = useState<DashboardStats>({
     workoutsLast7Days: 0,
     workoutsPrev7Days: 0,
@@ -322,8 +324,8 @@ export function Dashboard() {
                     data={stats.volumeSparklineData}
                     width={200}
                     height={28}
-                    color="#B482FF"
-                    peakDotColor="#7E29FF"
+                    color={tokens.sparkline.color}
+                    peakDotColor={tokens.sparkline.peakDot}
                     strokeWidth={1}
                     animate={true}
                   />
@@ -439,7 +441,7 @@ export function Dashboard() {
 
           {/* Label chip - bottom anchor */}
           <div>
-            <Chip variant="streak">Weekly</Chip>
+            <Chip>Weekly</Chip>
           </div>
         </div>
       </div>
@@ -524,15 +526,15 @@ export function Dashboard() {
                     onClick={() => window.location.href = '/auth'}
                     className="text-sm font-semibold px-5 py-2.5 rounded-md transition-all"
                     style={{
-                      backgroundColor: '#EDE0FF',
-                      color: '#7E29FF',
-                      border: '1px solid #D7BDFF',
+                      backgroundColor: tokens.button.primaryBg,
+                      color: tokens.button.primaryText,
+                      border: tokens.button.primaryBorder === 'none' ? 'none' : `1px solid ${tokens.button.primaryBorder}`,
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#E4D2FF';
+                      e.currentTarget.style.backgroundColor = tokens.button.primaryHover;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#EDE0FF';
+                      e.currentTarget.style.backgroundColor = tokens.button.primaryBg;
                     }}
                   >
                     Sign Up Free
@@ -579,7 +581,7 @@ export function Dashboard() {
                     borderColor: 'var(--border-subtle)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = '#7E29FF';
+                    e.currentTarget.style.borderColor = tokens.interactive.hoverPurple;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--border-subtle)';
@@ -611,7 +613,7 @@ export function Dashboard() {
                               toggleWorkoutExpansion(workout.id);
                             }}
                             className="text-xs hover:underline font-medium"
-                            style={{ color: '#7E29FF' }}
+                            style={{ color: tokens.interactive.linkPurple }}
                           >
                             +{remainingCount} more
                           </button>
@@ -623,7 +625,7 @@ export function Dashboard() {
                               toggleWorkoutExpansion(workout.id);
                             }}
                             className="text-xs hover:underline font-medium"
-                            style={{ color: '#7E29FF' }}
+                            style={{ color: tokens.interactive.linkPurple }}
                           >
                             show less
                           </button>
@@ -658,7 +660,7 @@ export function Dashboard() {
                           onMouseEnter={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = '#7E29FF';
+                              icon.style.color = tokens.interactive.hoverPurple;
                               icon.style.opacity = '1';
                             }
                           }}
@@ -682,7 +684,7 @@ export function Dashboard() {
                           onMouseEnter={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = '#7E29FF';
+                              icon.style.color = tokens.interactive.hoverPurple;
                               icon.style.opacity = '1';
                             }
                           }}
@@ -707,7 +709,7 @@ export function Dashboard() {
                           onMouseEnter={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = '#7E29FF';
+                              icon.style.color = tokens.interactive.hoverPurple;
                               icon.style.opacity = '1';
                             }
                           }}

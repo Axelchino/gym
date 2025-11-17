@@ -75,7 +75,7 @@
 
   --card-bg: #FFFFFF;                          /* White cards only */
   --card-border: 1px solid var(--border-subtle);
-  --card-hover-border: var(--color-purple);
+  --card-hover-border: #B482FF;              /* Match Recent Activity hover */
   --card-active-border: var(--color-purple-dark);
 
   /* Buttons */
@@ -241,7 +241,7 @@
 
   --card-bg: #000000;
   --card-border: 1px solid var(--border-subtle);
-  --card-hover-border: var(--border-light);
+  --card-hover-border: #F0F0F0;              /* Match Recent Activity hover (brighter gray) */
   --card-active-border: #0A0A0A;
 
   --button-primary-bg: var(--color-gray);

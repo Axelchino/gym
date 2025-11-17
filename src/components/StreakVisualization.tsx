@@ -1,3 +1,5 @@
+import { useThemeTokens } from '../utils/themeHelpers';
+
 interface StreakVisualizationProps {
   currentStreak: number;
   workoutDates?: Date[]; // All workout dates to determine holds vs active days
@@ -11,6 +13,7 @@ export function StreakVisualization({
   animate = true,
   simulatedToday,
 }: StreakVisualizationProps) {
+  const tokens = useThemeTokens();
   const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
   // Get current day of week (0 = Sunday, 6 = Saturday)
@@ -99,23 +102,23 @@ export function StreakVisualization({
                 borderRadius: '5px',
                 backgroundColor:
                   state === 'active'
-                    ? '#B482FF'
+                    ? tokens.statCard.accentGold
                     : state === 'future'
                       ? 'rgba(107, 114, 128, 0.1)'
                       : state === 'broken' || state === 'empty'
                         ? 'rgba(107, 114, 128, 0.2)'
-                        : 'rgba(180, 130, 255, 0.3)',
+                        : `${tokens.statCard.accentGold}40`,
                 border: `2px solid ${
                   isToday
-                    ? '#B482FF'
+                    ? tokens.statCard.accentGold
                     : state === 'active' || state === 'hold'
-                      ? '#B482FF'
+                      ? tokens.statCard.accentGold
                       : state === 'future'
                         ? 'rgba(107, 114, 128, 0.3)'
                         : '#6B7280'
                 }`,
                 boxShadow: isToday
-                  ? '0 0 0 3px rgba(180, 130, 255, 0.5), 0 0 8px rgba(180, 130, 255, 0.6)'
+                  ? `0 0 0 3px ${tokens.statCard.accentGold}80, 0 0 8px ${tokens.statCard.accentGold}99`
                   : 'none',
                 color:
                   state === 'active'
@@ -124,7 +127,7 @@ export function StreakVisualization({
                       ? 'rgba(107, 114, 128, 0.4)'
                       : state === 'broken' || state === 'empty'
                         ? '#6B7280'
-                        : '#B482FF',
+                        : tokens.statCard.accentGold,
                 transition: animate ? 'all 0.3s ease-out' : 'none',
                 transitionDelay: animate ? `${index * 50}ms` : '0ms',
                 fontSize: '10px',

@@ -1,11 +1,13 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, User, Plus, Dumbbell, RotateCcw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useThemeTokens } from '../../utils/themeHelpers';
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const tokens = useThemeTokens();
 
   // Clear all browser cache and reload
   function clearCacheAndReload() {
@@ -65,7 +67,7 @@ export function Header() {
                     to={to}
                     className="relative px-4 py-3 text-sm font-medium text-primary hover:text-secondary transition-colors"
                     style={{
-                      borderBottom: isActive ? '2px solid #7E29FF' : '2px solid transparent',
+                      borderBottom: isActive ? `2px solid ${tokens.navigation.activeIndicator}` : '2px solid transparent',
                     }}
                   >
                     {label}
@@ -115,42 +117,37 @@ export function Header() {
                   onClick={() => navigate('/workout')}
                   className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
                   style={{
-                    backgroundColor: '#EDE0FF',
-                    color: '#7E29FF',
-                    border: '1px solid #D7BDFF',
+                    backgroundColor: tokens.button.primaryBg,
+                    color: tokens.button.primaryText,
+                    border: tokens.button.primaryBorder === 'none' ? 'none' : `1px solid ${tokens.button.primaryBorder}`,
                     borderRadius: '10px',
                     height: '40px',
                     paddingLeft: '18px',
                     paddingRight: '18px',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#E4D2FF';
-                    e.currentTarget.style.borderColor = '#C9B0FF';
+                    e.currentTarget.style.backgroundColor = tokens.button.primaryHover;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#EDE0FF';
-                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    e.currentTarget.style.backgroundColor = tokens.button.primaryBg;
                     if (document.activeElement !== e.currentTarget) {
                       e.currentTarget.style.boxShadow = 'none';
                     }
                   }}
                   onMouseDown={(e) => {
-                    e.currentTarget.style.backgroundColor = '#DDC7FF';
-                    e.currentTarget.style.borderColor = '#C3A5FF';
+                    e.currentTarget.style.backgroundColor = tokens.button.primaryActive;
                     e.currentTarget.style.transform = 'translateY(1px)';
                   }}
                   onMouseUp={(e) => {
-                    e.currentTarget.style.backgroundColor = '#E4D2FF';
-                    e.currentTarget.style.borderColor = '#C9B0FF';
+                    e.currentTarget.style.backgroundColor = tokens.button.primaryHover;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.boxShadow = '0 0 0 2px #B482FF';
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tokens.interactive.focusRing}`;
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.backgroundColor = '#EDE0FF';
-                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    e.currentTarget.style.backgroundColor = tokens.button.primaryBg;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
