@@ -127,7 +127,7 @@
    ============================================ */
 .theme-dark {
   /* Surface colors */
-  --surface: #1A1A2E;
+  --surface: #111827;              /* Page background (Tailwind gray-900) */
   --surface-elevated: #2A2A3E;
   --surface-blue: #083B73;
 
@@ -174,8 +174,8 @@
 
   --card-bg: var(--surface);
   --card-border: 1px solid var(--border-subtle);
-  --card-hover-border: var(--color-purple-light);
-  --card-active-border: var(--color-purple-dark);
+  --card-hover-border: #00A2FF;                /* Blue hover to match primary button */
+  --card-active-border: #007FCC;               /* Blue active to match primary button */
 
   --button-primary-bg: var(--color-blue-primary);
   --button-primary-hover: var(--color-blue-hover);

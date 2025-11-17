@@ -295,7 +295,19 @@ export function Dashboard() {
       {/* 5-Tile Hero Row - Volume spans 2 columns */}
       <div className="grid grid-cols-5 gap-6">
         {/* Volume - 2 columns, hero metric */}
-        <div className="col-span-2 card-stats">
+        <div
+          className="col-span-2 rounded-xl p-2.5 transition-all"
+          style={{
+            backgroundColor: tokens.statCard.background,
+            border: `1px solid ${tokens.statCard.border}`
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.border;
+          }}
+        >
           {/* Top: Label with icon and microcopy */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-1.5">
@@ -352,7 +364,19 @@ export function Dashboard() {
         </div>
 
         {/* Workouts */}
-        <div className="card-stats">
+        <div
+          className="rounded-xl p-2.5 transition-all"
+          style={{
+            backgroundColor: tokens.statCard.background,
+            border: `1px solid ${tokens.statCard.border}`
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.border;
+          }}
+        >
           {/* Top: Label with icon */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-1.5">
@@ -378,7 +402,19 @@ export function Dashboard() {
         </div>
 
         {/* PRs */}
-        <div className="card-stats">
+        <div
+          className="rounded-xl p-2.5 transition-all"
+          style={{
+            backgroundColor: tokens.statCard.background,
+            border: `1px solid ${tokens.statCard.border}`
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.border;
+          }}
+        >
           {/* Top: Label with icon and microcopy */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-1.5">
@@ -407,7 +443,19 @@ export function Dashboard() {
         </div>
 
         {/* Streak */}
-        <div className="card-stats">
+        <div
+          className="rounded-xl p-2.5 transition-all"
+          style={{
+            backgroundColor: tokens.statCard.background,
+            border: `1px solid ${tokens.statCard.border}`
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = tokens.statCard.border;
+          }}
+        >
           {/* Top: Label with icon and microcopy */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-1.5">

@@ -196,9 +196,7 @@
     position: relative;
   }
 
-  .card-stats:hover {
-    border-color: var(--card-hover-border);
-  }
+  /* Hover handled via inline styles with TypeScript tokens */
 
   /* Volume card stays white (no purple tint) */
   .card-stats-volume {
@@ -210,9 +208,7 @@
     position: relative;
   }
 
-  .card-stats-volume:hover {
-    border-color: var(--card-hover-border);
-  }
+  /* Hover handled via inline styles with TypeScript tokens */
 
   /* Timeline card with spine and dot */
   .card-timeline {

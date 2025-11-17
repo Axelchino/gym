@@ -9,102 +9,137 @@
  *   const tokens = themeTokens[theme]; // theme = 'light' | 'dark' | 'amoled'
  */
 
+// Base color constants (to avoid duplication)
+
+// Light mode
+const LIGHT_SURFACE_PRIMARY = '#F7F8FA';
+const LIGHT_SURFACE_ELEVATED = '#FFFFFF';
+const LIGHT_SURFACE_ACCENT = '#F5F5F5';
+const LIGHT_BORDER_SUBTLE = '#E6E7EF';
+const LIGHT_BORDER_MEDIUM = '#D1D5DB';
+const LIGHT_PURPLE_PRIMARY = '#B482FF';
+const LIGHT_PURPLE_HOVER = '#C596FF';
+const LIGHT_PURPLE_ACTIVE = '#9D6EE8';
+const LIGHT_PURPLE_DARK = '#7E29FF';
+const LIGHT_TEXT_PRIMARY = '#0F131A';
+
+// Dark mode
+const DARK_SURFACE_PRIMARY = '#111827';
+const DARK_SURFACE_ELEVATED = '#2A2A3E';
+const DARK_BORDER_SUBTLE = '#2A2A3E';
+const DARK_BLUE_PRIMARY = '#0092E6';
+const DARK_BLUE_HOVER = '#00A2FF';
+const DARK_BLUE_ACTIVE = '#007FCC';
+
+// AMOLED mode
+const AMOLED_SURFACE_PRIMARY = '#000000';
+const AMOLED_SURFACE_CARD = '#1A1A1A';
+const AMOLED_SURFACE_ELEVATED = '#3A3A3A';
+const AMOLED_BORDER_SUBTLE = '#1A1A1A';
+const AMOLED_TEXT_PRIMARY = '#F0F0F0';
+const AMOLED_TEXT_SECONDARY = '#D8D8D8';
+const AMOLED_GOLD = '#D4A850';
+
 export const themeTokens = {
   light: {
     // Surface colors
     surface: {
-      primary: '#F7F8FA',      // Page background
-      elevated: '#FFFFFF',     // Cards, modals
-      accent: '#F5F5F5',       // Subtle highlights
+      primary: LIGHT_SURFACE_PRIMARY,      // Page background
+      elevated: LIGHT_SURFACE_ELEVATED,     // Cards, modals
+      accent: LIGHT_SURFACE_ACCENT,       // Subtle highlights
       hover: '#FAFAFA',        // Hover states
     },
 
     // Text colors
     text: {
-      primary: '#0F131A',      // Body text, headings
+      primary: LIGHT_TEXT_PRIMARY,      // Body text, headings
       secondary: '#5B6472',    // Labels, metadata
       muted: '#6B7280',        // Disabled, hints
     },
 
     // Brand colors
     brand: {
-      purple: '#B482FF',       // Primary brand color
-      purpleLight: '#C596FF',  // Hover states
-      purpleDark: '#9D6EE8',   // Active/pressed states
+      purple: LIGHT_PURPLE_PRIMARY,       // Primary brand color
+      purpleLight: LIGHT_PURPLE_HOVER,  // Hover states
+      purpleDark: LIGHT_PURPLE_ACTIVE,   // Active/pressed states
       blue: '#0090CC',         // Secondary accent
       bluePrimary: '#007DB2',  // Charts primary series
     },
 
     // Borders
     border: {
-      subtle: '#E6E7EF',       // Light card borders
-      medium: '#D1D5DB',       // Medium borders
+      subtle: LIGHT_BORDER_SUBTLE,       // Light card borders
+      medium: LIGHT_BORDER_MEDIUM,       // Medium borders
       light: '#E5E7EB',        // Lighter borders
     },
 
     // Component-specific tokens
     chip: {
       background: 'rgba(180, 130, 255, 0.15)',  // Light purple background
-      text: '#B482FF',                           // Purple text
+      text: LIGHT_PURPLE_PRIMARY,                           // Purple text
       border: 'rgba(180, 130, 255, 0.3)',       // Purple border
     },
 
     chipGold: {
       background: 'rgba(180, 130, 255, 0.15)',  // Same as regular chip in light mode
-      text: '#B482FF',
+      text: LIGHT_PURPLE_PRIMARY,
       border: 'rgba(180, 130, 255, 0.3)',
     },
 
     statCard: {
-      background: '#FFFFFF',
-      border: '#E6E7EF',
-      accentPurple: '#B482FF',
+      background: LIGHT_SURFACE_ELEVATED,
+      border: LIGHT_BORDER_SUBTLE,
+      hoverBorder: LIGHT_PURPLE_PRIMARY,    // Purple hover border in light mode
+      accentPurple: LIGHT_PURPLE_PRIMARY,
       accentBlue: '#0090CC',
-      accentGold: '#B482FF',    // Purple in light mode (same as accentPurple)
+      accentGold: LIGHT_PURPLE_PRIMARY,    // Purple in light mode (same as accentPurple)
       accentGray: '#6B7280',     // Not used in light mode, but needed for type consistency
     },
 
     button: {
-      primaryBg: '#B482FF',
-      primaryHover: '#C596FF',
-      primaryActive: '#9D6EE8',
+      primaryBg: LIGHT_PURPLE_PRIMARY,
+      primaryHover: LIGHT_PURPLE_HOVER,
+      primaryActive: LIGHT_PURPLE_ACTIVE,
       primaryText: '#FFFFFF',
       primaryBorder: 'none',          // Light mode has no border on primary buttons
       secondaryBg: 'transparent',
-      secondaryBorder: '#D1D5DB',
-      secondaryText: '#0F131A',
-      secondaryHoverBg: '#F5F5F5',
-      secondaryHoverBorder: '#D1D5DB',  // Same as regular border in light mode
+      secondaryBorder: LIGHT_BORDER_MEDIUM,
+      secondaryText: LIGHT_TEXT_PRIMARY,
+      secondaryHoverBg: LIGHT_SURFACE_ACCENT,
+      secondaryHoverBorder: LIGHT_BORDER_MEDIUM,  // Same as regular border in light mode
     },
 
     navigation: {
-      activeIndicator: '#7E29FF',      // Active tab border indicator
-      linkText: '#7E29FF',             // Link text color
+      activeIndicator: LIGHT_PURPLE_DARK,      // Active tab border indicator
+      linkText: LIGHT_PURPLE_DARK,             // Link text color
+      activeButtonBg: LIGHT_PURPLE_PRIMARY,       // Active nav button background
+      activeButtonHover: LIGHT_PURPLE_HOVER,    // Active nav button hover
+      activeButtonActive: LIGHT_PURPLE_ACTIVE,   // Active nav button pressed
     },
 
     heroCard: {
-      background: '#FFFFFF',           // Hero card background (not used in light but for consistency)
+      background: LIGHT_SURFACE_ELEVATED,           // Hero card background (not used in light but for consistency)
       chipBg: '#E8D9FF',              // Hero chip background
       chipText: '#6B3FC2',            // Hero chip text
     },
 
     interactive: {
-      linkPurple: '#7E29FF',          // Interactive links and "+X more" buttons
-      hoverPurple: '#B482FF',         // Hover states for purple elements
-      focusRing: '#B482FF',           // Focus ring color
+      linkPurple: LIGHT_PURPLE_DARK,          // Interactive links and "+X more" buttons
+      hoverPurple: LIGHT_PURPLE_PRIMARY,         // Hover states for purple elements
+      focusRing: LIGHT_PURPLE_PRIMARY,           // Focus ring color
     },
 
     sparkline: {
-      color: '#B482FF',               // Sparkline stroke color (purple in light mode)
-      peakDot: '#7E29FF',             // Peak dot color (darker purple)
+      color: LIGHT_PURPLE_PRIMARY,               // Sparkline stroke color (purple in light mode)
+      peakDot: LIGHT_PURPLE_DARK,             // Peak dot color (darker purple)
     },
   },
 
   dark: {
     // Surface colors
     surface: {
-      primary: '#1A1A2E',      // Page background
-      elevated: '#2A2A3E',     // Cards, modals
+      primary: DARK_SURFACE_PRIMARY,      // Page background (Tailwind gray-900)
+      elevated: DARK_SURFACE_ELEVATED,     // Cards, modals
       accent: '#3A3A4E',       // Subtle highlights
       hover: '#4A4A5E',        // Hover states
       blue: '#083B73',         // Hero card background
@@ -135,7 +170,7 @@ export const themeTokens = {
 
     // Borders
     border: {
-      subtle: '#2A2A3E',       // Step lighter than surface
+      subtle: DARK_BORDER_SUBTLE,       // Step lighter than surface
       medium: '#3A3A4E',       // Medium borders
       light: '#4A4A5E',        // Lighter borders
     },
@@ -154,8 +189,9 @@ export const themeTokens = {
     },
 
     statCard: {
-      background: '#1A1A2E',
-      border: '#2A2A3E',
+      background: DARK_SURFACE_PRIMARY,   // Same as page background
+      border: DARK_BORDER_SUBTLE,         // Border for definition
+      hoverBorder: DARK_BLUE_HOVER,       // Blue hover border in dark mode
       accentPurple: '#8B42FF',
       accentGold: '#E1BB62',  // For streaks
       accentBlue: '#0084FF',   // Not used but needed for type consistency
@@ -163,9 +199,9 @@ export const themeTokens = {
     },
 
     button: {
-      primaryBg: '#8B42FF',
-      primaryHover: '#A56BFF',
-      primaryActive: '#7433CC',
+      primaryBg: DARK_BLUE_PRIMARY,        // BLUE primary button in dark mode (not purple!)
+      primaryHover: DARK_BLUE_HOVER,       // Lighter blue on hover
+      primaryActive: DARK_BLUE_ACTIVE,     // Darker blue when active
       primaryText: '#FFFFFF',
       primaryBorder: 'none',
       secondaryBg: '#1A1A2E',
@@ -176,8 +212,11 @@ export const themeTokens = {
     },
 
     navigation: {
-      activeIndicator: '#8B42FF',      // Active tab border indicator (purple in dark mode)
-      linkText: '#8B42FF',             // Link text color
+      activeIndicator: DARK_BLUE_PRIMARY,      // Active tab border indicator (BLUE in dark mode)
+      linkText: DARK_BLUE_PRIMARY,             // Link text color (BLUE in dark mode)
+      activeButtonBg: '#8B42FF',       // Active nav button background (still purple)
+      activeButtonHover: '#A56BFF',    // Active nav button hover
+      activeButtonActive: '#7433CC',   // Active nav button pressed
     },
 
     heroCard: {
@@ -187,9 +226,9 @@ export const themeTokens = {
     },
 
     interactive: {
-      linkPurple: '#8B42FF',          // Interactive links and "+X more" buttons
-      hoverPurple: '#A56BFF',         // Hover states for purple elements
-      focusRing: '#8B42FF',           // Focus ring color
+      linkPurple: DARK_BLUE_PRIMARY,          // Interactive links and "+X more" buttons (BLUE in dark mode)
+      hoverPurple: DARK_BLUE_HOVER,           // Hover states for blue elements
+      focusRing: DARK_BLUE_PRIMARY,           // Focus ring color (BLUE in dark mode)
     },
 
     sparkline: {
@@ -201,16 +240,16 @@ export const themeTokens = {
   amoled: {
     // Surface colors
     surface: {
-      primary: '#000000',      // Pure black background
-      elevated: '#3A3A3A',     // Buttons, strips only
-      accent: '#1A1A1A',       // Cards
+      primary: AMOLED_SURFACE_PRIMARY,      // Pure black background
+      elevated: AMOLED_SURFACE_ELEVATED,     // Buttons, strips only
+      accent: AMOLED_SURFACE_CARD,       // Cards
       hover: '#4A4A4A',        // Hover states
     },
 
     // Text colors - AMOLED needs bright text on black
     text: {
-      primary: '#F0F0F0',      // Bright white for readability
-      secondary: '#D8D8D8',    // Labels, metadata
+      primary: AMOLED_TEXT_PRIMARY,      // Bright white for readability
+      secondary: AMOLED_TEXT_SECONDARY,    // Labels, metadata
       muted: '#B0B0B0',        // Disabled, hints
       light: '#A0A0A0',        // Very muted text
       badge: '#C8C8C8',        // Badge text
@@ -219,21 +258,21 @@ export const themeTokens = {
     // Brand colors - BRUTALIST GRAYSCALE + GOLD ONLY
     brand: {
       gold: '#E1BB62',         // ONLY for special micro-accents
-      gray: '#3A3A3A',         // Primary interactive color
+      gray: AMOLED_SURFACE_ELEVATED,         // Primary interactive color
       grayLight: '#4A4A4A',    // Hover states
       grayDark: '#2A2A2A',     // Active/pressed states
     },
 
     // Borders
     border: {
-      subtle: '#1A1A1A',       // Subtle on black
+      subtle: AMOLED_BORDER_SUBTLE,       // Subtle on black
       medium: '#2A2A2A',       // Medium borders
-      light: '#3A3A3A',        // Lighter borders
+      light: AMOLED_SURFACE_ELEVATED,        // Lighter borders
     },
 
     // Component-specific tokens
     chip: {
-      background: '#1A1A1A',   // Dark gray background
+      background: AMOLED_SURFACE_CARD,   // Dark gray background
       text: '#C8C8C8',         // Light gray text
       border: '#2A2A2A',       // Subtle gray border
     },
@@ -245,46 +284,50 @@ export const themeTokens = {
     },
 
     statCard: {
-      background: '#000000',      // Pure black
-      border: '#1A1A1A',          // Subtle border
-      accentGold: '#D4A850',      // Mustard/yellow ONLY for streaks (more glowing on AMOLED black)
-      accentGray: '#D8D8D8',      // For regular stats
-      accentPurple: '#D8D8D8',    // Not used (AMOLED is grayscale), but needed for type consistency
-      accentBlue: '#D8D8D8',      // Not used (AMOLED is grayscale), but needed for type consistency
+      background: AMOLED_SURFACE_PRIMARY,      // Pure black
+      border: AMOLED_BORDER_SUBTLE,          // Subtle border
+      hoverBorder: AMOLED_TEXT_PRIMARY,     // Bright gray hover border in AMOLED mode
+      accentGold: AMOLED_GOLD,      // Mustard/yellow ONLY for streaks (more glowing on AMOLED black)
+      accentGray: AMOLED_TEXT_SECONDARY,      // For regular stats
+      accentPurple: AMOLED_TEXT_SECONDARY,    // Not used (AMOLED is grayscale), but needed for type consistency
+      accentBlue: AMOLED_TEXT_SECONDARY,      // Not used (AMOLED is grayscale), but needed for type consistency
     },
 
     button: {
-      primaryBg: '#3A3A3A',
+      primaryBg: AMOLED_SURFACE_ELEVATED,
       primaryHover: '#4A4A4A',
       primaryActive: '#2A2A2A',
       primaryText: '#FFFFFF',
-      primaryBorder: '#1A1A1A',
-      secondaryBg: '#000000',
-      secondaryBorder: '#3A3A3A',
-      secondaryText: '#D8D8D8',
-      secondaryHoverBg: '#1A1A1A',
+      primaryBorder: AMOLED_BORDER_SUBTLE,
+      secondaryBg: AMOLED_SURFACE_PRIMARY,
+      secondaryBorder: AMOLED_SURFACE_ELEVATED,
+      secondaryText: AMOLED_TEXT_SECONDARY,
+      secondaryHoverBg: AMOLED_SURFACE_CARD,
       secondaryHoverBorder: '#4A4A4A',
     },
 
     navigation: {
-      activeIndicator: '#3A3A3A',      // Active tab border indicator (gray in AMOLED)
-      linkText: '#D8D8D8',             // Link text color (bright gray)
+      activeIndicator: AMOLED_SURFACE_ELEVATED,      // Active tab border indicator (gray in AMOLED)
+      linkText: AMOLED_TEXT_SECONDARY,             // Link text color (bright gray)
+      activeButtonBg: AMOLED_SURFACE_ELEVATED,       // Active nav button background (gray)
+      activeButtonHover: '#4A4A4A',    // Active nav button hover
+      activeButtonActive: '#2A2A2A',   // Active nav button pressed
     },
 
     heroCard: {
-      background: '#000000',           // Hero card background (pure black)
-      chipBg: '#1A1A1A',              // Hero chip background (grayscale)
+      background: AMOLED_SURFACE_PRIMARY,           // Hero card background (pure black)
+      chipBg: AMOLED_SURFACE_CARD,              // Hero chip background (grayscale)
       chipText: '#C8C8C8',            // Hero chip text (gray)
     },
 
     interactive: {
-      linkPurple: '#D8D8D8',          // Interactive links (grayscale, NOT purple!)
-      hoverPurple: '#F0F0F0',         // Hover states (brighter gray)
+      linkPurple: AMOLED_TEXT_SECONDARY,          // Interactive links (grayscale, NOT purple!)
+      hoverPurple: AMOLED_TEXT_PRIMARY,         // Hover states (brighter gray)
       focusRing: '#C8C8C8',           // Focus ring color (gray)
     },
 
     sparkline: {
-      color: '#D4A850',               // Sparkline stroke color (mustard/yellow in AMOLED)
+      color: AMOLED_GOLD,               // Sparkline stroke color (mustard/yellow in AMOLED)
       peakDot: '#E5C870',             // Peak dot color (lighter mustard)
     },
   },
