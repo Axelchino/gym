@@ -1,69 +1,86 @@
 # Theme System Architecture
 
-**Last Updated:** 2025-11-14
-**Status:** In Active Development
-**Priority:** HIGH - Critical for UX polish before public release
+**Last Updated:** 2025-11-17
+**Status:** ✅ Complete (Core Implementation)
+**Priority:** COMPLETE - TypeScript token system fully implemented
 
 ---
 
 ## 🎨 Overview
 
-GymTracker Pro uses a **hybrid theming system** inspired by Discord, GitHub, and modern design systems. We combine CSS variables for performance with TypeScript design tokens for type safety and complex conditional logic.
+GymTracker Pro uses a **TypeScript-first theming system** with design token constants for maintainability and type safety. After initial experimentation with CSS variables, we migrated to TypeScript tokens for better control and DRY principles.
 
 ### Why This Approach?
 
-After researching how industry leaders (Discord, GitHub, Slack) handle extensive theme libraries, we chose a hybrid approach that balances:
+After researching how industry leaders (Discord, GitHub, Slack) handle extensive theme libraries, we chose a TypeScript-first approach that prioritizes:
 
-- **Performance:** CSS variables enable instant theme switching without React re-renders
+- **DRY Principle:** Color constants defined once at the top, reused everywhere (no hardcoded duplicates)
 - **Type Safety:** TypeScript tokens prevent typos and provide autocomplete
+- **Maintainability:** Change a color = edit ONE constant instead of hunting through files
 - **Flexibility:** JavaScript logic handles complex theme-specific variations (e.g., AMOLED using gold accents instead of purple)
-- **Maintainability:** Centralized theme definitions in one place, easy to update
+- **Component Control:** Inline styles with `onMouseEnter`/`onMouseLeave` for theme-aware hover states
 
 ---
 
 ## 🏗️ System Architecture
 
-### Layer 1: Design Tokens (TypeScript)
+### Layer 1: Design Token Constants
 
-**Location:** `src/theme/tokens.ts` (TO BE CREATED)
+**Location:** `src/theme/tokens.ts` ✅ **COMPLETE**
 
-Design tokens define the semantic values for each theme. These are the source of truth.
+Color constants defined at the top of the file to eliminate hardcoded duplicates. Each color exists in exactly ONE place.
 
 ```typescript
+// Light mode constants
+const LIGHT_PURPLE_PRIMARY = '#B482FF';
+const LIGHT_SURFACE_ELEVATED = '#FFFFFF';
+// ... more constants
+
+// Dark mode constants
+const DARK_BLUE_PRIMARY = '#0092E6';
+const DARK_SURFACE_PRIMARY = '#111827';
+// ... more constants
+
+// AMOLED mode constants
+const AMOLED_SURFACE_PRIMARY = '#000000';
+const AMOLED_GOLD = '#D4A850';
+// ... more constants
+
 export const themeTokens = {
   light: {
     surface: {
-      primary: '#F7F8FA',      // Page background
-      elevated: '#FFFFFF',      // Cards, modals
-      accent: '#F5F5F5',        // Subtle highlights
+      primary: LIGHT_SURFACE_PRIMARY,      // Uses constant
+      elevated: LIGHT_SURFACE_ELEVATED,     // Uses constant
     },
-    text: {
-      primary: '#0F131A',       // Body text
-      secondary: '#5B6472',     // Labels, meta
-      muted: '#6B7280',         // Disabled, hints
+    button: {
+      primaryBg: LIGHT_PURPLE_PRIMARY,      // Uses constant
+      primaryHover: LIGHT_PURPLE_HOVER,     // Uses constant
     },
-    brand: {
-      purple: '#B482FF',        // Primary brand color
-      purpleLight: '#C596FF',   // Hover states
-      purpleDark: '#9D6EE8',    // Active states
+    statCard: {
+      background: LIGHT_SURFACE_ELEVATED,   // Uses constant
+      border: LIGHT_BORDER_SUBTLE,          // Uses constant
+      hoverBorder: LIGHT_PURPLE_PRIMARY,    // Uses constant
     },
-    // ... component-specific tokens
+    // ... all properties use constants
   },
   dark: {
     surface: {
-      primary: '#1A1A2E',
-      elevated: '#2A2A3E',
-      accent: '#3A3A4E',
+      primary: DARK_SURFACE_PRIMARY,        // #111827 (gray-900)
+      elevated: DARK_SURFACE_ELEVATED,      // Uses constant
     },
-    text: {
-      primary: '#FFFFFF',
-      secondary: '#E0E0EC',
-      muted: '#B8B8C8',
+    button: {
+      primaryBg: DARK_BLUE_PRIMARY,         // BLUE for dark mode (#0092E6)
+      primaryHover: DARK_BLUE_HOVER,        // Uses constant
+      primaryActive: DARK_BLUE_ACTIVE,      // Uses constant
     },
-    brand: {
-      purple: '#8B42FF',        // Different purple for dark mode
-      gold: '#E1BB62',          // Gold accents for streaks
+    interactive: {
+      linkPurple: DARK_BLUE_PRIMARY,        // BLUE for links in dark mode
+      hoverPurple: DARK_BLUE_HOVER,         // BLUE for hovers
     },
+    navigation: {
+      activeIndicator: DARK_BLUE_PRIMARY,   // BLUE tab indicators
+    },
+    // ... all properties use constants
   },
   amoled: {
     surface: {
@@ -162,7 +179,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 ### Layer 4: Theme Utilities (Helper Functions)
 
-**Location:** `src/utils/themeHelpers.ts` (TO BE CREATED)
+**Location:** `src/utils/themeHelpers.ts` ✅ **COMPLETE**
 
 For complex conditional logic that CSS can't handle (e.g., AMOLED uses gold, other themes use purple).
 
@@ -240,18 +257,22 @@ This page is our **living style guide** showing how each theme should be impleme
 **Philosophy:** Rich, theatrical, confident
 
 **Colors:**
-- Surface: `#1A1A2E` (dark blue-gray)
-- Purple: `#8B42FF` (vibrant, different from light mode)
-- Blue: `#0084FF` (electric blue)
+- Surface: `#111827` (Tailwind gray-900) - **UPDATED 2025-11-17**
+- Primary Buttons/Interactive: `#0092E6` (BLUE, not purple) - **UPDATED 2025-11-17**
+- Tab Navigation: `#0092E6` (BLUE) - **UPDATED 2025-11-17**
+- Purple (navigation buttons only): `#8B42FF`
+- Hero Cards: `#083B73` (deep blue surface)
 - Gold: `#E1BB62` (special accents like streaks)
 - Text: `#FFFFFF` (pure white)
 
 **Design patterns:**
+- **BLUE primary buttons** (`#0092E6`) for all CTAs - **CHANGED FROM PURPLE**
 - Blue hero cards (`#083B73`) for important CTAs
-- Purple top rules on stat cards
+- **BLUE tab indicators** and hover states - **CHANGED FROM PURPLE**
+- Purple navigation buttons (active state)
 - Gold accents for streaks (special/rare)
-- Subtle inset ring borders (`rgba(255, 255, 255, 0.1)`)
-- Icons one step brighter than body text
+- Stat cards match page background (`#111827`) - **UPDATED 2025-11-17**
+- Subtle borders (`#2A2A3E`) for definition
 
 ### AMOLED Mode - "Pure Black + Brutalist Grays"
 
@@ -416,29 +437,33 @@ export function Chip({ children, variant = 'default' }: ChipProps) {
 
 ## 📋 Current Status
 
-### ✅ Completed
+### ✅ Completed (2025-11-17)
 
 - [x] ThemeContext with localStorage persistence
 - [x] CSS variables defined in `themes.css`
 - [x] Light/Dark/AMOLED base colors established
 - [x] ThreeModesDemo as living style guide
 - [x] Basic theme switching UI
+- [x] **TypeScript design tokens file created** (`src/theme/tokens.ts`)
+- [x] **Color constants architecture** (DRY principle - no hardcoded duplicates)
+- [x] **Theme utilities** (`src/utils/themeHelpers.ts`)
+- [x] **Reusable Chip component** (`src/components/ui/Chip.tsx`)
+- [x] **Dashboard stat cards migrated** to TypeScript tokens
+- [x] **Dark mode colors fixed** to match ThreeModesDemo reference
+- [x] **Component-level hover handlers** (replaced CSS :hover rules)
 
 ### 🚧 In Progress
 
-- [ ] Expand CSS variables to cover all component variations
-- [ ] Create TypeScript design tokens file
-- [ ] Build reusable UI component library (`src/components/ui/`)
-- [ ] Migrate Dashboard to use proper theme system
-- [ ] Migrate all pages to use consistent theme patterns
+- [ ] Build remaining UI components (`<StatCard>`, `<Button>`, `<Card>`)
+- [ ] Migrate remaining pages to use TypeScript tokens
+- [ ] Complete Dashboard theme polish (all 3 modes tested)
 
 ### 📝 TODO
 
-- [ ] Document theme token naming conventions
-- [ ] Create theme testing checklist
 - [ ] Build Storybook or component showcase for UI library
 - [ ] Add theme preview in settings
 - [ ] Optimize for reduced motion preferences
+- [ ] High contrast mode for accessibility
 
 ---
 
@@ -471,21 +496,27 @@ When implementing theme-aware components, verify:
 
 ### What Worked Well
 
-1. **CSS variables for base colors:** Fast, browser-native, works great with Tailwind
+1. **TypeScript constants architecture:** DRY principle eliminated hardcoded duplicates - change one constant, updates everywhere
 2. **ThreeModesDemo as reference:** Having a single source of truth prevents inconsistencies
-3. **Hybrid approach:** CSS handles simple cases, TypeScript handles complex logic
+3. **Component-level hover handlers:** More control than CSS :hover, fully theme-aware
+4. **Type safety:** TypeScript caught errors during refactor before runtime
 
 ### What Didn't Work
 
-1. **Hardcoded colors in components:** Found many instances of `#111216` that were invisible on AMOLED
-2. **Inconsistent purple usage:** Light mode purple (`#B482FF`) was used in dark mode (should be `#8B42FF`)
-3. **Missing AMOLED-specific logic:** Many components assumed purple was always appropriate
+1. **Initial CSS variable approach:** Required maintaining parallel systems (CSS + TypeScript)
+2. **Hardcoded colors in components:** Found many instances of `#B482FF` duplicated 15+ times
+3. **Inconsistent purple usage:** Light mode purple (`#B482FF`) was used in dark mode (should be `#8B42FF`)
+4. **Missing AMOLED-specific logic:** Many components assumed purple was always appropriate
+5. **Dark mode wrong colors initially:** Used purple buttons instead of blue, wrong page background
 
-### Key Insights
+### Key Insights (Updated 2025-11-17)
 
+- **DRY principle is critical:** Hardcoded duplicates made theme changes error-prone and time-consuming
+- **Constants enable refactoring confidence:** Change a color constant, TypeScript shows all affected components
+- **Dark mode needs blue, not purple:** Primary buttons and interactive elements should be `#0092E6` blue
 - **AMOLED is fundamentally different:** It's not just "dark mode but darker" - it's a brutalist grayscale aesthetic
 - **Gold is special:** In dark themes, gold signifies rare/important things (streaks, achievements)
-- **Context matters:** The same component (chip badge) may need different colors based on what it represents
+- **Reference design is essential:** ThreeModesDemo prevented guesswork and inconsistencies
 
 ---
 
@@ -541,6 +572,7 @@ The approach is production-ready and mirrors systems used by Discord, GitHub, an
 
 ---
 
-**Last Updated:** 2025-11-14
-**Next Review:** When component library is complete
+**Last Updated:** 2025-11-17
+**Status:** Core implementation complete, additional UI components planned
+**Next Review:** When remaining UI components (`StatCard`, `Button`, `Card`) are built
 **Owner:** Axelchino
