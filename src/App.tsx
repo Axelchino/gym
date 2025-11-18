@@ -1,56 +1,65 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Layout } from './components/layout/Layout';
-import { Dashboard } from './pages/Dashboard';
-import { WorkoutLogger } from './pages/WorkoutLogger';
-import { Program } from './pages/Program';
-import { Analytics } from './pages/Analytics';
-import { ExerciseLibrary } from './pages/ExerciseLibrary';
-import { Profile } from './pages/Profile';
-import { Auth } from './pages/Auth';
-import UXDemo from './pages/UXDemo';
-import ThreeModesDemo from './pages/ThreeModesDemo';
-import ThemeDemo from './pages/ThemeDemo';
-import { StreakTest } from './pages/StreakTest';
+import { lazy, Suspense } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { DevTestPanel } from './components/DevTestPanel';
-import { useEffect } from 'react';
-import { initializeDatabase } from './services/initializeDatabase';
+
+// Eager load: Layout and Auth (critical for initial render)
+import { Layout } from './components/layout/Layout';
+import { Auth } from './pages/Auth';
+
+// Lazy load: All page components (code-split into separate chunks)
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const WorkoutLogger = lazy(() => import('./pages/WorkoutLogger'));
+const Program = lazy(() => import('./pages/Program'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const ExerciseLibrary = lazy(() => import('./pages/ExerciseLibrary'));
+const Profile = lazy(() => import('./pages/Profile'));
+const UXDemo = lazy(() => import('./pages/UXDemo'));
+const ThreeModesDemo = lazy(() => import('./pages/ThreeModesDemo'));
+const ThemeDemo = lazy(() => import('./pages/ThemeDemo'));
+const StreakTest = lazy(() => import('./pages/StreakTest'));
+
+// Loading fallback component
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="inline-block w-8 h-8 border-4 border-t-transparent border-purple-500 rounded-full animate-spin"></div>
+        <p className="mt-4 text-sm text-muted">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function App() {
-  useEffect(() => {
-    // Initialize database with exercises on app load
-    initializeDatabase().catch((error) => {
-      console.error('Database initialization failed:', error);
-    });
-  }, []);
-
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public route */}
-          <Route path="/auth" element={<Auth />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public route */}
+            <Route path="/auth" element={<Auth />} />
 
-          {/* UX Demo - accessible without auth */}
-          <Route path="/ux-demo" element={<UXDemo />} />
-          <Route path="/3-modes" element={<ThreeModesDemo />} />
-          <Route path="/theme-demo" element={<ThemeDemo />} />
-          <Route path="/streak-test" element={<StreakTest />} />
+            {/* UX Demo - accessible without auth */}
+            <Route path="/ux-demo" element={<UXDemo />} />
+            <Route path="/3-modes" element={<ThreeModesDemo />} />
+            <Route path="/theme-demo" element={<ThemeDemo />} />
+            <Route path="/streak-test" element={<StreakTest />} />
 
-          {/* Main routes - accessible to guests and authenticated users */}
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="workout" element={<WorkoutLogger />} />
-            <Route path="program" element={<Program />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="exercises" element={<ExerciseLibrary />} />
-            <Route path="profile" element={<Profile />} />
-          </Route>
-        </Routes>
+            {/* Main routes - accessible to guests and authenticated users */}
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="workout" element={<WorkoutLogger />} />
+              <Route path="program" element={<Program />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="exercises" element={<ExerciseLibrary />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+          </Routes>
 
-        {/* Dev Test Panel - Always visible in dev mode */}
-        {import.meta.env.DEV && <DevTestPanel />}
+          {/* Dev Test Panel - Always visible in dev mode */}
+          {import.meta.env.DEV && <DevTestPanel />}
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

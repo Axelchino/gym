@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, BarChart3, Award, Trophy, Zap, Dumbbell, Calendar, Filter, Download, X, Flame } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { getWorkoutLogs } from '../services/supabaseDataService';
 import { calculateWorkoutStats, calculateStreak, getExerciseProgressionByName, calculate1RM } from '../utils/analytics';
 import type { PersonalRecord } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
@@ -12,69 +11,61 @@ import { CalendarHeatmap } from '../components/CalendarHeatmap';
 import { StreakDisplay } from '../components/StreakDisplay';
 import { ProgressReports } from '../components/ProgressReports';
 import { StrengthStandards } from '../components/StrengthStandards';
+import { useAllWorkouts } from '../hooks/useWorkoutData';
 import { db } from '../services/database';
 
-export function Analytics() {
+function Analytics() {
   const { user } = useAuth();
   const { weightUnit } = useUserSettings();
-  const [workouts, setWorkouts] = useState<WorkoutLog[]>([]);
+
+  // REACT QUERY: Fetch all workouts with automatic caching
+  const { data: workouts = [], isLoading } = useAllWorkouts();
+
   const [recentPRs, setRecentPRs] = useState<PersonalRecord[]>([]);
   const [allPRs, setAllPRs] = useState<PersonalRecord[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [exerciseList, setExerciseList] = useState<{ id: string; name: string }[]>([]);
   const [timeFilter, setTimeFilter] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [selectedDateWorkouts, setSelectedDateWorkouts] = useState<{ date: Date; workouts: WorkoutLog[] } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
+  // Load PRs and exercise list whenever workouts change
   useEffect(() => {
-    loadData();
-  }, [user]);
+    if (workouts.length === 0) return;
 
-  async function loadData() {
-    setIsLoading(true);
+    async function loadAdditionalData() {
+      try {
+        // Load all PRs
+        const prs = await db.personalRecords
+          .orderBy('date')
+          .reverse()
+          .toArray();
+        setAllPRs(prs);
 
-    // If no user (guest mode), don't load data
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
+        // Get PRs from last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const recent = prs.filter(pr => new Date(pr.date) >= thirtyDaysAgo);
+        setRecentPRs(recent);
 
-    try {
-      // Load all workouts from Supabase
-      const allWorkouts = await getWorkoutLogs();
-      setWorkouts(allWorkouts);
-
-      // Load all PRs
-      const prs = await db.personalRecords
-        .orderBy('date')
-        .reverse()
-        .toArray();
-      setAllPRs(prs);
-
-      // Get PRs from last 30 days
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const recent = prs.filter(pr => new Date(pr.date) >= thirtyDaysAgo);
-      setRecentPRs(recent);
-
-      // Get unique exercises from workouts (deduplicate by name, not ID)
-      const exerciseMap = new Map<string, { id: string; name: string }>();
-      allWorkouts.forEach(workout => {
-        workout.exercises.forEach(ex => {
-          // Use name as key to avoid duplicates with same name but different IDs
-          if (!exerciseMap.has(ex.exerciseName)) {
-            exerciseMap.set(ex.exerciseName, { id: ex.exerciseId, name: ex.exerciseName });
-          }
+        // Get unique exercises from workouts (deduplicate by name, not ID)
+        const exerciseMap = new Map<string, { id: string; name: string }>();
+        workouts.forEach(workout => {
+          workout.exercises.forEach(ex => {
+            // Use name as key to avoid duplicates with same name but different IDs
+            if (!exerciseMap.has(ex.exerciseName)) {
+              exerciseMap.set(ex.exerciseName, { id: ex.exerciseId, name: ex.exerciseName });
+            }
+          });
         });
-      });
-      const exercises = Array.from(exerciseMap.values());
-      setExerciseList(exercises.sort((a, b) => a.name.localeCompare(b.name)));
-    } catch (error) {
-      console.error('Error loading analytics data:', error);
-    } finally {
-      setIsLoading(false);
+        const exercises = Array.from(exerciseMap.values());
+        setExerciseList(exercises.sort((a, b) => a.name.localeCompare(b.name)));
+      } catch (error) {
+        console.error('Error loading analytics data:', error);
+      }
     }
-  }
+
+    loadAdditionalData();
+  }, [workouts]);
 
   // Calculate stats
   const stats = calculateWorkoutStats(workouts);
@@ -758,3 +749,5 @@ export function Analytics() {
     </div>
   );
 }
+
+export default Analytics;

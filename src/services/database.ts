@@ -5,6 +5,19 @@ import type { UserProfile, BodyMeasurement, Achievement } from '../types/user';
 import { enhancedExercises } from '../data/enhancedExercises';
 import { v4 as uuidv4 } from 'uuid';
 
+// Sync queue for offline-first operations
+export interface SyncQueueItem {
+  id: string;
+  type: 'workout' | 'template' | 'program' | 'pr';
+  operation: 'create' | 'update' | 'delete';
+  data: any;
+  recordId: string; // ID of the record being synced
+  createdAt: Date;
+  attempts: number;
+  lastAttempt?: Date;
+  error?: string;
+}
+
 export class GymTrackerDatabase extends Dexie {
   // Tables
   users!: Dexie.Table<UserProfile, string>;
@@ -16,6 +29,7 @@ export class GymTrackerDatabase extends Dexie {
   bodyMeasurements!: Dexie.Table<BodyMeasurement, string>;
   achievements!: Dexie.Table<Achievement, string>;
   programs!: Dexie.Table<Program, string>;
+  syncQueue!: Dexie.Table<SyncQueueItem, string>;
 
   constructor() {
     super('GymTrackerDB');
@@ -43,6 +57,13 @@ export class GymTrackerDatabase extends Dexie {
       // New exercises from enhancedExercises.ts already have these fields
       // This migration ensures any custom exercises get default values
       console.log('Upgrading to v2: Adding movementType, popularityRank, and sourceUrl fields');
+    });
+
+    // Version 3: Add sync queue for offline-first support
+    this.version(3).stores({
+      syncQueue: 'id, type, operation, recordId, createdAt, attempts, [type+operation]',
+    }).upgrade(async (tx) => {
+      console.log('Upgrading to v3: Adding syncQueue table for offline-first support');
     });
   }
 }
@@ -99,6 +120,7 @@ export async function clearDatabase(): Promise<void> {
   await db.bodyMeasurements.clear();
   await db.achievements.clear();
   await db.programs.clear();
+  await db.syncQueue.clear();
   console.log('🗑️ Database cleared');
 }
 

@@ -1,68 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Calendar, Plus, ChevronLeft, ChevronRight, Play, X, Check, TrendingUp, CheckCircle2, Wrench, Trash2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { db } from '../services/database';
 import type { Program, WorkoutTemplate, WorkoutLog } from '../types/workout';
 import { PROGRAM_TEMPLATES } from '../data/programTemplates';
 import { useNavigate } from 'react-router-dom';
 import { ProgramBuilder } from '../components/ProgramBuilder';
 import {
-  getPrograms,
   createProgram,
   updateProgram,
   deleteProgram,
-  getWorkoutTemplates,
-  getWorkoutLogs,
 } from '../services/supabaseDataService';
+import { usePrograms, useWorkoutTemplates, useAllWorkouts } from '../hooks/useWorkoutData';
 
-export function Program() {
+function Program() {
   const navigate = useNavigate();
-  const [programs, setPrograms] = useState<Program[]>([]);
-  const [activeProgram, setActiveProgram] = useState<Program | null>(null);
-  const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
-  const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
+  const queryClient = useQueryClient();
+
+  // REACT QUERY: Fetch data with automatic caching
+  const { data: programs = [], isLoading: programsLoading } = usePrograms();
+  const { data: templates = [], isLoading: templatesLoading } = useWorkoutTemplates();
+  const { data: workoutLogs = [], isLoading: logsLoading } = useAllWorkouts();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
   const [showProgramBuilder, setShowProgramBuilder] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadPrograms();
-    loadTemplates();
-    loadWorkoutLogs();
-  }, []);
-
-  async function loadPrograms() {
-    try {
-      const allPrograms = await getPrograms();
-      setPrograms(allPrograms);
-
-      const active = allPrograms.find(p => p.isActive);
-      setActiveProgram(active || null);
-    } catch (error) {
-      console.error('Error loading programs:', error);
-      setPrograms([]);
-    }
-  }
-
-  async function loadTemplates() {
-    try {
-      const allTemplates = await getWorkoutTemplates();
-      setTemplates(allTemplates);
-    } catch (error) {
-      console.error('Error loading templates:', error);
-      setTemplates([]);
-    }
-  }
-
-  async function loadWorkoutLogs() {
-    try {
-      const logs = await getWorkoutLogs();
-      setWorkoutLogs(logs);
-    } catch (error) {
-      console.error('Error loading workout logs:', error);
-      setWorkoutLogs([]);
-    }
-  }
+  // Memoize active program calculation
+  const activeProgram = useMemo(() => {
+    return programs.find(p => p.isActive) || null;
+  }, [programs]);
 
   async function handleActivateTemplate(templateId: string) {
     const template = PROGRAM_TEMPLATES.find(t => t.id === templateId);
@@ -87,7 +55,8 @@ export function Program() {
       newProgram.startDate = startOfWeek;
 
       await createProgram(newProgram);
-      await loadPrograms();
+      // Invalidate cache to refetch programs
+      queryClient.invalidateQueries({ queryKey: ['programs'] });
       setShowTemplateBrowser(false);
       setSelectedTemplate(null);
     } catch (error) {
@@ -115,7 +84,8 @@ export function Program() {
         isActive: true,
         startDate: startOfWeek
       });
-      await loadPrograms();
+      // Invalidate cache to refetch programs
+      queryClient.invalidateQueries({ queryKey: ['programs'] });
     } catch (error) {
       console.error('Error activating program:', error);
       alert('Failed to activate program. Please try again.');
@@ -125,7 +95,8 @@ export function Program() {
   async function handleDeactivateProgram(programId: string) {
     try {
       await updateProgram(programId, { isActive: false });
-      await loadPrograms();
+      // Invalidate cache to refetch programs
+      queryClient.invalidateQueries({ queryKey: ['programs'] });
     } catch (error) {
       console.error('Error deactivating program:', error);
       alert('Failed to deactivate program. Please try again.');
@@ -136,7 +107,8 @@ export function Program() {
     if (confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
       try {
         await deleteProgram(programId);
-        await loadPrograms();
+        // Invalidate cache to refetch programs
+        queryClient.invalidateQueries({ queryKey: ['programs'] });
       } catch (error) {
         console.error('Error deleting program:', error);
         alert('Failed to delete program. Please try again.');
@@ -181,10 +153,10 @@ export function Program() {
 
     if (weekNumber > activeProgram.duration) return null; // Program finished
 
-    const programWeek = activeProgram.weeks.find(w => w.weekNumber === weekNumber);
+    const programWeek = activeProgram.weeks.find((w: any) => w.weekNumber === weekNumber);
     if (!programWeek) return null;
 
-    const scheduledWorkout = programWeek.workouts.find(w => w.dayOfWeek === dayOfWeek);
+    const scheduledWorkout = programWeek.workouts.find((w: any) => w.dayOfWeek === dayOfWeek);
     return scheduledWorkout || null;
   }
 
@@ -266,11 +238,11 @@ export function Program() {
       const weekNumber = Math.floor(dayOffset / 7) + 1;
       if (weekNumber > activeProgram.duration) break;
 
-      const programWeek = activeProgram.weeks.find(w => w.weekNumber === weekNumber);
+      const programWeek = activeProgram.weeks.find((w: any) => w.weekNumber === weekNumber);
       if (!programWeek) continue;
 
       const dayOfWeek = checkDate.getDay();
-      const hasScheduledWorkout = programWeek.workouts.some(w => w.dayOfWeek === dayOfWeek);
+      const hasScheduledWorkout = programWeek.workouts.some((w: any) => w.dayOfWeek === dayOfWeek);
 
       if (hasScheduledWorkout) {
         scheduledCount++;
@@ -868,7 +840,8 @@ export function Program() {
         <ProgramBuilder
           onClose={() => setShowProgramBuilder(false)}
           onSave={() => {
-            loadPrograms();
+            // Invalidate cache to refetch programs
+            queryClient.invalidateQueries({ queryKey: ['programs'] });
             setShowProgramBuilder(false);
           }}
         />
@@ -876,3 +849,5 @@ export function Program() {
     </div>
   );
 }
+
+export default Program;

@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, User, Plus, Dumbbell, RotateCcw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useThemeTokens } from '../../utils/themeHelpers';
+import { OfflineIndicator } from '../OfflineIndicator';
 
 export function Header() {
   const navigate = useNavigate();
@@ -91,6 +92,9 @@ export function Header() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-3" style={{ width: '260px', justifyContent: 'flex-end' }}>
+            {/* Offline Indicator */}
+            <OfflineIndicator />
+
             {/* Clear Cache Button */}
             <button
               onClick={clearCacheAndReload}

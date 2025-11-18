@@ -3,8 +3,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { exerciseService } from '../services/exerciseService';
 import type { Exercise, Difficulty, Equipment, MuscleGroup } from '../types/exercise';
 import { searchExercises, type SearchFilters } from '../utils/searchEngine';
+import { initializeDatabase } from '../services/initializeDatabase';
 
-export function ExerciseLibrary() {
+function ExerciseLibrary() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,6 +15,9 @@ export function ExerciseLibrary() {
   useEffect(() => {
     async function loadExercises() {
       try {
+        // Initialize database ONLY when ExerciseLibrary is loaded (lazy load 712KB JSON)
+        await initializeDatabase();
+
         const allExercises = await exerciseService.getAll();
         setExercises(allExercises);
         setLoading(false);
@@ -374,3 +378,5 @@ export function ExerciseLibrary() {
     </div>
   );
 }
+
+export default ExerciseLibrary;

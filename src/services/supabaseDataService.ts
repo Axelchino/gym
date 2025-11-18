@@ -165,14 +165,38 @@ export async function deleteWorkoutTemplate(templateId: string): Promise<void> {
 /**
  * Get all workout logs for the current user
  */
-export async function getWorkoutLogs(): Promise<WorkoutLog[]> {
+/**
+ * Get workout logs with optional date range filter
+ * @param startDate - Optional start date (inclusive)
+ * @param endDate - Optional end date (inclusive)
+ * @param limit - Optional limit for number of results (default: all)
+ */
+export async function getWorkoutLogs(
+  startDate?: Date,
+  endDate?: Date,
+  limit?: number
+): Promise<WorkoutLog[]> {
   const userId = await getCurrentUserId();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('workout_logs')
     .select('*')
-    .eq('user_id', userId)
-    .order('date', { ascending: false });
+    .eq('user_id', userId);
+
+  // Apply date filters if provided
+  if (startDate) {
+    query = query.gte('date', startDate.toISOString());
+  }
+  if (endDate) {
+    query = query.lte('date', endDate.toISOString());
+  }
+
+  // Apply limit if provided
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query.order('date', { ascending: false });
 
   if (error) {
     console.error('Error fetching workout logs:', error);
@@ -298,14 +322,31 @@ export async function deleteWorkoutLog(logId: string): Promise<void> {
 /**
  * Get all personal records for the current user
  */
-export async function getPersonalRecords(): Promise<PersonalRecord[]> {
+/**
+ * Get personal records with optional date range filter
+ * @param startDate - Optional start date (inclusive)
+ * @param endDate - Optional end date (inclusive)
+ */
+export async function getPersonalRecords(
+  startDate?: Date,
+  endDate?: Date
+): Promise<PersonalRecord[]> {
   const userId = await getCurrentUserId();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('personal_records')
     .select('*')
-    .eq('user_id', userId)
-    .order('date', { ascending: false });
+    .eq('user_id', userId);
+
+  // Apply date filters if provided
+  if (startDate) {
+    query = query.gte('date', startDate.toISOString());
+  }
+  if (endDate) {
+    query = query.lte('date', endDate.toISOString());
+  }
+
+  const { data, error } = await query.order('date', { ascending: false });
 
   if (error) {
     console.error('Error fetching personal records:', error);

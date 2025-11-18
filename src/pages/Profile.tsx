@@ -7,7 +7,7 @@ import type { UserProfile, UnitSystem } from '../types/user';
 import { getWorkoutLogs, getPersonalRecords, getUserProfile, updateUserProfile } from '../services/supabaseDataService';
 import { useTheme, type Theme } from '../contexts/ThemeContext';
 
-export function Profile() {
+function Profile() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -306,6 +306,8 @@ export function Profile() {
     </div>
   );
 }
+
+export default Profile;
 
 // Edit Profile Modal Component
 function EditProfileModal({

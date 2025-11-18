@@ -11,6 +11,7 @@ import {
   createPersonalRecord,
 } from '../services/supabaseDataService';
 import { useAuth } from '../contexts/AuthContext';
+import { syncManager } from '../services/syncManager';
 
 const ACTIVE_WORKOUT_KEY = 'gym-tracker-active-workout';
 const GUEST_WORKOUTS_KEY = 'gym-tracker-guest-workouts';
@@ -319,10 +320,13 @@ export function useActiveWorkout() {
         return { workoutId: guestWorkout.id, workout: guestWorkout, prs: [] };
       }
 
-      console.log('✅ User authenticated, proceeding with cloud save...');
+      console.log('✅ User authenticated, proceeding with OFFLINE-FIRST save...');
 
-      // STEP 2: Create workout log in Supabase
-      const savedWorkout = await createWorkoutLog({
+      // STEP 2: Save to IndexedDB FIRST (instant, always works)
+      const workoutId = uuidv4();
+      const savedWorkout: WorkoutLog = {
+        id: workoutId,
+        userId: user.id,
         name: activeWorkout.name,
         date: new Date(),
         startTime: activeWorkout.startTime,
@@ -330,13 +334,24 @@ export function useActiveWorkout() {
         duration: Math.round((new Date().getTime() - activeWorkout.startTime.getTime()) / 60000),
         totalVolume: activeWorkout.exercises.reduce((sum, ex) => sum + ex.totalVolume, 0),
         exercises: activeWorkout.exercises,
-      });
+        synced: false, // Mark as not synced yet
+        createdAt: new Date(),
+      };
 
-      console.log('✅ Workout saved to Supabase:', savedWorkout.id);
-
-      // STEP 3: Save to IndexedDB for offline access and edit functionality
       await db.workoutLogs.put(savedWorkout);
-      console.log('✅ Workout saved to IndexedDB');
+      console.log('✅ Workout saved to IndexedDB (instant)');
+
+      // STEP 3: Queue for cloud sync (background, non-blocking)
+      await syncManager.queueSync('workout', 'create', workoutId, {
+        name: savedWorkout.name,
+        date: savedWorkout.date,
+        startTime: savedWorkout.startTime,
+        endTime: savedWorkout.endTime,
+        duration: savedWorkout.duration,
+        totalVolume: savedWorkout.totalVolume,
+        exercises: savedWorkout.exercises,
+      });
+      console.log('✅ Workout queued for sync to Supabase');
 
       // STEP 4: Detect and save Personal Records
       const allPRs = [];
@@ -407,14 +422,14 @@ export function useActiveWorkout() {
 
       if (errorMessage.includes('logged in') || errorMessage.includes('authenticated')) {
         alert('⚠️ You must be signed in to save workouts.\n\nYour workout is still saved locally. Please sign in and try saving again.');
-      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-        alert('⚠️ Network connection issue.\n\nYour workout is saved locally and will be uploaded when you have internet connection. You can keep working out offline.');
-        // TODO: Add to offline queue for later sync
       } else {
-        alert(`⚠️ Failed to save workout: ${errorMessage}\n\nYour workout is still saved locally. Please try again or contact support if the issue persists.`);
+        // For offline-first, most errors are non-critical since data is already saved locally
+        console.error('Non-critical error during workout save:', error);
+        alert(`✅ Workout saved locally!\n\n⚠️ ${errorMessage}\n\nYour workout will sync to the cloud when you're back online.`);
       }
 
-      throw error;
+      // Don't throw - we still saved locally which is what matters
+      return null;
     }
   }, [activeWorkout, calculateVolume, isSaving, user]);
 

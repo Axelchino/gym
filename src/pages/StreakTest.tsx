@@ -1,6 +1,6 @@
 import { StreakVisualization } from '../components/StreakVisualization';
 
-export function StreakTest() {
+function StreakTest() {
   // Simulate as if today is Friday (day 4 of the week)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -175,3 +175,5 @@ export function StreakTest() {
     </div>
   );
 }
+
+export default StreakTest;

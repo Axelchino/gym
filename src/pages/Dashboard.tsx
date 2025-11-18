@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { TrendingUp, Calendar, Award, Flame, Edit2, Share2, Copy } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useAuth } from '../contexts/AuthContext';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber';
+import { useWorkouts, usePersonalRecords } from '../hooks/useWorkoutData';
 import { WorkoutEditModal } from '../components/WorkoutEditModal';
 import { Sparkline } from '../components/Sparkline';
 import { StreakVisualization } from '../components/StreakVisualization';
 import { calculateStreak } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
-import { getWorkoutLogs, getPersonalRecords, createWorkoutTemplate } from '../services/supabaseDataService';
+import { createWorkoutTemplate } from '../services/supabaseDataService';
 import { SaveTemplateModal } from '../components/SaveTemplateModal';
 import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 import { Chip } from '../components/ui';
@@ -26,25 +28,41 @@ interface DashboardStats {
   volumeSparklineData: number[];
 }
 
-export function Dashboard() {
+function Dashboard() {
   const { weightUnit } = useUserSettings();
   const { user } = useAuth();
   const tokens = useThemeTokens();
-  const [stats, setStats] = useState<DashboardStats>({
-    workoutsLast7Days: 0,
-    workoutsPrev7Days: 0,
-    volumeLast7Days: 0,
-    volumePrev7Days: 0,
-    currentStreak: 0,
-    prsLast30Days: 0,
-    recentWorkouts: [],
-    allWorkouts: [],
-    volumeSparklineData: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // Calculate date ranges
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }, []);
+
+  const thirtyDaysAgo = useMemo(() => {
+    const d = new Date(today);
+    d.setDate(today.getDate() - 30);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [today]);
+
+  // REACT QUERY: Fetch data with automatic caching
+  const { data: allWorkouts = [], isLoading: workoutsLoading } = useWorkouts(
+    user ? thirtyDaysAgo : undefined,
+    user ? today : undefined
+  );
+
+  const { data: allPRs = [], isLoading: prsLoading } = usePersonalRecords(
+    user ? thirtyDaysAgo : undefined,
+    user ? today : undefined
+  );
+
+  const isLoading = workoutsLoading || prsLoading;
+
   const [editingWorkoutId, setEditingWorkoutId] = useState<string | null>(null);
   const [viewingWorkoutId, setViewingWorkoutId] = useState<string | null>(null);
-  const [daysSinceLastPR, setDaysSinceLastPR] = useState<number>(-1);
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [periodFilter, setPeriodFilter] = useState<'7d' | '30d' | '90d'>('7d');
   const [typeFilter, setTypeFilter] = useState<'all' | 'program' | 'free'>('all');
@@ -52,109 +70,134 @@ export function Dashboard() {
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutLog | null>(null);
 
+  // Calculate stats from React Query data
+  const stats = useMemo(() => {
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const fourteenDaysAgo = new Date(today);
+    fourteenDaysAgo.setDate(today.getDate() - 14);
+    fourteenDaysAgo.setHours(0, 0, 0, 0);
+
+    // Last 7 days
+    const workoutsLast7Days = allWorkouts.filter(w => {
+      const workoutDate = new Date(w.date);
+      return workoutDate >= sevenDaysAgo && workoutDate <= today;
+    });
+    const volumeLast7Days = workoutsLast7Days.reduce((sum, w) => sum + w.totalVolume, 0);
+
+    // Previous 7 days (for comparison)
+    const workoutsPrev7Days = allWorkouts.filter(w => {
+      const workoutDate = new Date(w.date);
+      return workoutDate >= fourteenDaysAgo && workoutDate < sevenDaysAgo;
+    });
+    const volumePrev7Days = workoutsPrev7Days.reduce((sum, w) => sum + w.totalVolume, 0);
+
+    return {
+      workoutsLast7Days: workoutsLast7Days.length,
+      workoutsPrev7Days: workoutsPrev7Days.length,
+      volumeLast7Days,
+      volumePrev7Days,
+      currentStreak: calculateStreak(allWorkouts),
+      prsLast30Days: allPRs.length,
+    };
+  }, [allWorkouts, allPRs, today]);
+
   // Animated numbers for hero tiles
   const animatedVolume = useAnimatedNumber(stats.volumeLast7Days, 400, !isLoading);
   const animatedWorkouts = useAnimatedNumber(stats.workoutsLast7Days, 350, !isLoading);
   const animatedPRs = useAnimatedNumber(stats.prsLast30Days, 350, !isLoading);
   const animatedStreak = useAnimatedNumber(stats.currentStreak, 350, !isLoading);
 
-  useEffect(() => {
-    loadDashboardStats();
-  }, [user]);
+  // OPTIMIZATION 2: Memoize sparkline calculation (only recalculates when allWorkouts changes)
+  const volumeSparklineData = useMemo(() => {
+    if (allWorkouts.length === 0) return [];
 
-  async function loadDashboardStats() {
-    setIsLoading(true);
+    const data: number[] = [];
 
-    try {
-      // If user is not authenticated (guest mode), don't load data
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
+    for (let i = 13; i >= 0; i--) {
+      const dayStart = new Date(today);
+      dayStart.setDate(today.getDate() - i);
+      dayStart.setHours(0, 0, 0, 0);
 
-      // Get all workouts from Supabase
-      const allWorkouts = await getWorkoutLogs();
+      const dayEnd = new Date(dayStart);
+      dayEnd.setHours(23, 59, 59, 999);
 
-      // Calculate rolling 7-day windows
-      const today = new Date();
-      today.setHours(23, 59, 59, 999); // End of today
-
-      const sevenDaysAgo = new Date(today);
-      sevenDaysAgo.setDate(today.getDate() - 7);
-      sevenDaysAgo.setHours(0, 0, 0, 0);
-
-      const fourteenDaysAgo = new Date(today);
-      fourteenDaysAgo.setDate(today.getDate() - 14);
-      fourteenDaysAgo.setHours(0, 0, 0, 0);
-
-      // Last 7 days (rolling window)
-      const workoutsLast7Days = allWorkouts.filter(w => {
+      const dayWorkouts = allWorkouts.filter(w => {
         const workoutDate = new Date(w.date);
-        return workoutDate >= sevenDaysAgo && workoutDate <= today;
-      });
-      const volumeLast7Days = workoutsLast7Days.reduce((sum, w) => sum + w.totalVolume, 0);
-
-      // Previous 7 days (for comparison)
-      const workoutsPrev7Days = allWorkouts.filter(w => {
-        const workoutDate = new Date(w.date);
-        return workoutDate >= fourteenDaysAgo && workoutDate < sevenDaysAgo;
-      });
-      const volumePrev7Days = workoutsPrev7Days.reduce((sum, w) => sum + w.totalVolume, 0);
-
-      // Calculate current streak (in weeks)
-      const currentStreak = calculateStreak(allWorkouts);
-
-      // Get PRs from last 30 days
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(today.getDate() - 30);
-      thirtyDaysAgo.setHours(0, 0, 0, 0);
-
-      const allPRs = await getPersonalRecords();
-      const prsLast30Days = allPRs.filter(pr => new Date(pr.date) >= thirtyDaysAgo).length;
-
-      // Get recent workouts (last 5)
-      const recentWorkouts = allWorkouts.slice(0, 5);
-
-      // Calculate volume sparkline data (last 14 days for trend)
-      const volumeSparklineData: number[] = [];
-      for (let i = 13; i >= 0; i--) {
-        const dayStart = new Date(today);
-        dayStart.setDate(today.getDate() - i);
-        dayStart.setHours(0, 0, 0, 0);
-
-        const dayEnd = new Date(dayStart);
-        dayEnd.setHours(23, 59, 59, 999);
-
-        const dayWorkouts = allWorkouts.filter(w => {
-          const workoutDate = new Date(w.date);
-          return workoutDate >= dayStart && workoutDate <= dayEnd;
-        });
-
-        const dayVolume = dayWorkouts.reduce((sum, w) => sum + w.totalVolume, 0);
-        volumeSparklineData.push(dayVolume);
-      }
-
-      setStats({
-        workoutsLast7Days: workoutsLast7Days.length,
-        workoutsPrev7Days: workoutsPrev7Days.length,
-        volumeLast7Days,
-        volumePrev7Days,
-        currentStreak,
-        prsLast30Days,
-        recentWorkouts,
-        allWorkouts,
-        volumeSparklineData,
+        return workoutDate >= dayStart && workoutDate <= dayEnd;
       });
 
-      // Load days since last PR
-      const days = await getDaysSinceLastPR();
-      setDaysSinceLastPR(days);
-    } catch (error) {
-      console.error('Error loading dashboard stats:', error);
-    } finally {
-      setIsLoading(false);
+      const dayVolume = dayWorkouts.reduce((sum, w) => sum + w.totalVolume, 0);
+      data.push(dayVolume);
     }
-  }
+
+    return data;
+  }, [allWorkouts, today]);
+
+  // OPTIMIZATION 3: Memoize filtered workouts (avoid unnecessary re-renders)
+  const recentWorkouts = useMemo(() =>
+    allWorkouts.slice(0, 5),
+    [allWorkouts]
+  );
+
+  // Days since last PR
+  const daysSinceLastPR = useMemo(() => {
+    if (allPRs.length === 0) return -1;
+    const lastPRDate = new Date(allPRs[0].date);
+    const diffTime = today.getTime() - lastPRDate.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  }, [allPRs, today]);
+
+  // OPTIMIZATION 4: Memoize stats card calculations
+  const bestVolumeDay = useMemo(() => {
+    if (allWorkouts.length === 0) return '';
+
+    const dayVolumes: Record<string, number> = {};
+    allWorkouts.forEach(w => {
+      const day = new Date(w.date).toLocaleDateString('en-US', { weekday: 'short' });
+      dayVolumes[day] = (dayVolumes[day] || 0) + w.totalVolume;
+    });
+
+    let maxDay = '';
+    let maxVolume = 0;
+    Object.entries(dayVolumes).forEach(([day, vol]) => {
+      if (vol > maxVolume) {
+        maxVolume = vol;
+        maxDay = day;
+      }
+    });
+
+    return maxDay;
+  }, [allWorkouts]);
+
+  const avgSetVolume = useMemo(() => {
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const recentWorkouts = allWorkouts.filter(w => {
+      const workoutDate = new Date(w.date);
+      return workoutDate >= sevenDaysAgo && workoutDate <= today;
+    });
+
+    let totalSets = 0;
+    let totalVolume = 0;
+
+    recentWorkouts.forEach(workout => {
+      workout.exercises.forEach(exercise => {
+        exercise.sets.forEach(set => {
+          if (set.completed && set.weight && set.reps) {
+            totalSets++;
+            totalVolume += set.weight * set.reps;
+          }
+        });
+      });
+    });
+
+    return totalSets > 0 ? totalVolume / totalSets : 0;
+  }, [allWorkouts, today]);
 
   function formatDate(date: Date): string {
     const d = new Date(date);
@@ -175,55 +218,6 @@ export function Dashboard() {
     return `${mins}m`;
   }
 
-  // Get best day for volume
-  function getBestVolumeDay(): string {
-    if (stats.allWorkouts.length === 0) return '';
-
-    const dayVolumes: Record<string, number> = {};
-    stats.allWorkouts.forEach(w => {
-      const day = new Date(w.date).toLocaleDateString('en-US', { weekday: 'short' });
-      dayVolumes[day] = (dayVolumes[day] || 0) + w.totalVolume;
-    });
-
-    let maxDay = '';
-    let maxVolume = 0;
-    Object.entries(dayVolumes).forEach(([day, vol]) => {
-      if (vol > maxVolume) {
-        maxVolume = vol;
-        maxDay = day;
-      }
-    });
-
-    return maxDay;
-  }
-
-  // Get days since last PR
-  async function getDaysSinceLastPR(): Promise<number> {
-    try {
-      const allPRs = await getPersonalRecords();
-      if (allPRs.length === 0) return -1;
-
-      const sortedPRs = allPRs.sort((a, b) =>
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-
-      const lastPRDate = new Date(sortedPRs[0].date);
-      const today = new Date();
-      const diffTime = today.getTime() - lastPRDate.getTime();
-      return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    } catch {
-      return -1;
-    }
-  }
-
-  // Calculate progress to next week (0-100%)
-  function getWeekProgress(): number {
-    const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
-    const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to Monday = 0
-    return (daysSinceMonday / 7) * 100;
-  }
-
   // Toggle workout expansion
   function toggleWorkoutExpansion(workoutId: string) {
     setExpandedWorkouts(prev => {
@@ -237,36 +231,6 @@ export function Dashboard() {
     });
   }
 
-  // Calculate average set volume
-  function getAvgSetVolume(): number {
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(today.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-
-    const recentWorkouts = stats.allWorkouts.filter(w => {
-      const workoutDate = new Date(w.date);
-      return workoutDate >= sevenDaysAgo && workoutDate <= today;
-    });
-
-    let totalSets = 0;
-    let totalVolume = 0;
-
-    recentWorkouts.forEach(workout => {
-      workout.exercises.forEach(exercise => {
-        exercise.sets.forEach(set => {
-          if (set.completed && set.weight && set.reps) {
-            totalSets++;
-            totalVolume += set.weight * set.reps;
-          }
-        });
-      });
-    });
-
-    return totalSets > 0 ? totalVolume / totalSets : 0;
-  }
 
   // Convert workout to template
   function handleConvertToTemplate(workout: WorkoutLog) {
@@ -314,8 +278,8 @@ export function Dashboard() {
               <TrendingUp className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">Total Volume</span>
             </div>
-            {!isLoading && getBestVolumeDay() && (
-              <p className="text-xs text-secondary">Best day {getBestVolumeDay()}</p>
+            {!isLoading && bestVolumeDay && (
+              <p className="text-xs text-secondary">Best day {bestVolumeDay}</p>
             )}
           </div>
 
@@ -329,11 +293,11 @@ export function Dashboard() {
 
           {/* Sparkline + Delta */}
           <div className="mb-3" style={{ height: '28px' }}>
-            {!isLoading && stats.volumeSparklineData.length > 0 ? (
+            {!isLoading && volumeSparklineData.length > 0 ? (
               <div className="flex items-center justify-between h-full">
                 <div className="flex-1">
                   <Sparkline
-                    data={stats.volumeSparklineData}
+                    data={volumeSparklineData}
                     width={200}
                     height={28}
                     color={tokens.sparkline.color}
@@ -481,7 +445,7 @@ export function Dashboard() {
             {!isLoading && (
               <StreakVisualization
                 currentStreak={stats.currentStreak}
-                workoutDates={stats.allWorkouts.map(w => w.date)}
+                workoutDates={allWorkouts.map(w => w.date)}
                 animate={true}
               />
             )}
@@ -500,7 +464,7 @@ export function Dashboard() {
           <h2 className="text-lg font-semibold text-primary uppercase tracking-wide">Recent Activity</h2>
 
           {/* Feed Controls */}
-          {!isLoading && stats.recentWorkouts.length > 0 && (
+          {!isLoading && recentWorkouts.length > 0 && (
             <div className="flex items-center gap-3 text-sm">
               {/* Period Filter */}
               <select
@@ -563,7 +527,7 @@ export function Dashboard() {
           <div className="text-center py-12 text-secondary">
             <p className="text-sm">Loading workouts...</p>
           </div>
-        ) : stats.recentWorkouts.length === 0 ? (
+        ) : recentWorkouts.length === 0 ? (
           <div className="text-center py-12">
             {!user ? (
               <div className="max-w-md mx-auto space-y-4">
@@ -615,7 +579,7 @@ export function Dashboard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {stats.recentWorkouts.map((workout) => {
+            {recentWorkouts.map((workout) => {
               const isExpanded = expandedWorkouts.has(workout.id);
               const firstFourExercises = workout.exercises.slice(0, 4);
               const remainingCount = Math.max(0, workout.exercises.length - 4);
@@ -788,7 +752,8 @@ export function Dashboard() {
           onClose={() => setViewingWorkoutId(null)}
           onSave={() => {
             setViewingWorkoutId(null);
-            loadDashboardStats();
+            // Invalidate React Query cache to refetch fresh data
+            queryClient.invalidateQueries({ queryKey: ['workouts'] });
           }}
           readOnly={true}
         />
@@ -801,7 +766,8 @@ export function Dashboard() {
           onClose={() => setEditingWorkoutId(null)}
           onSave={() => {
             setEditingWorkoutId(null);
-            loadDashboardStats();
+            // Invalidate React Query cache to refetch fresh data
+            queryClient.invalidateQueries({ queryKey: ['workouts'] });
           }}
           readOnly={false}
         />
@@ -821,3 +787,5 @@ export function Dashboard() {
     </div>
   );
 }
+
+export default Dashboard;

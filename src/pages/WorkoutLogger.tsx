@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Plus, Save, X, Trash2, Clock, Timer, Edit, Dumbbell, Trophy, TrendingUp, Zap, Download, Upload, AlertCircle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useActiveWorkout } from '../hooks/useActiveWorkout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useRestTimer } from '../hooks/useRestTimer';
@@ -16,19 +17,19 @@ import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile 
 import { BUILTIN_WORKOUT_TEMPLATES, isBuiltinTemplate } from '../data/workoutTemplates';
 import { findExerciseByName } from '../utils/exerciseNameMatcher';
 import {
-  getWorkoutTemplates,
-  getWorkoutLogs,
   createWorkoutTemplate,
   updateWorkoutTemplate,
-  deleteWorkoutTemplate
+  deleteWorkoutTemplate,
 } from '../services/supabaseDataService';
 import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 import { SaveTemplateModal } from '../components/SaveTemplateModal';
+import { useWorkoutTemplates, useAllWorkouts } from '../hooks/useWorkoutData';
 import type { WorkoutLog } from '../types/workout';
 
-export function WorkoutLogger() {
+function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     activeWorkout,
@@ -56,7 +57,9 @@ export function WorkoutLogger() {
     skipTimer,
   } = useRestTimer(90);
 
-  const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
+  // REACT QUERY: Fetch templates and workouts with automatic caching
+  const { data: templates = [], isLoading: templatesLoading } = useWorkoutTemplates();
+  const { data: allWorkouts = [], isLoading: workoutsLoading } = useAllWorkouts();
   const [templateExerciseNames, setTemplateExerciseNames] = useState<Map<string, Map<string, string>>>(new Map());
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
@@ -72,10 +75,6 @@ export function WorkoutLogger() {
   const [savedWorkout, setSavedWorkout] = useState<WorkoutLog | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    loadTemplates();
-  }, []);
 
   useEffect(() => {
     loadTemplateExerciseNames();
@@ -109,14 +108,14 @@ export function WorkoutLogger() {
 
     const previousData = new Map();
 
+    // Use React Query cached workouts (sorted by date descending)
+    const sortedWorkouts = [...allWorkouts].sort((a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
     for (const exercise of activeWorkout.exercises) {
       // Find the most recent workout that contains this exercise
-      const recentWorkouts = await db.workoutLogs
-        .orderBy('date')
-        .reverse()
-        .toArray();
-
-      for (const workout of recentWorkouts) {
+      for (const workout of sortedWorkouts) {
         const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.exerciseId);
         if (exerciseData && exerciseData.sets.length > 0) {
           previousData.set(exercise.exerciseId, exerciseData.sets);
@@ -145,17 +144,6 @@ export function WorkoutLogger() {
     }
 
     setTemplateExerciseNames(nameMap);
-  }
-
-  async function loadTemplates() {
-    try {
-      const allTemplates = await getWorkoutTemplates();
-      setTemplates(allTemplates);
-    } catch (error) {
-      console.error('Error loading templates:', error);
-      // Fallback to empty array if error
-      setTemplates([]);
-    }
   }
 
   function handleStartWorkout() {
@@ -198,8 +186,8 @@ export function WorkoutLogger() {
       const templateData = convertWorkoutLogToTemplate(savedWorkout, templateName);
       await createWorkoutTemplate(templateData);
 
-      // Reload templates
-      await loadTemplates();
+      // Invalidate React Query cache to trigger refetch
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
 
       // Close modal and reset state
       setShowSaveTemplateModal(false);
@@ -242,7 +230,9 @@ export function WorkoutLogger() {
         });
       }
 
-      await loadTemplates();
+      // Invalidate React Query cache to trigger refetch
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+
       setShowTemplateBuilder(false);
       setEditingTemplate(null);
     } catch (error) {
@@ -255,8 +245,10 @@ export function WorkoutLogger() {
     // Build the complete workout structure with all exercises and sets
     const exercises = [];
 
-    // Get all recent workouts from Supabase to find previous data
-    const recentWorkouts = await getWorkoutLogs();
+    // Use React Query cached workouts (sorted by date descending)
+    const recentWorkouts = [...allWorkouts].sort((a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
     for (let i = 0; i < template.exercises.length; i++) {
       const templateEx = template.exercises[i];
@@ -372,7 +364,8 @@ export function WorkoutLogger() {
     if (confirm('Are you sure you want to delete this template?')) {
       try {
         await deleteWorkoutTemplate(templateId);
-        await loadTemplates();
+        // Invalidate React Query cache to trigger refetch
+        queryClient.invalidateQueries({ queryKey: ['templates'] });
       } catch (error) {
         console.error('Error deleting template:', error);
         alert('Failed to delete template. Please try again.');
@@ -411,9 +404,8 @@ export function WorkoutLogger() {
 
       let skippedExercises = 0;
 
-      // Add imported templates to Supabase with remapped exercise IDs
-      const existingTemplates = await getWorkoutTemplates();
-      const existingIds = new Set(existingTemplates.map(t => t.id));
+      // Use React Query cached templates to check for existing IDs
+      const existingIds = new Set(templates.map(t => t.id));
 
       for (const template of importedTemplates) {
         // Check if template with same ID already exists
@@ -455,7 +447,8 @@ export function WorkoutLogger() {
         }
       }
 
-      await loadTemplates();
+      // Invalidate React Query cache to trigger refetch
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
 
       if (skippedExercises > 0) {
         alert(
@@ -1396,3 +1389,5 @@ export function WorkoutLogger() {
     </div>
   );
 }
+
+export default WorkoutLogger;
