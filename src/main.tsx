@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { syncManager } from './services/syncManager'
+import { initializeDatabase } from './services/initializeDatabase'
 
 // Configure React Query with optimal caching settings
 const queryClient = new QueryClient({
@@ -18,6 +19,13 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Initialize exercise database on app start (critical for templates to work)
+initializeDatabase().then(() => {
+  console.log('✅ Exercise database initialized');
+}).catch((error) => {
+  console.error('❌ Failed to initialize exercise database:', error);
+});
 
 // Start offline sync manager
 syncManager.start();

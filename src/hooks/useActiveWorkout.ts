@@ -380,18 +380,23 @@ export function useActiveWorkout() {
               savedWorkout.userId
             );
 
-            // Save each PR individually to Supabase
+            // Save each PR individually (non-blocking, offline-safe)
             for (const pr of prs) {
-              await createPersonalRecord({
-                exerciseId: pr.exerciseId,
-                exerciseName: pr.exerciseName,
-                type: pr.type,
-                value: pr.value,
-                reps: pr.reps,
-                date: pr.date,
-                workoutLogId: pr.workoutLogId,
-                previousRecord: pr.previousRecord,
-              });
+              try {
+                await createPersonalRecord({
+                  exerciseId: pr.exerciseId,
+                  exerciseName: pr.exerciseName,
+                  type: pr.type,
+                  value: pr.value,
+                  reps: pr.reps,
+                  date: pr.date,
+                  workoutLogId: pr.workoutLogId,
+                  previousRecord: pr.previousRecord,
+                });
+              } catch (prError) {
+                // Don't fail workout save if PR save fails (offline-safe)
+                console.warn('Failed to save PR (will retry on sync):', prError);
+              }
             }
 
             allPRs.push(...prs);

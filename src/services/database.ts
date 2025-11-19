@@ -61,6 +61,16 @@ export class GymTrackerDatabase extends Dexie {
 
     // Version 3: Add sync queue for offline-first support
     this.version(3).stores({
+      users: 'id, email, createdAt',
+      exercises:
+        'id, name, category, equipment, difficulty, movementType, popularityRank, isCustom, createdAt, [category+equipment], [movementType+popularityRank]',
+      workoutTemplates: 'id, userId, name, isActive, createdAt, [userId+isActive]',
+      workoutLogs: 'id, userId, templateId, date, createdAt, [userId+date], [userId+templateId]',
+      sets: 'id, workoutLogId, exerciseId, timestamp, [workoutLogId+exerciseId]',
+      personalRecords: 'id, userId, exerciseId, type, date, [userId+exerciseId], [userId+date]',
+      bodyMeasurements: 'id, userId, date, [userId+date]',
+      achievements: 'id, category, unlockedAt',
+      programs: 'id, userId, isActive, createdAt, [userId+isActive]',
       syncQueue: 'id, type, operation, recordId, createdAt, attempts, [type+operation]',
     }).upgrade(async (tx) => {
       console.log('Upgrading to v3: Adding syncQueue table for offline-first support');
