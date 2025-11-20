@@ -111,12 +111,13 @@ function Dashboard() {
   const animatedStreak = useAnimatedNumber(stats.currentStreak, 350, !isLoading);
 
   // OPTIMIZATION 2: Memoize sparkline calculation (only recalculates when allWorkouts changes)
+  // Shows last 7 days to match the volume chip
   const volumeSparklineData = useMemo(() => {
     if (allWorkouts.length === 0) return [];
 
     const data: number[] = [];
 
-    for (let i = 13; i >= 0; i--) {
+    for (let i = 6; i >= 0; i--) {
       const dayStart = new Date(today);
       dayStart.setDate(today.getDate() - i);
       dayStart.setHours(0, 0, 0, 0);

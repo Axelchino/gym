@@ -29,12 +29,16 @@ export function Sparkline({
   // Calculate min/max for scaling
   const min = Math.min(...data);
   const max = Math.max(...data);
-  const range = max - min || 1;
+  const range = max - min;
+
+  // Check if all values are the same (flat data)
+  const isFlat = range === 0;
 
   // Generate path
   const points = data.map((value, index) => {
     const x = (index / (data.length - 1)) * width;
-    const y = height - ((value - min) / range) * height;
+    // If flat data, draw a horizontal line in the middle
+    const y = isFlat ? height / 2 : height - ((value - min) / range) * height;
     return { x, y };
   });
 
