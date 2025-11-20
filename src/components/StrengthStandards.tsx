@@ -145,7 +145,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
             <User className="text-yellow-500 flex-shrink-0 mt-0.5" size={20} />
             <div className="flex-1">
               <h3 className="font-semibold text-yellow-500 mb-1">Add Your Stats for Accurate Comparisons</h3>
-              <p className="text-sm text-gray-300 mb-3">
+              <p className="text-sm mb-3" style={{ color: 'var(--text-primary)' }}>
                 To see personalized strength standards, please add your bodyweight and sex in your profile.
               </p>
               <button
@@ -154,7 +154,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
               >
                 Update Profile →
               </button>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
                 We respect your privacy. This data is only used for strength comparisons and can be skipped.
               </p>
             </div>

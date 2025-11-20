@@ -164,7 +164,7 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
 
       {/* Month/Year */}
       <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-300">{monthName}</h3>
+        <h3 className="text-lg font-semibold text-primary">{monthName}</h3>
       </div>
 
       {/* Day names */}
@@ -205,7 +205,7 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
                   ? '#FFFFFF'
                   : future
                     ? 'var(--text-muted)'
-                    : 'var(--text-secondary)',
+                    : 'var(--text-primary)',
                 cursor: hasWorkout ? 'pointer' : 'default',
                 boxShadow: today ? '0 0 0 2px #B482FF' : 'none',
                 transform: 'scale(1)'
