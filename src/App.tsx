@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
-import { DevTestPanel } from './components/DevTestPanel';
 
 // Eager load: Layout and Auth (critical for initial render)
 import { Layout } from './components/layout/Layout';
@@ -56,9 +55,6 @@ function App() {
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
-
-          {/* Dev Test Panel - Always visible in dev mode */}
-          {import.meta.env.DEV && <DevTestPanel />}
         </Suspense>
       </AuthProvider>
     </BrowserRouter>
