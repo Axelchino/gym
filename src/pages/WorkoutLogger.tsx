@@ -73,6 +73,7 @@ function WorkoutLogger() {
   const [hasLoadedFromUrl, setHasLoadedFromUrl] = useState(false);
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
   const [savedWorkout, setSavedWorkout] = useState<WorkoutLog | null>(null);
+  const [expandedTemplateId, setExpandedTemplateId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -584,7 +585,7 @@ function WorkoutLogger() {
                   <h3 className="text-sm font-semibold text-secondary mb-3 uppercase tracking-wide">Your Templates</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {templates.map((template) => (
-                      <div key={template.id} className="card-elevated">
+                      <div key={template.id} className="card-elevated flex flex-col">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <h3 className="font-semibold text-lg text-primary">{template.name}</h3>
@@ -631,8 +632,11 @@ function WorkoutLogger() {
                         </div>
 
                         {/* Exercise Preview */}
-                        <div className="space-y-1 mb-4">
-                          {template.exercises.slice(0, 3).map((ex, idx) => {
+                        <div className="space-y-1 mb-4 overflow-hidden transition-all duration-300 ease-in-out flex-1">
+                          {(expandedTemplateId === template.id
+                            ? template.exercises
+                            : template.exercises.slice(0, 3)
+                          ).map((ex, idx) => {
                             const exerciseName = templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...';
                             return (
                               <div key={idx} className="text-xs text-secondary flex items-center gap-2">
@@ -643,9 +647,10 @@ function WorkoutLogger() {
                               </div>
                             );
                           })}
-                          {template.exercises.length > 3 && (
-                            <div
-                              className="text-xs cursor-help transition-colors"
+                          {template.exercises.length > 3 && expandedTemplateId !== template.id && (
+                            <button
+                              onClick={() => setExpandedTemplateId(template.id)}
+                              className="text-xs cursor-pointer transition-colors"
                               style={{ color: 'var(--text-muted)' }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = 'var(--text-secondary)';
@@ -653,18 +658,30 @@ function WorkoutLogger() {
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.color = 'var(--text-muted)';
                               }}
-                              title={template.exercises.slice(3).map(ex =>
-                                templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...'
-                              ).join(', ')}
                             >
-                              +{template.exercises.length - 3} more (hover to see)
-                            </div>
+                              +{template.exercises.length - 3} more
+                            </button>
+                          )}
+                          {template.exercises.length > 3 && expandedTemplateId === template.id && (
+                            <button
+                              onClick={() => setExpandedTemplateId(null)}
+                              className="text-xs cursor-pointer transition-colors"
+                              style={{ color: 'var(--text-muted)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = 'var(--text-secondary)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--text-muted)';
+                              }}
+                            >
+                              Show less
+                            </button>
                           )}
                         </div>
 
                         <button
                           onClick={() => handleStartFromTemplate(template)}
-                          className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2"
+                          className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2 mt-auto"
                         >
                           <Play size={16} />
                           Start Workout
@@ -697,7 +714,7 @@ function WorkoutLogger() {
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {BUILTIN_WORKOUT_TEMPLATES.map((template) => (
-                      <div key={template.id} className="card-elevated" style={{ borderColor: 'var(--border-subtle)' }}>
+                      <div key={template.id} className="card-elevated flex flex-col" style={{ borderColor: 'var(--border-subtle)' }}>
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
@@ -734,8 +751,11 @@ function WorkoutLogger() {
                         </div>
 
                         {/* Exercise Preview */}
-                        <div className="space-y-1 mb-4">
-                          {template.exercises.slice(0, 3).map((ex, idx) => (
+                        <div className="space-y-1 mb-4 overflow-hidden transition-all duration-300 ease-in-out flex-1">
+                          {(expandedTemplateId === template.id
+                            ? template.exercises
+                            : template.exercises.slice(0, 3)
+                          ).map((ex, idx) => (
                             <div key={idx} className="text-xs text-secondary flex items-center gap-2">
                               <Dumbbell size={12} className="flex-shrink-0" />
                               <span className="truncate">
@@ -743,16 +763,41 @@ function WorkoutLogger() {
                               </span>
                             </div>
                           ))}
-                          {template.exercises.length > 3 && (
-                            <div className="text-xs text-muted">
+                          {template.exercises.length > 3 && expandedTemplateId !== template.id && (
+                            <button
+                              onClick={() => setExpandedTemplateId(template.id)}
+                              className="text-xs cursor-pointer transition-colors"
+                              style={{ color: 'var(--text-muted)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = 'var(--text-secondary)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--text-muted)';
+                              }}
+                            >
                               +{template.exercises.length - 3} more
-                            </div>
+                            </button>
+                          )}
+                          {template.exercises.length > 3 && expandedTemplateId === template.id && (
+                            <button
+                              onClick={() => setExpandedTemplateId(null)}
+                              className="text-xs cursor-pointer transition-colors"
+                              style={{ color: 'var(--text-muted)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = 'var(--text-secondary)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = 'var(--text-muted)';
+                              }}
+                            >
+                              Show less
+                            </button>
                           )}
                         </div>
 
                         <button
                           onClick={() => handleStartFromTemplate(template as any)}
-                          className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2"
+                          className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2 mt-auto"
                         >
                           <Play size={16} />
                           Start Workout
