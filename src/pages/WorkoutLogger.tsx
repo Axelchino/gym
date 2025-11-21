@@ -484,20 +484,30 @@ function WorkoutLogger() {
           onClick={handleStartWorkout}
           className="w-full rounded-lg transition-all flex items-center justify-center gap-3 py-6"
           style={{
-            backgroundColor: 'var(--surface-elevated)',
-            border: '1px solid var(--border-subtle)'
+            background: 'linear-gradient(180deg, #FAFAFA 0%, #E4D2FF 100%)',
+            border: '1px solid #D7BDFF'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#B482FF';
+            e.currentTarget.style.background = 'linear-gradient(180deg, #F5F5F5 0%, #D7BDFF 100%)';
+            e.currentTarget.style.borderColor = '#C9B0FF';
             e.currentTarget.style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.background = 'linear-gradient(180deg, #FAFAFA 0%, #E4D2FF 100%)';
+            e.currentTarget.style.borderColor = '#D7BDFF';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(180deg, #F0F0F0 0%, #C9B0FF 100%)';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }}
+          onMouseUp={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(180deg, #F5F5F5 0%, #D7BDFF 100%)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
         >
-          <Play style={{ color: '#B482FF' }} size={24} />
-          <span className="text-lg font-semibold text-primary">Start Empty Workout</span>
+          <Play style={{ color: '#7E29FF' }} size={24} />
+          <span className="text-lg font-semibold" style={{ color: '#7E29FF' }}>Start Empty Workout</span>
         </button>
 
         {/* Templates Section */}

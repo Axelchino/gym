@@ -126,8 +126,8 @@ export function Header() {
                     border: tokens.button.primaryBorder === 'none' ? 'none' : `1px solid ${tokens.button.primaryBorder}`,
                     borderRadius: '10px',
                     height: '40px',
-                    paddingLeft: '18px',
-                    paddingRight: '18px',
+                    paddingLeft: '24px',
+                    paddingRight: '24px',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = tokens.button.primaryHover;
@@ -155,7 +155,6 @@ export function Header() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  <Plus size={16} strokeWidth={2} />
                   Start Workout
                 </button>
               </>
