@@ -57,15 +57,15 @@ export function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--surface-primary)' }}>
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-blue/20 rounded-full mb-4">
             <Dumbbell size={32} className="text-primary-blue" />
           </div>
-          <h1 className="text-3xl font-bold mb-2">Gym Tracker Pro</h1>
-          <p className="text-gray-400">
+          <h1 className="text-3xl font-bold mb-2 text-primary">Gym Tracker Pro</h1>
+          <p className="text-secondary">
             {mode === 'signin' && 'Welcome back! Sign in to your existing account'}
             {mode === 'signup' && 'Create a new account to get started'}
             {mode === 'reset' && "We'll send you a link to reset your password"}
@@ -78,15 +78,16 @@ export function Auth() {
             {/* Name (signup only) */}
             {mode === 'signup' && (
               <div>
-                <label className="block text-sm font-medium mb-2">Name</label>
+                <label className="block text-sm font-medium mb-2 text-primary">Name</label>
                 <div className="relative">
-                  <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Your name"
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary placeholder:text-muted"
+                    style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                   />
                 </div>
               </div>
@@ -94,16 +95,17 @@ export function Auth() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
+              <label className="block text-sm font-medium mb-2 text-primary">Email</label>
               <div className="relative">
-                <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary placeholder:text-muted"
+                  style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                 />
               </div>
             </div>
@@ -111,9 +113,9 @@ export function Auth() {
             {/* Password (not for reset) */}
             {mode !== 'reset' && (
               <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
+                <label className="block text-sm font-medium mb-2 text-primary">Password</label>
                 <div className="relative">
-                  <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                   <input
                     type="password"
                     value={password}
@@ -121,7 +123,8 @@ export function Auth() {
                     placeholder="••••••••"
                     required
                     minLength={6}
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary placeholder:text-muted"
+                    style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                   />
                 </div>
               </div>
@@ -160,10 +163,10 @@ export function Auth() {
           {mode !== 'reset' && (
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
+                <div className="w-full" style={{ borderTop: '1px solid var(--border-subtle)' }}></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-900 text-gray-500">Or continue with</span>
+                <span className="px-2 text-muted" style={{ backgroundColor: 'var(--surface-elevated)' }}>Or continue with</span>
               </div>
             </div>
           )}
@@ -216,7 +219,7 @@ export function Auth() {
                 >
                   Forgot password?
                 </button>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-secondary">
                   Don't have an account?{' '}
                   <button
                     onClick={() => {
@@ -233,7 +236,7 @@ export function Auth() {
             )}
 
             {mode === 'signup' && (
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-secondary">
                 Already have an account?{' '}
                 <button
                   onClick={() => {
@@ -264,7 +267,7 @@ export function Auth() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-muted mt-6">
           Your data is encrypted and stored securely
         </p>
       </div>

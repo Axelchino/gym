@@ -974,6 +974,12 @@ function WorkoutLogger() {
               {isSaving ? 'Saving...' : 'Finish'}
             </button>
           </div>
+          {/* Warning when no sets completed */}
+          {stats.completedSets === 0 && (
+            <p className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
+              Complete at least one set to save your workout
+            </p>
+          )}
         </div>
 
         {/* Timer (collapsible) */}
@@ -1172,22 +1178,22 @@ function WorkoutLogger() {
 
               {/* Warning for incomplete sets */}
               {hasIncompleteSets && (
-                <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: 'rgba(255, 165, 0, 0.1)', border: '1px solid rgba(255, 165, 0, 0.3)' }}>
+                <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: 'rgba(255, 165, 0, 0.15)', border: '1px solid rgba(255, 165, 0, 0.4)' }}>
                   <div className="flex items-start gap-2">
-                    <div className="mt-0.5" style={{ color: '#FFA500' }}>⚠️</div>
+                    <div className="mt-0.5">⚠️</div>
                     <div className="flex-1">
-                      <p className="font-semibold text-sm mb-2" style={{ color: '#FFA500' }}>
+                      <p className="font-semibold text-sm mb-2" style={{ color: '#92400E' }}>
                         Warning: {incompleteSets.length} uncompleted set{incompleteSets.length !== 1 ? 's' : ''}
                       </p>
-                      <p className="text-xs mb-2" style={{ color: '#FFB84D' }}>
+                      <p className="text-xs mb-2" style={{ color: '#78350F' }}>
                         These sets won't count toward your volume:
                       </p>
-                      <ul className="text-xs list-disc list-inside space-y-1" style={{ color: '#FFB84D' }}>
+                      <ul className="text-xs list-disc list-inside space-y-1" style={{ color: '#78350F' }}>
                         {exercisesWithIncomplete.map((name, idx) => (
                           <li key={idx}>{name}</li>
                         ))}
                       </ul>
-                      <p className="text-xs mt-2 italic" style={{ color: '#FFB84D' }}>
+                      <p className="text-xs mt-2 italic" style={{ color: '#78350F' }}>
                         Click the checkmark (✓) on each set to mark it complete.
                       </p>
                     </div>

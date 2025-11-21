@@ -9,11 +9,31 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Detect OS theme preference
+function getSystemTheme(): Theme {
+  try {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return 'light';
+    }
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mediaQuery && typeof mediaQuery.matches === 'boolean') {
+      return mediaQuery.matches ? 'dark' : 'light';
+    }
+    return 'light';
+  } catch {
+    return 'light';
+  }
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Try to load theme from localStorage, default to 'light'
+  // Try to load theme from localStorage, or detect OS preference
   const [theme, setThemeState] = useState<Theme>(() => {
     const saved = localStorage.getItem('gym-tracker-theme');
-    return (saved as Theme) || 'light';
+    if (saved) {
+      return saved as Theme;
+    }
+    // No saved preference - detect OS theme
+    return getSystemTheme();
   });
 
   // Update document class and save to localStorage when theme changes
