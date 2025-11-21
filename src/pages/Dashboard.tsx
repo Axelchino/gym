@@ -151,26 +151,36 @@ function Dashboard() {
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   }, [allPRs, today]);
 
-  // OPTIMIZATION 4: Memoize stats card calculations
-  const bestVolumeDay = useMemo(() => {
-    if (allWorkouts.length === 0) return '';
+  // OPTIMIZATION 4: Memoize best day calculation (aggregate same-day workouts)
+  const bestWorkout = useMemo(() => {
+    if (allWorkouts.length === 0) return null;
 
+    // Aggregate volume by day
     const dayVolumes: Record<string, number> = {};
     allWorkouts.forEach(w => {
-      const day = new Date(w.date).toLocaleDateString('en-US', { weekday: 'short' });
-      dayVolumes[day] = (dayVolumes[day] || 0) + w.totalVolume;
+      const dateKey = new Date(w.date).toDateString();
+      dayVolumes[dateKey] = (dayVolumes[dateKey] || 0) + w.totalVolume;
     });
 
-    let maxDay = '';
-    let maxVolume = 0;
-    Object.entries(dayVolumes).forEach(([day, vol]) => {
-      if (vol > maxVolume) {
-        maxVolume = vol;
-        maxDay = day;
+    // Find best day
+    let bestDate = '';
+    let bestVolume = 0;
+    Object.entries(dayVolumes).forEach(([dateKey, vol]) => {
+      if (vol > bestVolume) {
+        bestVolume = vol;
+        bestDate = dateKey;
       }
     });
 
-    return maxDay;
+    const formattedDate = new Date(bestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    // Format volume with "k" abbreviation for thousands
+    const volumeK = bestVolume >= 1000
+      ? `${(bestVolume / 1000).toFixed(bestVolume >= 10000 ? 0 : 1)}k`
+      : Math.round(bestVolume).toString();
+    return {
+      date: formattedDate,
+      volume: volumeK
+    };
   }, [allWorkouts]);
 
   const avgSetVolume = useMemo(() => {
@@ -279,8 +289,11 @@ function Dashboard() {
               <TrendingUp className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">Total Volume</span>
             </div>
-            {!isLoading && bestVolumeDay && (
-              <p className="text-xs text-secondary">Best day {bestVolumeDay}</p>
+            {!isLoading && bestWorkout && (
+              <div className="text-right">
+                <p className="text-xs text-secondary">Best, {bestWorkout.date}</p>
+                <p className="text-xs text-muted">{bestWorkout.volume} {weightUnit}</p>
+              </div>
             )}
           </div>
 

@@ -95,14 +95,16 @@ function Analytics() {
 
   const filteredWorkouts = getFilteredWorkouts();
 
-  // Prepare volume chart data
+  // Prepare volume chart data - add index to handle same-day workouts
   const volumeData = filteredWorkouts
     .slice()
     .reverse()
-    .map(w => ({
+    .map((w, index) => ({
       date: new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       volume: w.totalVolume,
       sets: w.exercises.reduce((sum, ex) => sum + ex.sets.filter(s => !s.isWarmup).length, 0),
+      // Unique key for tooltip to distinguish same-day workouts
+      uniqueKey: `${new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}-${index}`,
     }));
 
   // Prepare exercise progression data
@@ -414,11 +416,13 @@ function Analytics() {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={volumeData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
-                <XAxis dataKey="date" stroke="var(--text-muted)" style={{ fontSize: '12px' }} />
+                <XAxis dataKey="uniqueKey" stroke="var(--text-muted)" style={{ fontSize: '12px' }} tickFormatter={(value) => value.split('-')[0]} />
                 <YAxis stroke="var(--text-muted)" style={{ fontSize: '12px' }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px' }}
                   labelStyle={{ color: 'var(--text-primary)' }}
+                  labelFormatter={(value) => value.split('-')[0]}
+                  formatter={(value: number) => [Math.round(value).toLocaleString(), `Volume (${weightUnit})`]}
                 />
                 <Legend wrapperStyle={{ fontSize: '14px' }} />
                 <Bar dataKey="volume" fill="#B482FF" name={`Volume (${weightUnit})`} />

@@ -84,17 +84,19 @@ export function Sparkline({
           animation: 'drawPath 400ms ease-out forwards',
         } : undefined}
       />
-      {/* Small dot at peak */}
-      <circle
-        cx={peakPoint.x}
-        cy={peakPoint.y}
-        r={2}
-        fill={peakDotColor || color}
-        style={shouldAnimate ? {
-          opacity: 0,
-          animation: 'fadeInDot 200ms ease-out 400ms forwards',
-        } : undefined}
-      />
+      {/* Small dot at peak - hide when data is flat */}
+      {!isFlat && (
+        <circle
+          cx={peakPoint.x}
+          cy={peakPoint.y}
+          r={2}
+          fill={peakDotColor || color}
+          style={shouldAnimate ? {
+            opacity: 0,
+            animation: 'fadeInDot 200ms ease-out 400ms forwards',
+          } : undefined}
+        />
+      )}
       <style>{`
         @keyframes drawPath {
           to {
