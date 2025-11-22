@@ -1,14 +1,18 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, User, Plus, Dumbbell, RotateCcw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useThemeTokens } from '../../utils/themeHelpers';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useThemeTokens, getAccentColors, getSelectedColors } from '../../utils/themeHelpers';
 import { OfflineIndicator } from '../OfflineIndicator';
 
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { theme } = useTheme();
   const tokens = useThemeTokens();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
 
   // Clear all browser cache and reload
   function clearCacheAndReload() {
@@ -194,7 +198,7 @@ export function Header() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.2)';
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tokens.interactive.focusRing}`;
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.boxShadow = 'none';
@@ -212,9 +216,9 @@ export function Header() {
                   onClick={() => navigate('/auth')}
                   className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
                   style={{
-                    backgroundColor: '#EDE0FF',
-                    color: '#7E29FF',
-                    border: '1px solid #D7BDFF',
+                    backgroundColor: selectedColors.background,
+                    color: selectedColors.text,
+                    border: `1px solid ${selectedColors.border}`,
                     borderRadius: '10px',
                     height: '40px',
                     paddingLeft: '18px',
@@ -222,33 +226,28 @@ export function Header() {
                     whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#E4D2FF';
-                    e.currentTarget.style.borderColor = '#C9B0FF';
+                    e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#EDE0FF';
-                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    e.currentTarget.style.backgroundColor = selectedColors.background;
                     if (document.activeElement !== e.currentTarget) {
                       e.currentTarget.style.boxShadow = 'none';
                     }
                   }}
                   onMouseDown={(e) => {
-                    e.currentTarget.style.backgroundColor = '#DDC7FF';
-                    e.currentTarget.style.borderColor = '#C3A5FF';
+                    e.currentTarget.style.backgroundColor = accentColors.background;
                     e.currentTarget.style.transform = 'translateY(1px)';
                   }}
                   onMouseUp={(e) => {
-                    e.currentTarget.style.backgroundColor = '#E4D2FF';
-                    e.currentTarget.style.borderColor = '#C9B0FF';
+                    e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.boxShadow = '0 0 0 2px #B482FF';
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tokens.interactive.focusRing}`;
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.backgroundColor = '#EDE0FF';
-                    e.currentTarget.style.borderColor = '#D7BDFF';
+                    e.currentTarget.style.backgroundColor = selectedColors.background;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >

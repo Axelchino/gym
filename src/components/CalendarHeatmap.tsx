@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Flame, TrendingUp } from 'lucide-react';
 import type { WorkoutLog } from '../types/workout';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 
 interface CalendarHeatmapProps {
   workouts: WorkoutLog[];
@@ -9,6 +11,9 @@ interface CalendarHeatmapProps {
 
 export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
 
   // Get first and last day of current month
   const year = currentDate.getFullYear();
@@ -75,11 +80,19 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
     const totalVolume = workouts.reduce((sum, w) => sum + w.totalVolume, 0);
     const intensity = totalVolume / maxVolume;
 
-    // Purple intensity colors
-    if (intensity > 0.75) return '#7E29FF'; // Dark purple - highest intensity
+    // Theme-aware intensity colors
+    if (theme === 'amoled') {
+      // Gold intensity for AMOLED
+      if (intensity > 0.75) return '#D4A017';
+      if (intensity > 0.5) return 'rgba(212, 160, 23, 0.8)';
+      if (intensity > 0.25) return 'rgba(212, 160, 23, 0.6)';
+      return 'rgba(212, 160, 23, 0.4)';
+    }
+    // Purple intensity for dark/light
+    if (intensity > 0.75) return accentColors.secondary;
     if (intensity > 0.5) return 'rgba(180, 130, 255, 0.8)';
     if (intensity > 0.25) return 'rgba(180, 130, 255, 0.6)';
-    return 'rgba(180, 130, 255, 0.4)'; // Light purple - lowest intensity
+    return 'rgba(180, 130, 255, 0.4)';
   };
 
   const handleDayClick = (day: number) => {
@@ -111,7 +124,7 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold flex items-center gap-2 text-primary">
-          <Calendar size={24} style={{ color: '#B482FF' }} />
+          <Calendar size={24} style={{ color: accentColors.primary }} />
           Training Calendar
         </h2>
         <div className="flex items-center gap-2">
@@ -133,14 +146,14 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
             onClick={goToToday}
             className="px-3 py-1 text-sm rounded-lg transition-colors"
             style={{
-              backgroundColor: '#EDE0FF',
-              color: '#7E29FF'
+              backgroundColor: selectedColors.background,
+              color: selectedColors.text
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#E4D2FF';
+              e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#EDE0FF';
+              e.currentTarget.style.backgroundColor = selectedColors.background;
             }}
           >
             Today
@@ -207,7 +220,7 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
                     ? 'var(--text-muted)'
                     : 'var(--text-primary)',
                 cursor: hasWorkout ? 'pointer' : 'default',
-                boxShadow: today ? '0 0 0 2px #B482FF' : 'none',
+                boxShadow: today ? `0 0 0 2px ${accentColors.primary}` : 'none',
                 transform: 'scale(1)'
               }}
               onMouseEnter={(e) => {
@@ -244,10 +257,10 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
           <span>Less</span>
           <div className="flex items-center gap-1">
             <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--surface-accent)' }} />
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(180, 130, 255, 0.4)' }} />
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(180, 130, 255, 0.6)' }} />
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(180, 130, 255, 0.8)' }} />
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#7E29FF' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.6)' : 'rgba(180, 130, 255, 0.6)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.8)' : 'rgba(180, 130, 255, 0.8)' }} />
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: accentColors.secondary }} />
           </div>
           <span>More</span>
         </div>

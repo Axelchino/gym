@@ -4,6 +4,8 @@ import { SetRow } from './SetRow';
 import { db } from '../services/database';
 import { getWorkoutLogs, updateWorkoutLog } from '../services/supabaseDataService';
 import { useUserSettings } from '../hooks/useUserSettings';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 import type { WorkoutLog, Set } from '../types/workout';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,6 +18,9 @@ interface WorkoutEditModalProps {
 
 export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false }: WorkoutEditModalProps) {
   const { weightUnit } = useUserSettings();
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
   const [workout, setWorkout] = useState<WorkoutLog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -339,19 +344,17 @@ export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false 
               disabled={isSaving}
               className="flex-1 flex items-center justify-center gap-2 font-semibold py-3 px-6 rounded-lg transition-all"
               style={{
-                backgroundColor: '#EDE0FF',
-                color: '#7E29FF',
-                border: '1px solid #D7BDFF',
+                backgroundColor: selectedColors.background,
+                color: selectedColors.text,
+                border: `1px solid ${selectedColors.border}`,
               }}
               onMouseEnter={(e) => {
                 if (!isSaving) {
-                  e.currentTarget.style.backgroundColor = '#E4D2FF';
-                  e.currentTarget.style.borderColor = '#C9B0FF';
+                  e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#EDE0FF';
-                e.currentTarget.style.borderColor = '#D7BDFF';
+                e.currentTarget.style.backgroundColor = selectedColors.background;
               }}
             >
               <Save size={16} />

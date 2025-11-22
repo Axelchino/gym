@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { Trophy, TrendingUp, User } from 'lucide-react';
 import type { WorkoutLog } from '../types/workout';
 import { calculate1RM } from '../utils/analytics';
-import { calculateStrengthLevel, getLevelColor, getLevelBadgeColor, getLevelBadgeColorHex, type StrengthLevel, type StandardType } from '../utils/strengthStandards';
+import { calculateStrengthLevel, getLevelColor, getLevelBadgeColor, getLevelBadgeColorHex, getLevelTextColor, type StrengthLevel, type StandardType } from '../utils/strengthStandards';
+import { useTheme } from '../contexts/ThemeContext';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/database';
@@ -18,6 +19,7 @@ const BIG_LIFTS = ['Squat', 'Bench Press', 'Deadlift', 'Overhead Press'];
 export function StrengthStandards({ workouts }: StrengthStandardsProps) {
   const { weightUnit } = useUserSettings();
   const { user } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
@@ -178,8 +180,9 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                     <div
                       className="px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5"
                       style={{
-                        backgroundColor: getLevelBadgeColorHex(generalLevel.level),
-                        color: '#111216'
+                        backgroundColor: getLevelBadgeColorHex(generalLevel.level, theme),
+                        color: getLevelTextColor(theme),
+                        border: theme !== 'light' ? '1px solid rgba(255,255,255,0.12)' : 'none'
                       }}
                       title="vs Everyday Athletes"
                     >
@@ -189,8 +192,9 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                     <div
                       className="px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5"
                       style={{
-                        backgroundColor: getLevelBadgeColorHex(powerliftingLevel.level),
-                        color: '#111216'
+                        backgroundColor: getLevelBadgeColorHex(powerliftingLevel.level, theme),
+                        color: getLevelTextColor(theme),
+                        border: theme !== 'light' ? '1px solid rgba(255,255,255,0.12)' : 'none'
                       }}
                       title="vs Competitive Powerlifters"
                     >
@@ -225,14 +229,15 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                         <span
                           className="inline-block px-2 py-0.5 rounded text-xs font-bold"
                           style={{
-                            backgroundColor: getLevelBadgeColorHex(generalLevel.level),
-                            color: '#111216'
+                            backgroundColor: getLevelBadgeColorHex(generalLevel.level, theme),
+                            color: getLevelTextColor(theme),
+                            border: theme !== 'light' ? '1px solid rgba(255,255,255,0.12)' : 'none'
                           }}
                         >
                           Top {generalLevel.percentile.toFixed(1)}%
                         </span>
                       </div>
-                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: theme === 'amoled' ? '#1A1A1A' : 'var(--surface-accent, #C0C0C0)' }}>
                         <div
                           className={`h-full transition-all duration-500 ${
                             generalLevel.level === 'World Class' ? 'bg-orange-400' :
@@ -262,14 +267,15 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                           <span
                             className="inline-block px-2 py-0.5 rounded text-xs font-bold"
                             style={{
-                              backgroundColor: getLevelBadgeColorHex(powerliftingLevel.level),
-                              color: '#111216'
+                              backgroundColor: getLevelBadgeColorHex(powerliftingLevel.level, theme),
+                              color: getLevelTextColor(theme),
+                              border: theme !== 'light' ? '1px solid rgba(255,255,255,0.12)' : 'none'
                             }}
                           >
                             Top {powerliftingLevel.percentile.toFixed(1)}%
                           </span>
                         </div>
-                        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-accent, #C0C0C0)' }}>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ background: theme === 'amoled' ? '#1A1A1A' : 'var(--surface-accent, #C0C0C0)' }}>
                           <div
                             className={`h-full transition-all duration-500 ${
                               powerliftingLevel.level === 'World Class' ? 'bg-orange-400' :
@@ -322,8 +328,9 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
                   key={level}
                   className="px-2.5 py-1.5 rounded-md text-xs font-bold"
                   style={{
-                    backgroundColor: getLevelBadgeColorHex(level),
-                    color: '#111216'
+                    backgroundColor: getLevelBadgeColorHex(level, theme),
+                    color: getLevelTextColor(theme),
+                    border: theme !== 'light' ? '1px solid rgba(255,255,255,0.12)' : 'none'
                   }}
                 >
                   {level}

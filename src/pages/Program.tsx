@@ -12,10 +12,15 @@ import {
   deleteProgram,
 } from '../services/supabaseDataService';
 import { usePrograms, useWorkoutTemplates, useAllWorkouts } from '../hooks/useWorkoutData';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 
 function Program() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
 
   // REACT QUERY: Fetch data with automatic caching
   const { data: programs = [], isLoading: programsLoading } = usePrograms();
@@ -273,17 +278,19 @@ function Program() {
       {/* Active Program Card */}
       {activeProgram ? (
         <div className="card-elevated" style={{
-          background: 'linear-gradient(135deg, rgba(180, 130, 255, 0.08) 0%, rgba(126, 41, 255, 0.12) 100%)',
-          border: '1px solid rgba(180, 130, 255, 0.3)'
+          background: theme === 'amoled'
+            ? 'linear-gradient(135deg, rgba(212, 160, 23, 0.08) 0%, rgba(212, 160, 23, 0.12) 100%)'
+            : 'linear-gradient(135deg, rgba(180, 130, 255, 0.08) 0%, rgba(126, 41, 255, 0.12) 100%)',
+          border: theme === 'amoled' ? '1px solid rgba(212, 160, 23, 0.3)' : '1px solid rgba(180, 130, 255, 0.3)'
         }}>
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-xl font-bold" style={{ color: '#B482FF' }}>{activeProgram.name}</h2>
+                <h2 className="text-xl font-bold" style={{ color: accentColors.primary }}>{activeProgram.name}</h2>
                 <span className="text-xs px-2 py-1 rounded-full font-medium" style={{
-                  backgroundColor: 'rgba(180, 130, 255, 0.2)',
-                  color: '#B482FF',
-                  border: '1px solid rgba(180, 130, 255, 0.4)'
+                  backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(180, 130, 255, 0.2)',
+                  color: accentColors.primary,
+                  border: theme === 'amoled' ? '1px solid rgba(212, 160, 23, 0.4)' : '1px solid rgba(180, 130, 255, 0.4)'
                 }}>
                   Active
                 </span>
@@ -329,14 +336,14 @@ function Program() {
           <div className="mb-2">
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="text-muted">Program Progress</span>
-              <span className="font-semibold" style={{ color: '#B482FF' }}>{calculateProgress().toFixed(0)}%</span>
+              <span className="font-semibold" style={{ color: accentColors.primary }}>{calculateProgress().toFixed(0)}%</span>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--surface-accent)' }}>
               <div
                 className="h-full transition-all duration-500"
                 style={{
                   width: `${calculateProgress()}%`,
-                  backgroundColor: '#B482FF'
+                  backgroundColor: accentColors.primary
                 }}
               ></div>
             </div>
@@ -370,15 +377,15 @@ function Program() {
               onClick={() => setShowTemplateBrowser(true)}
               className="px-6 py-2 rounded-md text-sm font-semibold transition-all"
               style={{
-                backgroundColor: '#EDE0FF',
-                color: '#7E29FF',
-                border: '1px solid #D7BDFF'
+                backgroundColor: selectedColors.background,
+                color: selectedColors.text,
+                border: `1px solid ${selectedColors.border}`
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#E4D2FF';
+                e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#EDE0FF';
+                e.currentTarget.style.backgroundColor = selectedColors.background;
               }}
             >
               Browse Templates
@@ -409,7 +416,7 @@ function Program() {
       <div className="card-elevated">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold flex items-center gap-2 text-primary">
-            <Calendar size={24} style={{ color: '#B482FF' }} />
+            <Calendar size={24} style={{ color: accentColors.primary }} />
             {activeProgram ? 'Training Calendar' : 'Calendar Preview'}
           </h2>
           <div className="flex items-center gap-2">
@@ -471,15 +478,15 @@ function Program() {
                 style={{
                   backgroundColor: scheduledWorkout
                     ? completed
-                      ? 'rgba(126, 41, 255, 0.15)'
-                      : 'rgba(180, 130, 255, 0.12)'
+                      ? (theme === 'amoled' ? 'rgba(212, 160, 23, 0.15)' : 'rgba(126, 41, 255, 0.15)')
+                      : (theme === 'amoled' ? 'rgba(212, 160, 23, 0.12)' : 'rgba(180, 130, 255, 0.12)')
                     : 'var(--surface-accent)',
                   border: scheduledWorkout
                     ? completed
-                      ? '1px solid rgba(126, 41, 255, 0.5)'
-                      : '1px solid rgba(180, 130, 255, 0.4)'
+                      ? (theme === 'amoled' ? '1px solid rgba(212, 160, 23, 0.5)' : '1px solid rgba(126, 41, 255, 0.5)')
+                      : (theme === 'amoled' ? '1px solid rgba(212, 160, 23, 0.4)' : '1px solid rgba(180, 130, 255, 0.4)')
                     : '1px solid var(--border-subtle)',
-                  boxShadow: today ? '0 0 0 2px #B482FF' : 'none',
+                  boxShadow: today ? `0 0 0 2px ${accentColors.primary}` : 'none',
                   opacity: past && !scheduledWorkout ? 0.5 : 1,
                   transform: 'scale(1)',
                 }}
@@ -487,14 +494,14 @@ function Program() {
                   if (scheduledWorkout) {
                     e.currentTarget.style.transform = 'scale(1.05)';
                     if (!completed) {
-                      e.currentTarget.style.backgroundColor = 'rgba(180, 130, 255, 0.18)';
+                      e.currentTarget.style.backgroundColor = theme === 'amoled' ? 'rgba(212, 160, 23, 0.18)' : 'rgba(180, 130, 255, 0.18)';
                     }
                   }
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'scale(1)';
                   if (scheduledWorkout && !completed) {
-                    e.currentTarget.style.backgroundColor = 'rgba(180, 130, 255, 0.12)';
+                    e.currentTarget.style.backgroundColor = theme === 'amoled' ? 'rgba(212, 160, 23, 0.12)' : 'rgba(180, 130, 255, 0.12)';
                   }
                 }}
                 onClick={() => scheduledWorkout && handleStartWorkout(scheduledWorkout.templateId, scheduledWorkout.templateName)}
@@ -503,7 +510,7 @@ function Program() {
                   className="text-xs"
                   style={{
                     fontWeight: scheduledWorkout ? 'bold' : 'normal',
-                    color: scheduledWorkout ? '#B482FF' : 'var(--text-muted)',
+                    color: scheduledWorkout ? accentColors.primary : 'var(--text-muted)',
                   }}
                 >
                   {day}
@@ -512,18 +519,18 @@ function Program() {
                   <>
                     <span
                       className="text-xs font-medium mt-1 leading-tight line-clamp-2"
-                      style={{ color: completed ? '#B482FF' : 'var(--text-primary)' }}
+                      style={{ color: completed ? accentColors.primary : 'var(--text-primary)' }}
                     >
                       {scheduledWorkout.templateName}
                     </span>
                     {completed && (
                       <div className="absolute bottom-1 right-1">
-                        <CheckCircle2 size={14} style={{ color: '#7E29FF' }} />
+                        <CheckCircle2 size={14} style={{ color: accentColors.primary }} />
                       </div>
                     )}
                     {today && !completed && (
                       <div className="absolute bottom-1 right-1">
-                        <Play size={12} style={{ color: '#B482FF' }} />
+                        <Play size={12} style={{ color: accentColors.primary }} />
                       </div>
                     )}
                   </>
@@ -548,12 +555,12 @@ function Program() {
             <button
               onClick={() => setShowProgramBuilder(true)}
               className="text-sm transition-colors flex items-center gap-1"
-              style={{ color: '#B482FF' }}
+              style={{ color: accentColors.primary }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = '#9B6DFF';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#B482FF';
+                e.currentTarget.style.color = accentColors.primary;
               }}
             >
               <Wrench size={16} />
@@ -562,12 +569,12 @@ function Program() {
             <button
               onClick={() => setShowTemplateBrowser(true)}
               className="text-sm transition-colors flex items-center gap-1"
-              style={{ color: '#B482FF' }}
+              style={{ color: accentColors.primary }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = '#9B6DFF';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#B482FF';
+                e.currentTarget.style.color = accentColors.primary;
               }}
             >
               <Plus size={16} />
@@ -584,10 +591,10 @@ function Program() {
                 className="p-4 rounded-lg border transition-colors"
                 style={{
                   backgroundColor: program.isActive
-                    ? 'rgba(180, 130, 255, 0.08)'
+                    ? (theme === 'amoled' ? 'rgba(212, 160, 23, 0.08)' : 'rgba(180, 130, 255, 0.08)')
                     : 'var(--surface-accent)',
                   borderColor: program.isActive
-                    ? 'rgba(180, 130, 255, 0.4)'
+                    ? (theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)')
                     : 'var(--border-subtle)',
                 }}
                 onMouseEnter={(e) => {
@@ -609,8 +616,8 @@ function Program() {
                         <span
                           className="text-xs px-2 py-0.5 rounded-full"
                           style={{
-                            backgroundColor: 'rgba(180, 130, 255, 0.2)',
-                            color: '#B482FF'
+                            backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(180, 130, 255, 0.2)',
+                            color: accentColors.primary
                           }}
                         >
                           Active
@@ -633,15 +640,15 @@ function Program() {
                         onClick={() => handleActivateProgram(program.id)}
                         className="text-xs px-3 py-1 rounded-md font-semibold transition-all"
                         style={{
-                          backgroundColor: '#EDE0FF',
-                          color: '#7E29FF',
-                          border: '1px solid #D7BDFF'
+                          backgroundColor: selectedColors.background,
+                          color: selectedColors.text,
+                          border: `1px solid ${selectedColors.border}`
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#E4D2FF';
+                          e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#EDE0FF';
+                          e.currentTarget.style.backgroundColor = selectedColors.background;
                         }}
                       >
                         Activate
@@ -724,12 +731,12 @@ function Program() {
                   setShowProgramBuilder(true);
                 }}
                 className="text-sm transition-colors flex items-center gap-1"
-                style={{ color: '#B482FF' }}
+                style={{ color: accentColors.primary }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = '#9B6DFF';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#B482FF';
+                  e.currentTarget.style.color = accentColors.primary;
                 }}
               >
                 <Wrench size={16} />
@@ -744,10 +751,10 @@ function Program() {
                   className="p-4 rounded-lg border cursor-pointer transition-all"
                   style={{
                     backgroundColor: selectedTemplate === template.id
-                      ? 'rgba(180, 130, 255, 0.12)'
+                      ? (theme === 'amoled' ? 'rgba(212, 160, 23, 0.12)' : 'rgba(180, 130, 255, 0.12)')
                       : 'var(--surface-accent)',
                     borderColor: selectedTemplate === template.id
-                      ? '#B482FF'
+                      ? accentColors.primary
                       : 'var(--border-subtle)',
                   }}
                   onMouseEnter={(e) => {
@@ -765,7 +772,7 @@ function Program() {
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold text-lg text-primary">{template.name}</h3>
                     {selectedTemplate === template.id && (
-                      <Check size={20} style={{ color: '#B482FF' }} />
+                      <Check size={20} style={{ color: accentColors.primary }} />
                     )}
                   </div>
 
@@ -812,19 +819,19 @@ function Program() {
                 disabled={!selectedTemplate}
                 className="flex-1 py-2 rounded-md font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#7E29FF',
-                  border: '1px solid #D7BDFF',
+                  backgroundColor: selectedColors.background,
+                  color: selectedColors.text,
+                  border: `1px solid ${selectedColors.border}`,
                   opacity: !selectedTemplate ? 0.5 : 1,
                 }}
                 onMouseEnter={(e) => {
                   if (selectedTemplate) {
-                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedTemplate) {
-                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    e.currentTarget.style.backgroundColor = selectedColors.background;
                   }
                 }}
               >

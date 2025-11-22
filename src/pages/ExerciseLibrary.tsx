@@ -4,6 +4,8 @@ import { exerciseService } from '../services/exerciseService';
 import type { Exercise, Difficulty, Equipment, MuscleGroup } from '../types/exercise';
 import { searchExercises, type SearchFilters } from '../utils/searchEngine';
 import { initializeDatabase } from '../services/initializeDatabase';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors } from '../utils/themeHelpers';
 
 function ExerciseLibrary() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -11,6 +13,52 @@ function ExerciseLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<SearchFilters>({});
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+
+  // Theme-aware colors for difficulty badges
+  const getDifficultyColors = (difficulty: string) => {
+    const isLight = theme === 'light';
+    switch (difficulty) {
+      case 'Beginner':
+        return {
+          bg: isLight ? '#BBF7D0' : theme === 'amoled' ? '#14532D' : '#16A34A40',
+          text: isLight ? '#111216' : '#86EFAC'
+        };
+      case 'Intermediate':
+        return {
+          bg: isLight ? '#FEF08A' : theme === 'amoled' ? '#713F12' : '#CA8A0440',
+          text: isLight ? '#111216' : '#FDE047'
+        };
+      case 'Advanced':
+        return {
+          bg: isLight ? '#FCA5A5' : theme === 'amoled' ? '#7F1D1D' : '#EF444440',
+          text: isLight ? '#111216' : '#FCA5A5'
+        };
+      default:
+        return {
+          bg: isLight ? '#E5E7EB' : theme === 'amoled' ? '#2A2A2A' : '#3F3F46',
+          text: isLight ? '#111216' : '#FFFFFF'
+        };
+    }
+  };
+
+  // Theme-aware colors for selected filter chips
+  const getSelectedChipColors = () => {
+    if (theme === 'amoled') {
+      return {
+        bg: 'rgba(212, 160, 23, 0.2)',
+        text: '#D4A017',
+        border: 'rgba(212, 160, 23, 0.4)'
+      };
+    }
+    const isLight = theme === 'light';
+    return {
+      bg: isLight ? '#EDE0FF' : '#9333EA40',
+      text: isLight ? '#7E29FF' : '#C4B5FD',
+      border: isLight ? '#D7BDFF' : '#9333EA60'
+    };
+  };
 
   useEffect(() => {
     async function loadExercises() {
@@ -82,9 +130,9 @@ function ExerciseLibrary() {
           onClick={() => setShowFilterModal(true)}
           className="px-4 py-2 rounded-lg transition-colors relative"
           style={{
-            backgroundColor: Object.keys(filters).length > 0 ? 'rgba(180, 130, 255, 0.2)' : 'var(--surface-accent)',
-            border: Object.keys(filters).length > 0 ? '1px solid #B482FF' : '1px solid var(--border-subtle)',
-            color: Object.keys(filters).length > 0 ? '#B482FF' : 'var(--text-secondary)'
+            backgroundColor: Object.keys(filters).length > 0 ? (theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(180, 130, 255, 0.2)') : 'var(--surface-accent)',
+            border: Object.keys(filters).length > 0 ? `1px solid ${accentColors.primary}` : '1px solid var(--border-subtle)',
+            color: Object.keys(filters).length > 0 ? accentColors.primary : 'var(--text-secondary)'
           }}
           onMouseEnter={(e) => {
             if (Object.keys(filters).length === 0) {
@@ -102,7 +150,7 @@ function ExerciseLibrary() {
             <span
               className="absolute -top-1 -right-1 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
               style={{
-                backgroundColor: '#B482FF',
+                backgroundColor: accentColors.primary,
                 color: 'white'
               }}
             >
@@ -137,12 +185,8 @@ function ExerciseLibrary() {
                   <span
                     className="text-xs px-2 py-0.5 rounded font-bold"
                     style={{
-                      backgroundColor: exercise.difficulty === 'Beginner'
-                        ? '#BBF7D0'  // Green (easy)
-                        : exercise.difficulty === 'Intermediate'
-                          ? '#FEF08A'  // Yellow (medium)
-                          : '#FCA5A5',  // Red (hard)
-                      color: '#111216'
+                      backgroundColor: getDifficultyColors(exercise.difficulty).bg,
+                      color: getDifficultyColors(exercise.difficulty).text
                     }}
                   >
                     {exercise.difficulty}
@@ -159,9 +203,21 @@ function ExerciseLibrary() {
                           key={muscle}
                           className="text-xs px-2 py-1 rounded font-medium"
                           style={{
-                            backgroundColor: 'rgba(180, 130, 255, 0.2)',
-                            color: '#B482FF',
-                            border: '1px solid rgba(180, 130, 255, 0.4)'
+                            backgroundColor: theme === 'amoled'
+                              ? 'rgba(156, 163, 175, 0.15)'
+                              : theme === 'dark'
+                                ? '#006DD4'
+                                : 'rgba(180, 130, 255, 0.2)',
+                            color: theme === 'amoled'
+                              ? '#D1D5DB'
+                              : theme === 'dark'
+                                ? '#FFFFFF'
+                                : accentColors.primary,
+                            border: theme === 'amoled'
+                              ? '1px solid rgba(156, 163, 175, 0.3)'
+                              : theme === 'dark'
+                                ? 'none'
+                                : '1px solid rgba(180, 130, 255, 0.4)'
                           }}
                         >
                           {muscle}
@@ -255,9 +311,9 @@ function ExerciseLibrary() {
                       }}
                       className="px-4 py-2 rounded-lg font-medium transition-all"
                       style={{
-                        backgroundColor: filters.muscleGroups?.includes(muscle) ? '#EDE0FF' : 'var(--surface-accent)',
-                        color: filters.muscleGroups?.includes(muscle) ? '#7E29FF' : 'var(--text-secondary)',
-                        border: filters.muscleGroups?.includes(muscle) ? '1px solid #D7BDFF' : '1px solid var(--border-subtle)'
+                        backgroundColor: filters.muscleGroups?.includes(muscle) ? getSelectedChipColors().bg : 'var(--surface-accent)',
+                        color: filters.muscleGroups?.includes(muscle) ? getSelectedChipColors().text : 'var(--text-secondary)',
+                        border: filters.muscleGroups?.includes(muscle) ? `1px solid ${getSelectedChipColors().border}` : '1px solid var(--border-subtle)'
                       }}
                     >
                       {muscle}
@@ -287,9 +343,9 @@ function ExerciseLibrary() {
                       }}
                       className="px-4 py-2 rounded-lg font-medium transition-all"
                       style={{
-                        backgroundColor: filters.difficulty?.includes(diff) ? '#EDE0FF' : 'var(--surface-accent)',
-                        color: filters.difficulty?.includes(diff) ? '#7E29FF' : 'var(--text-secondary)',
-                        border: filters.difficulty?.includes(diff) ? '1px solid #D7BDFF' : '1px solid var(--border-subtle)'
+                        backgroundColor: filters.difficulty?.includes(diff) ? getSelectedChipColors().bg : 'var(--surface-accent)',
+                        color: filters.difficulty?.includes(diff) ? getSelectedChipColors().text : 'var(--text-secondary)',
+                        border: filters.difficulty?.includes(diff) ? `1px solid ${getSelectedChipColors().border}` : '1px solid var(--border-subtle)'
                       }}
                     >
                       {diff}
@@ -319,9 +375,9 @@ function ExerciseLibrary() {
                       }}
                       className="px-4 py-2 rounded-lg font-medium transition-all"
                       style={{
-                        backgroundColor: filters.equipment?.includes(equip) ? '#EDE0FF' : 'var(--surface-accent)',
-                        color: filters.equipment?.includes(equip) ? '#7E29FF' : 'var(--text-secondary)',
-                        border: filters.equipment?.includes(equip) ? '1px solid #D7BDFF' : '1px solid var(--border-subtle)'
+                        backgroundColor: filters.equipment?.includes(equip) ? getSelectedChipColors().bg : 'var(--surface-accent)',
+                        color: filters.equipment?.includes(equip) ? getSelectedChipColors().text : 'var(--text-secondary)',
+                        border: filters.equipment?.includes(equip) ? `1px solid ${getSelectedChipColors().border}` : '1px solid var(--border-subtle)'
                       }}
                     >
                       {equip}
@@ -358,15 +414,9 @@ function ExerciseLibrary() {
                 onClick={() => setShowFilterModal(false)}
                 className="flex-1 py-2 rounded-md font-semibold transition-all"
                 style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#7E29FF',
-                  border: '1px solid #D7BDFF'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#E4D2FF';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#EDE0FF';
+                  backgroundColor: getSelectedChipColors().bg,
+                  color: getSelectedChipColors().text,
+                  border: `1px solid ${getSelectedChipColors().border}`
                 }}
               >
                 Apply Filters

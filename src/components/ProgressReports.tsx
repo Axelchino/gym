@@ -14,6 +14,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { WorkoutLog } from '../types/workout';
 import type { PersonalRecord } from '../utils/analytics';
 import { useUserSettings } from '../hooks/useUserSettings';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getSelectedColors, getChartColors } from '../utils/themeHelpers';
 
 type TimePeriod = 'week' | 'month' | 'year';
 
@@ -25,6 +27,10 @@ interface ProgressReportsProps {
 export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
   const { weightUnit } = useUserSettings();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('month');
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
+  const chartColors = getChartColors(theme);
 
   // Calculate date ranges
   const getDateRanges = () => {
@@ -222,7 +228,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
     return (
       <div
         className={`flex items-center gap-1 text-sm`}
-        style={{ color: isPositive ? '#B482FF' : '#FF6B6B' }}
+        style={{ color: isPositive ? accentColors.primary : '#FF6B6B' }}
       >
         {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
         <span>
@@ -238,7 +244,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold text-primary mb-1 flex items-center gap-2">
-            <BarChart3 size={22} style={{ color: '#B482FF' }} strokeWidth={1.5} />
+            <BarChart3 size={22} style={{ color: accentColors.primary }} strokeWidth={1.5} />
             Progress Report
           </h2>
           <p className="text-sm text-secondary">Summary of your training progress</p>
@@ -252,9 +258,9 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
               onClick={() => setSelectedPeriod(period)}
               className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
               style={{
-                backgroundColor: selectedPeriod === period ? '#EDE0FF' : 'transparent',
-                color: selectedPeriod === period ? '#7E29FF' : 'var(--text-secondary)',
-                border: `1px solid ${selectedPeriod === period ? '#D7BDFF' : 'var(--border-subtle)'}`,
+                backgroundColor: selectedPeriod === period ? selectedColors.background : 'transparent',
+                color: selectedPeriod === period ? selectedColors.text : 'var(--text-secondary)',
+                border: `1px solid ${selectedPeriod === period ? selectedColors.border : 'var(--border-subtle)'}`,
               }}
               onMouseEnter={(e) => {
                 if (selectedPeriod !== period) {
@@ -377,7 +383,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
                 }}
                 labelStyle={{ color: 'var(--text-primary)' }}
               />
-              <Bar dataKey="workouts" fill="#B482FF" name="Workouts" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="workouts" fill={chartColors.primary} name="Workouts" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -398,7 +404,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
           }}
         >
           <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
-            <Trophy size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
+            <Trophy size={20} style={{ color: accentColors.primary }} strokeWidth={1.5} />
             Top Exercises
           </h3>
           {reportData.topExercises.length > 0 ? (
@@ -407,21 +413,36 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
                 // Medal colors for top 3
                 const getMedalStyle = (index: number) => {
                   if (index === 0) {
-                    return {
+                    return theme === 'amoled' ? {
+                      backgroundColor: '#F59E0B',  // Brilliant gold
+                      color: '#000000',
+                      border: '1px solid #FCD34D',
+                      setColor: '#F59E0B',
+                    } : {
                       backgroundColor: '#FEF3C7',
                       color: '#92400E',
                       border: '1px solid #FCD34D',
                       setColor: '#F59E0B',
                     };
                   } else if (index === 1) {
-                    return {
+                    return theme === 'amoled' ? {
+                      backgroundColor: '#9CA3AF',  // Brilliant silver
+                      color: '#000000',
+                      border: '1px solid #D1D5DB',
+                      setColor: '#9CA3AF',
+                    } : {
                       backgroundColor: '#F3F4F6',
                       color: '#374151',
                       border: '1px solid #D1D5DB',
                       setColor: '#6B7280',
                     };
                   } else if (index === 2) {
-                    return {
+                    return theme === 'amoled' ? {
+                      backgroundColor: '#F97316',  // Brilliant bronze/orange
+                      color: '#000000',
+                      border: '1px solid #FDBA74',
+                      setColor: '#F97316',
+                    } : {
                       backgroundColor: '#FED7AA',
                       color: '#7C2D12',
                       border: '1px solid #FDBA74',
@@ -429,10 +450,10 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
                     };
                   } else {
                     return {
-                      backgroundColor: 'rgba(180, 130, 255, 0.15)',
-                      color: '#7E29FF',
-                      border: '1px solid #B482FF40',
-                      setColor: '#B482FF',
+                      backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.15)' : 'rgba(180, 130, 255, 0.15)',
+                      color: selectedColors.text,
+                      border: `1px solid ${accentColors.primary}40`,
+                      setColor: accentColors.primary,
                     };
                   }
                 };
@@ -486,7 +507,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
           }}
         >
           <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
-            <Award size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
+            <Award size={20} style={{ color: accentColors.primary }} strokeWidth={1.5} />
             PR Highlights
           </h3>
           {reportData.currentPRs.length > 0 ? (

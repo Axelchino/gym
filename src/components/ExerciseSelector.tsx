@@ -3,6 +3,8 @@ import { Search, X, Dumbbell } from 'lucide-react';
 import type { Exercise } from '../types/exercise';
 import { db } from '../services/database';
 import { searchExercises } from '../utils/searchEngine';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors } from '../utils/themeHelpers';
 
 interface ExerciseSelectorProps {
   onSelect: (exercise: Exercise) => void;
@@ -10,6 +12,8 @@ interface ExerciseSelectorProps {
 }
 
 export function ExerciseSelector({ onSelect, onClose }: ExerciseSelectorProps) {
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
   const [searchQuery, setSearchQuery] = useState('');
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -109,7 +113,7 @@ export function ExerciseSelector({ onSelect, onClose }: ExerciseSelectorProps) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-                  e.currentTarget.style.borderColor = '#B482FF';
+                  e.currentTarget.style.borderColor = accentColors.primary;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'var(--surface-accent)';
@@ -125,9 +129,9 @@ export function ExerciseSelector({ onSelect, onClose }: ExerciseSelectorProps) {
                           key={muscle}
                           className="text-xs px-2 py-1 rounded"
                           style={{
-                            backgroundColor: 'rgba(180, 130, 255, 0.2)',
-                            color: '#B482FF',
-                            border: '1px solid rgba(180, 130, 255, 0.4)'
+                            backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(180, 130, 255, 0.2)',
+                            color: accentColors.primary,
+                            border: theme === 'amoled' ? '1px solid rgba(212, 160, 23, 0.4)' : '1px solid rgba(180, 130, 255, 0.4)'
                           }}
                         >
                           {muscle}

@@ -5,6 +5,8 @@ import { getWorkoutTemplates } from '../services/supabaseDataService';
 import type { Program, ProgramWeek, ScheduledWorkout, WorkoutTemplate, ProgramGoal } from '../types/workout';
 import { v4 as uuidv4 } from 'uuid';
 import { BUILTIN_WORKOUT_TEMPLATES } from '../data/workoutTemplates';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 
 interface ProgramBuilderProps {
   onClose: () => void;
@@ -14,6 +16,10 @@ interface ProgramBuilderProps {
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
+
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [programName, setProgramName] = useState('');
   const [description, setDescription] = useState('');
@@ -200,7 +206,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <h2 className="text-2xl font-bold flex items-center gap-2 text-primary">
-            <Calendar style={{ color: '#B482FF' }} />
+            <Calendar style={{ color: accentColors.primary }} />
             Create Custom Program
           </h2>
           <button
@@ -237,7 +243,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                 border: '1px solid var(--border-subtle)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
               }}
               onBlur={(e) => {
                 e.currentTarget.style.boxShadow = 'none';
@@ -260,7 +266,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                 border: '1px solid var(--border-subtle)'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
               }}
               onBlur={(e) => {
                 e.currentTarget.style.boxShadow = 'none';
@@ -285,7 +291,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   border: '1px solid var(--border-subtle)'
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.boxShadow = 'none';
@@ -306,7 +312,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                   border: '1px solid var(--border-subtle)'
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.boxShadow = 'none';
@@ -331,7 +337,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                 className="px-4 py-2 rounded-lg whitespace-nowrap transition-all"
                 style={{
                   backgroundColor: currentWeek === week.weekNumber
-                    ? '#B482FF'
+                    ? accentColors.primary
                     : 'var(--surface-accent)',
                   color: currentWeek === week.weekNumber
                     ? '#FFFFFF'
@@ -377,7 +383,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                     border: '1px solid var(--border-subtle)'
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.boxShadow = 'none';
@@ -399,7 +405,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                     border: '1px solid var(--border-subtle)'
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.boxShadow = 'none';
@@ -435,8 +441,8 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                         <div
                           className="flex-1 flex items-center justify-between rounded px-3 py-2"
                           style={{
-                            backgroundColor: 'rgba(180, 130, 255, 0.12)',
-                            border: '1px solid rgba(180, 130, 255, 0.4)'
+                            backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.12)' : 'rgba(180, 130, 255, 0.12)',
+                            border: theme === 'amoled' ? '1px solid rgba(212, 160, 23, 0.4)' : '1px solid rgba(180, 130, 255, 0.4)'
                           }}
                         >
                           <span className="text-sm font-medium text-primary">
@@ -472,7 +478,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                               border: '1px solid var(--border-subtle)'
                             }}
                             onFocus={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 0 2px rgba(180, 130, 255, 0.4)';
+                              e.currentTarget.style.boxShadow = `0 0 0 2px ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.4)' : 'rgba(180, 130, 255, 0.4)'}`;
                             }}
                             onBlur={(e) => {
                               e.currentTarget.style.boxShadow = 'none';
@@ -530,15 +536,15 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
             }}
             disabled={currentWeek >= weeks.length}
             className="text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-            style={{ color: currentWeek >= weeks.length ? 'var(--text-muted)' : '#B482FF' }}
+            style={{ color: currentWeek >= weeks.length ? 'var(--text-muted)' : accentColors.primary }}
             onMouseEnter={(e) => {
               if (currentWeek < weeks.length) {
-                e.currentTarget.style.color = '#9B6DFF';
+                e.currentTarget.style.color = accentColors.secondary;
               }
             }}
             onMouseLeave={(e) => {
               if (currentWeek < weeks.length) {
-                e.currentTarget.style.color = '#B482FF';
+                e.currentTarget.style.color = accentColors.primary;
               }
             }}
           >
@@ -552,12 +558,12 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
               setShowCopyModal(true);
             }}
             className="text-sm transition-colors flex items-center gap-1"
-            style={{ color: '#B482FF' }}
+            style={{ color: accentColors.primary }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#9B6DFF';
+              e.currentTarget.style.color = accentColors.secondary;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#B482FF';
+              e.currentTarget.style.color = accentColors.primary;
             }}
           >
             <Copy size={14} />
@@ -596,15 +602,15 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
             onClick={handleSave}
             className="flex-1 py-2 rounded-md font-semibold transition-all flex items-center justify-center gap-2"
             style={{
-              backgroundColor: '#EDE0FF',
-              color: '#7E29FF',
-              border: '1px solid #D7BDFF'
+              backgroundColor: selectedColors.background,
+              color: selectedColors.text,
+              border: `1px solid ${selectedColors.border}`
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#E4D2FF';
+              e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#EDE0FF';
+              e.currentTarget.style.backgroundColor = selectedColors.background;
             }}
           >
             <Save size={18} />
@@ -624,7 +630,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
-                <Copy style={{ color: '#B482FF' }} />
+                <Copy style={{ color: accentColors.primary }} />
                 Copy Week {currentWeek} to Other Weeks
               </h3>
               <button
@@ -743,7 +749,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                       backgroundColor: isCurrentWeek
                         ? 'var(--surface-hover)'
                         : isSelected
-                          ? '#B482FF'
+                          ? accentColors.primary
                           : 'var(--surface-hover)',
                       color: isCurrentWeek
                         ? 'var(--text-muted)'
@@ -751,7 +757,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                           ? '#FFFFFF'
                           : 'var(--text-secondary)',
                       border: isSelected
-                        ? '2px solid #B482FF'
+                        ? `2px solid ${accentColors.primary}`
                         : '2px solid transparent',
                       cursor: isCurrentWeek ? 'not-allowed' : 'pointer',
                     }}
@@ -823,19 +829,19 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
                 disabled={selectedWeeksToCopy.length === 0}
                 className="flex-1 py-2 rounded-md font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#7E29FF',
-                  border: '1px solid #D7BDFF',
+                  backgroundColor: selectedColors.background,
+                  color: selectedColors.text,
+                  border: `1px solid ${selectedColors.border}`,
                   opacity: selectedWeeksToCopy.length === 0 ? 0.5 : 1,
                 }}
                 onMouseEnter={(e) => {
                   if (selectedWeeksToCopy.length > 0) {
-                    e.currentTarget.style.backgroundColor = '#E4D2FF';
+                    e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedWeeksToCopy.length > 0) {
-                    e.currentTarget.style.backgroundColor = '#EDE0FF';
+                    e.currentTarget.style.backgroundColor = selectedColors.background;
                   }
                 }}
               >

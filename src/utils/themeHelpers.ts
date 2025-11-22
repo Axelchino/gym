@@ -88,3 +88,103 @@ export function getButtonStyles(theme: Theme, variant: 'primary' | 'secondary' =
     hoverBorder: theme === 'light' ? undefined : tokens.button.secondaryHoverBorder,
   };
 }
+
+/**
+ * Get brand accent colors based on theme
+ * AMOLED: Gold/gray (no purple)
+ * Dark: Purple
+ * Light: Purple
+ */
+export function getAccentColors(theme: Theme) {
+  if (theme === 'amoled') {
+    return {
+      primary: '#D4A017',      // Gold
+      secondary: '#6B7280',    // Gray
+      background: '#1A1A1A',   // Dark gray
+      backgroundHover: '#2A2A2A',
+      text: '#FFFFFF',
+      border: 'rgba(255,255,255,0.12)',
+    };
+  }
+
+  if (theme === 'dark') {
+    return {
+      primary: '#0092E6',      // Blue (same as Start Workout button)
+      secondary: '#006DD4',    // Darker blue
+      background: '#0A2A3D',   // Dark blue background
+      backgroundHover: '#0D3A52', // Slightly lighter blue
+      text: '#FFFFFF',
+      border: '#0092E640',
+    };
+  }
+
+  // Light
+  return {
+    primary: '#7E29FF',
+    secondary: '#B482FF',
+    background: '#EDE0FF',
+    backgroundHover: '#E4D2FF',
+    text: '#7E29FF',
+    border: '#D7BDFF',
+  };
+}
+
+/**
+ * Get chart colors based on theme
+ * AMOLED uses gold/gray, others use purple
+ */
+export function getChartColors(theme: Theme) {
+  if (theme === 'amoled') {
+    return {
+      primary: '#D4A017',     // Gold
+      secondary: '#6B7280',   // Gray
+      tertiary: '#9CA3AF',    // Light gray
+      grid: 'rgba(255,255,255,0.1)',
+    };
+  }
+
+  if (theme === 'dark') {
+    return {
+      primary: '#0092E6',     // Blue (same as Start Workout button)
+      secondary: '#006DD4',   // Darker blue
+      tertiary: '#38BDF8',    // Light blue
+      grid: 'rgba(255,255,255,0.1)',
+    };
+  }
+
+  // Light
+  return {
+    primary: '#B482FF',
+    secondary: '#7E29FF',
+    tertiary: '#A78BFA',
+    grid: 'rgba(0,0,0,0.1)',
+  };
+}
+
+/**
+ * Get selected/active state colors
+ */
+export function getSelectedColors(theme: Theme) {
+  if (theme === 'amoled') {
+    return {
+      background: '#2A2A2A',
+      text: '#D4A017',
+      border: '#D4A01740',
+    };
+  }
+
+  if (theme === 'dark') {
+    return {
+      background: '#0A2A3D',   // Dark blue background
+      text: '#0092E6',         // Blue text
+      border: '#0092E640',
+    };
+  }
+
+  // Light
+  return {
+    background: '#EDE0FF',
+    text: '#7E29FF',
+    border: '#D7BDFF',
+  };
+}

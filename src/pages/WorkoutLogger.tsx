@@ -6,6 +6,8 @@ import { useActiveWorkout } from '../hooks/useActiveWorkout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useRestTimer } from '../hooks/useRestTimer';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 import { ExerciseSelector } from '../components/ExerciseSelector';
 import { SetRow } from '../components/SetRow';
 import { TemplateBuilder } from '../components/TemplateBuilder';
@@ -30,6 +32,9 @@ function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const selectedColors = getSelectedColors(theme);
 
   const {
     activeWorkout,
@@ -484,30 +489,28 @@ function WorkoutLogger() {
           onClick={handleStartWorkout}
           className="w-full rounded-lg transition-all flex items-center justify-center gap-3 py-6"
           style={{
-            background: 'linear-gradient(180deg, #FAFAFA 0%, #E4D2FF 100%)',
-            border: '1px solid #D7BDFF'
+            background: theme === 'light'
+              ? 'linear-gradient(180deg, #FAFAFA 0%, #E4D2FF 100%)'
+              : theme === 'amoled'
+                ? 'linear-gradient(180deg, #1A1A1A 0%, #2A2A2A 100%)'
+                : 'linear-gradient(180deg, #2D2640 0%, #3D3650 100%)',
+            border: `1px solid ${accentColors.border}`
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(180deg, #F5F5F5 0%, #D7BDFF 100%)';
-            e.currentTarget.style.borderColor = '#C9B0FF';
             e.currentTarget.style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(180deg, #FAFAFA 0%, #E4D2FF 100%)';
-            e.currentTarget.style.borderColor = '#D7BDFF';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
           onMouseDown={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(180deg, #F0F0F0 0%, #C9B0FF 100%)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseUp={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(180deg, #F5F5F5 0%, #D7BDFF 100%)';
             e.currentTarget.style.transform = 'translateY(-2px)';
           }}
         >
-          <Play style={{ color: '#7E29FF' }} size={24} />
-          <span className="text-lg font-semibold" style={{ color: '#7E29FF' }}>Start Empty Workout</span>
+          <Play style={{ color: accentColors.primary }} size={24} />
+          <span className="text-lg font-semibold" style={{ color: accentColors.primary }}>Start Empty Workout</span>
         </button>
 
         {/* Templates Section */}
@@ -614,7 +617,7 @@ function WorkoutLogger() {
                                 className="transition-colors"
                                 style={{ color: 'var(--text-muted)' }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.color = '#B482FF';
+                                  e.currentTarget.style.color = accentColors.primary;
                                 }}
                                 onMouseLeave={(e) => {
                                   e.currentTarget.style.color = 'var(--text-muted)';
@@ -729,7 +732,7 @@ function WorkoutLogger() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <h3 className="font-semibold text-lg text-primary">{template.name}</h3>
-                              <span className="text-[10px] px-2 py-0.5 rounded uppercase tracking-wide" style={{ backgroundColor: 'rgba(180, 130, 255, 0.2)', color: '#B482FF' }}>
+                              <span className="text-[10px] px-2 py-0.5 rounded uppercase tracking-wide" style={{ backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(180, 130, 255, 0.2)', color: accentColors.primary }}>
                                 Built-in
                               </span>
                             </div>
@@ -748,7 +751,7 @@ function WorkoutLogger() {
                               className="transition-colors"
                               style={{ color: 'var(--text-muted)' }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.color = '#B482FF';
+                                e.currentTarget.style.color = accentColors.primary;
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.color = 'var(--text-muted)';
@@ -912,9 +915,9 @@ function WorkoutLogger() {
               onClick={() => setShowTimer(!showTimer)}
               className="px-3 py-2 text-xs rounded-lg transition-all"
               style={{
-                backgroundColor: showTimer ? '#B482FF' : 'var(--surface-accent)',
+                backgroundColor: showTimer ? accentColors.primary : 'var(--surface-accent)',
                 color: showTimer ? 'white' : 'var(--text-primary)',
-                border: showTimer ? '1px solid #B482FF' : '1px solid var(--border-subtle)'
+                border: showTimer ? `1px solid ${accentColors.primary}` : '1px solid var(--border-subtle)'
               }}
               onMouseEnter={(e) => {
                 if (!showTimer) {
@@ -952,20 +955,20 @@ function WorkoutLogger() {
               onClick={() => setShowSaveConfirm(true)}
               className="px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
               style={{
-                backgroundColor: stats.completedSets === 0 || isSaving ? 'var(--surface-accent)' : '#EDE0FF',
-                color: stats.completedSets === 0 || isSaving ? 'var(--text-muted)' : '#7E29FF',
-                border: stats.completedSets === 0 || isSaving ? '1px solid var(--border-subtle)' : '1px solid #D7BDFF',
+                backgroundColor: stats.completedSets === 0 || isSaving ? 'var(--surface-accent)' : selectedColors.background,
+                color: stats.completedSets === 0 || isSaving ? 'var(--text-muted)' : selectedColors.text,
+                border: stats.completedSets === 0 || isSaving ? '1px solid var(--border-subtle)' : `1px solid ${selectedColors.border}`,
                 cursor: stats.completedSets === 0 || isSaving ? 'not-allowed' : 'pointer',
                 opacity: stats.completedSets === 0 || isSaving ? 0.5 : 1
               }}
               onMouseEnter={(e) => {
                 if (stats.completedSets > 0 && !isSaving) {
-                  e.currentTarget.style.backgroundColor = '#E4D2FF';
+                  e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                 }
               }}
               onMouseLeave={(e) => {
                 if (stats.completedSets > 0 && !isSaving) {
-                  e.currentTarget.style.backgroundColor = '#EDE0FF';
+                  e.currentTarget.style.backgroundColor = selectedColors.background;
                 }
               }}
               disabled={stats.completedSets === 0 || isSaving}
@@ -994,7 +997,7 @@ function WorkoutLogger() {
               </div>
               <div className="flex gap-2">
                 {!timerIsRunning ? (
-                  <button onClick={() => startTimer(90)} className="rounded px-4 py-2 text-sm transition-colors" style={{ backgroundColor: '#B482FF', color: 'white' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#A372EF'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#B482FF'}>
+                  <button onClick={() => startTimer(90)} className="rounded px-4 py-2 text-sm transition-colors" style={{ backgroundColor: accentColors.primary, color: 'white' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = accentColors.secondary} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = accentColors.primary}>
                     Start
                   </button>
                 ) : (
@@ -1050,7 +1053,7 @@ function WorkoutLogger() {
                         (set.weight > best.weight || (set.weight === best.weight && set.reps > best.reps)) ? set : best
                       , prevSets[0]);
                     return (
-                      <span className="text-xs" style={{ color: '#B482FF' }}>
+                      <span className="text-xs" style={{ color: accentColors.primary }}>
                         Last: {bestPrevSet.weight}{weightUnit} × {bestPrevSet.reps}
                       </span>
                     );
@@ -1135,7 +1138,7 @@ function WorkoutLogger() {
           border: '1px solid var(--border-subtle)'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = '#B482FF';
+          e.currentTarget.style.borderColor = accentColors.border;
           e.currentTarget.style.transform = 'translateY(-2px)';
         }}
         onMouseLeave={(e) => {
@@ -1143,7 +1146,7 @@ function WorkoutLogger() {
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        <Plus style={{ color: '#B482FF' }} size={20} />
+        <Plus style={{ color: accentColors.primary }} size={20} />
         <span className="font-semibold text-primary">Add Exercise</span>
       </button>
 
@@ -1230,20 +1233,20 @@ function WorkoutLogger() {
                   onClick={handleSaveWorkout}
                   className="flex-1 py-2 rounded-lg font-semibold transition-all"
                   style={{
-                    backgroundColor: isSaving ? 'var(--surface-accent)' : '#EDE0FF',
-                    color: isSaving ? 'var(--text-muted)' : '#7E29FF',
-                    border: isSaving ? '1px solid var(--border-subtle)' : '1px solid #D7BDFF',
+                    backgroundColor: isSaving ? 'var(--surface-accent)' : selectedColors.background,
+                    color: isSaving ? 'var(--text-muted)' : selectedColors.text,
+                    border: isSaving ? '1px solid var(--border-subtle)' : `1px solid ${selectedColors.border}`,
                     opacity: isSaving ? 0.5 : 1,
                     cursor: isSaving ? 'not-allowed' : 'pointer'
                   }}
                   onMouseEnter={(e) => {
                     if (!isSaving) {
-                      e.currentTarget.style.backgroundColor = '#E4D2FF';
+                      e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isSaving) {
-                      e.currentTarget.style.backgroundColor = '#EDE0FF';
+                      e.currentTarget.style.backgroundColor = selectedColors.background;
                     }
                   }}
                   disabled={isSaving}
@@ -1316,7 +1319,7 @@ function WorkoutLogger() {
             <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-primary-yellow via-primary-blue to-primary-yellow bg-clip-text text-transparent">
               NEW PERSONAL RECORD{detectedPRs.length > 1 ? 'S' : ''}!
             </h2>
-            <p className="text-center text-gray-300 mb-6">
+            <p className="text-center text-secondary mb-6">
               You just set {detectedPRs.length} new PR{detectedPRs.length > 1 ? 's' : ''}!
             </p>
 
@@ -1342,24 +1345,24 @@ function WorkoutLogger() {
                 return (
                   <div
                     key={index}
-                    className="bg-gray-900/50 border border-primary-blue/30 rounded-lg p-4 animate-slideInLeft"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    className="border border-primary-blue/30 rounded-lg p-4 animate-slideInLeft"
+                    style={{ backgroundColor: 'var(--surface-accent)', animationDelay: `${index * 100}ms` }}
                   >
                     <div className="flex items-start gap-3">
                       <Icon size={24} className="text-primary-blue mt-1 flex-shrink-0" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-white">{pr.exerciseName}</h3>
+                          <h3 className="font-semibold text-primary">{pr.exerciseName}</h3>
                           <span className="text-xs font-bold text-primary-yellow uppercase tracking-wide">
                             {prTypeLabel}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-300">
+                        <div className="text-sm text-secondary">
                           {pr.type === 'weight' && (
                             <p>
                               <span className="text-primary-blue font-bold">{pr.weight}{weightUnit}</span> × {pr.reps} reps
                               {pr.previousRecord && (
-                                <span className="text-gray-500 ml-2">
+                                <span className="text-muted ml-2">
                                   (+{(pr.improvement || 0).toFixed(1)}{weightUnit} from {pr.previousRecord}{weightUnit})
                                 </span>
                               )}
@@ -1369,7 +1372,7 @@ function WorkoutLogger() {
                             <p>
                               <span className="text-primary-blue font-bold">{pr.reps} reps</span> at {pr.weight}{weightUnit}
                               {pr.previousRecord && (
-                                <span className="text-gray-500 ml-2">
+                                <span className="text-muted ml-2">
                                   (+{pr.improvement} reps from {pr.previousRecord})
                                 </span>
                               )}
@@ -1378,11 +1381,11 @@ function WorkoutLogger() {
                           {pr.type === 'volume' && (
                             <p>
                               <span className="text-primary-blue font-bold">{pr.value.toFixed(0)} {weightUnit}</span> single-set volume
-                              <span className="text-gray-400 ml-2">
+                              <span className="text-muted ml-2">
                                 ({pr.weight}{weightUnit} × {pr.reps})
                               </span>
                               {pr.previousRecord && (
-                                <span className="text-gray-500 ml-2">
+                                <span className="text-muted ml-2">
                                   (+{(pr.improvement || 0).toFixed(0)}{weightUnit})
                                 </span>
                               )}
@@ -1391,11 +1394,11 @@ function WorkoutLogger() {
                           {pr.type === '1rm' && (
                             <p>
                               <span className="text-primary-blue font-bold">{pr.value.toFixed(1)}{weightUnit}</span> estimated 1RM
-                              <span className="text-gray-400 ml-2">
+                              <span className="text-muted ml-2">
                                 ({pr.weight}{weightUnit} × {pr.reps})
                               </span>
                               {pr.previousRecord && (
-                                <span className="text-gray-500 ml-2">
+                                <span className="text-muted ml-2">
                                   (+{(pr.improvement || 0).toFixed(1)}{weightUnit} from {pr.previousRecord.toFixed(1)}{weightUnit})
                                 </span>
                               )}

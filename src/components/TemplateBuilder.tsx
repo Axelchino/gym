@@ -105,11 +105,11 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-gray-900 rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
+      <div className="rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col" style={{ backgroundColor: 'var(--surface-elevated)' }}>
         {/* Header */}
-        <div className="p-6 border-b border-gray-800 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">{isEditing ? 'Edit Workout Template' : 'Create Workout Template'}</h2>
-          <button onClick={onCancel} className="text-gray-400 hover:text-white">
+        <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <h2 className="text-2xl font-bold text-primary">{isEditing ? 'Edit Workout Template' : 'Create Workout Template'}</h2>
+          <button onClick={onCancel} className="text-secondary hover:text-primary transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -118,7 +118,7 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Template Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-secondary mb-2">
               Template Name *
             </label>
             <input
@@ -126,14 +126,15 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
               placeholder="e.g., Push Day, Pull Day, Leg Day"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary-blue"
+              className="w-full rounded-lg px-4 py-3 text-primary placeholder:text-muted focus:outline-none focus:border-primary-blue"
+              style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
             />
           </div>
 
           {/* Exercises List */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Exercises ({exercises.length})</h3>
+              <h3 className="text-lg font-semibold text-primary">Exercises ({exercises.length})</h3>
               <button
                 onClick={() => setShowExerciseSelector(true)}
                 className="btn-primary px-4 py-2 text-sm flex items-center gap-2"
@@ -144,7 +145,7 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
             </div>
 
             {exercises.length === 0 ? (
-              <div className="card text-center py-12 text-gray-400">
+              <div className="card text-center py-12 text-secondary">
                 <p>No exercises added yet</p>
                 <p className="text-sm mt-2">Click "Add Exercise" to start building your template</p>
               </div>
@@ -156,14 +157,14 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
                   <div key={index} className="card-elevated p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h4 className="font-semibold">{details?.name || 'Loading...'}</h4>
+                        <h4 className="font-semibold text-primary">{details?.name || 'Loading...'}</h4>
                         <div className="flex gap-2 mt-1">
                           {details && (
                             <>
-                              <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
+                              <span className="text-xs px-2 py-1 rounded text-secondary" style={{ backgroundColor: 'var(--surface-accent)' }}>
                                 {details.equipment}
                               </span>
-                              <span className="text-xs bg-gray-700 text-gray-400 px-2 py-1 rounded">
+                              <span className="text-xs px-2 py-1 rounded text-muted" style={{ backgroundColor: 'var(--surface-accent)' }}>
                                 {details.movementType}
                               </span>
                             </>
@@ -172,7 +173,7 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
                       </div>
                       <button
                         onClick={() => handleRemoveExercise(index)}
-                        className="text-gray-400 hover:text-red-400 transition-colors ml-2"
+                        className="text-secondary hover:text-red-400 transition-colors ml-2"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -180,53 +181,58 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs text-gray-400 mb-1">Working Sets</label>
+                        <label className="block text-xs text-secondary mb-1">Working Sets</label>
                         <input
                           type="number"
                           value={exercise.targetSets}
                           onChange={(e) => handleUpdateExercise(index, { targetSets: parseInt(e.target.value) || 0 })}
-                          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-primary-blue"
+                          className="w-full rounded px-3 py-2 text-primary text-sm focus:outline-none focus:border-primary-blue"
+                          style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                           min="1"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-400 mb-1">Warmup Sets</label>
+                        <label className="block text-xs text-secondary mb-1">Warmup Sets</label>
                         <input
                           type="number"
                           value={exercise.warmupSets || 0}
                           onChange={(e) => handleUpdateExercise(index, { warmupSets: parseInt(e.target.value) || 0 })}
-                          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-primary-blue"
+                          className="w-full rounded px-3 py-2 text-primary text-sm focus:outline-none focus:border-primary-blue"
+                          style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                           min="0"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-400 mb-1">Target Reps</label>
+                        <label className="block text-xs text-secondary mb-1">Target Reps</label>
                         <input
                           type="number"
                           value={exercise.targetReps}
                           onChange={(e) => handleUpdateExercise(index, { targetReps: parseInt(e.target.value) || 0 })}
-                          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-primary-blue"
+                          className="w-full rounded px-3 py-2 text-primary text-sm focus:outline-none focus:border-primary-blue"
+                          style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                           min="1"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-400 mb-1">Target RIR</label>
+                        <label className="block text-xs text-secondary mb-1">Target RIR</label>
                         <input
                           type="number"
                           value={exercise.targetRIR ?? 2}
                           onChange={(e) => handleUpdateExercise(index, { targetRIR: parseInt(e.target.value) })}
-                          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-primary-blue"
+                          className="w-full rounded px-3 py-2 text-primary text-sm focus:outline-none focus:border-primary-blue"
+                          style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                           min="0"
                           max="10"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-400 mb-1">Rest (seconds)</label>
+                        <label className="block text-xs text-secondary mb-1">Rest (seconds)</label>
                         <input
                           type="number"
                           value={exercise.restSeconds || 90}
                           onChange={(e) => handleUpdateExercise(index, { restSeconds: parseInt(e.target.value) || 90 })}
-                          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-primary-blue"
+                          className="w-full rounded px-3 py-2 text-primary text-sm focus:outline-none focus:border-primary-blue"
+                          style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                           min="0"
                           step="15"
                         />
@@ -235,13 +241,14 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
 
                     {/* Notes */}
                     <div className="mt-3">
-                      <label className="block text-xs text-gray-400 mb-1">Notes (optional)</label>
+                      <label className="block text-xs text-secondary mb-1">Notes (optional)</label>
                       <input
                         type="text"
                         value={exercise.notes || ''}
                         onChange={(e) => handleUpdateExercise(index, { notes: e.target.value })}
                         placeholder="e.g., Focus on form, explosive reps"
-                        className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-primary-blue placeholder-gray-500"
+                        className="w-full rounded px-3 py-2 text-primary text-sm focus:outline-none focus:border-primary-blue placeholder:text-muted"
+                        style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
                       />
                     </div>
                   </div>
@@ -253,7 +260,7 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-800 flex gap-3">
+        <div className="p-6 flex gap-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
           <button onClick={onCancel} className="flex-1 btn-secondary">
             Cancel
           </button>

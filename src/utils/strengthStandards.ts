@@ -383,23 +383,52 @@ export function getLevelBadgeColor(level: StrengthLevel): string {
 
 /**
  * Get background color hex for strength level badge
- * Light pastel colors with more saturation for better visibility
+ * Theme-aware colors: bright pastels for light, muted for dark/AMOLED
  */
-export function getLevelBadgeColorHex(level: StrengthLevel): string {
+export function getLevelBadgeColorHex(level: StrengthLevel, theme: 'light' | 'dark' | 'amoled' = 'light'): string {
+  // Light theme: bright pastels
+  if (theme === 'light') {
+    switch (level) {
+      case 'Beginner':
+        return '#E5E7EB'; // Light gray (gray-200)
+      case 'Novice':
+        return '#BFDBFE'; // Light blue (blue-200)
+      case 'Intermediate':
+        return '#BBF7D0'; // Light green (green-200)
+      case 'Advanced':
+        return '#FEF08A'; // Light yellow (yellow-200)
+      case 'Elite':
+        return '#E9D5FF'; // Light purple (purple-200)
+      case 'World Class':
+        return '#FED7AA'; // Light orange (orange-200)
+      default:
+        return '#E5E7EB';
+    }
+  }
+
+  // Dark/AMOLED theme: saturated colors on black with white text
   switch (level) {
     case 'Beginner':
-      return '#E5E7EB'; // Light gray (gray-200)
+      return '#6B7280'; // Gray
     case 'Novice':
-      return '#BFDBFE'; // Light blue (blue-200)
+      return '#38BDF8'; // Sky blue
     case 'Intermediate':
-      return '#BBF7D0'; // Light green (green-200)
+      return '#22C55E'; // Green
     case 'Advanced':
-      return '#FEF08A'; // Light yellow (yellow-200)
+      return '#C58B37'; // Amber
     case 'Elite':
-      return '#E9D5FF'; // Light purple (purple-200)
+      return '#8E63FF'; // Purple
     case 'World Class':
-      return '#FED7AA'; // Light orange (orange-200)
+      return '#D97706'; // Orange
     default:
-      return '#E5E7EB';
+      return '#6B7280';
   }
 }
+
+/**
+ * Get text color for strength level badge based on theme
+ */
+export function getLevelTextColor(theme: 'light' | 'dark' | 'amoled' = 'light'): string {
+  return theme === 'light' ? '#111216' : '#FFFFFF';
+}
+

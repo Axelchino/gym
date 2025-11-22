@@ -6,6 +6,8 @@ import type { PersonalRecord } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { getAccentColors, getChartColors, getSelectedColors } from '../utils/themeHelpers';
 import { exportWorkoutLogsToCSV, downloadCSV } from '../utils/csvExport';
 import { CalendarHeatmap } from '../components/CalendarHeatmap';
 import { StreakDisplay } from '../components/StreakDisplay';
@@ -17,6 +19,10 @@ import { db } from '../services/database';
 function Analytics() {
   const { user } = useAuth();
   const { weightUnit } = useUserSettings();
+  const { theme } = useTheme();
+  const accentColors = getAccentColors(theme);
+  const chartColors = getChartColors(theme);
+  const selectedColors = getSelectedColors(theme);
 
   // REACT QUERY: Fetch all workouts with automatic caching
   const { data: workouts = [], isLoading } = useAllWorkouts();
@@ -123,10 +129,10 @@ function Analytics() {
 
   const prIcon = (type: string) => {
     switch (type) {
-      case 'weight': return <TrendingUp size={18} style={{ color: '#B482FF' }} />;
-      case 'reps': return <Zap size={18} style={{ color: '#9D6FFF' }} />;
-      case 'volume': return <Dumbbell size={18} style={{ color: '#7E29FF' }} />;
-      case '1rm': return <Trophy size={18} style={{ color: '#B482FF' }} />;
+      case 'weight': return <TrendingUp size={18} style={{ color: accentColors.primary }} />;
+      case 'reps': return <Zap size={18} style={{ color: accentColors.secondary }} />;
+      case 'volume': return <Dumbbell size={18} style={{ color: accentColors.primary }} />;
+      case '1rm': return <Trophy size={18} style={{ color: accentColors.primary }} />;
       default: return <Award size={18} className="text-muted" />;
     }
   };
@@ -189,8 +195,8 @@ function Analytics() {
           <div className="max-w-md text-center space-y-6">
             {/* Icon */}
             <div className="flex justify-center">
-              <div className="p-4 rounded-full" style={{ backgroundColor: '#F5EDFF' }}>
-                <BarChart3 size={48} strokeWidth={1.5} style={{ color: '#9D6FFF', opacity: 0.85 }} />
+              <div className="p-4 rounded-full" style={{ backgroundColor: accentColors.background }}>
+                <BarChart3 size={48} strokeWidth={1.5} style={{ color: accentColors.primary, opacity: 0.85 }} />
               </div>
             </div>
 
@@ -208,9 +214,9 @@ function Analytics() {
                 onClick={() => window.location.href = '/auth'}
                 className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
                 style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#7E29FF',
-                  border: '1px solid #D7BDFF',
+                  backgroundColor: accentColors.background,
+                  color: accentColors.text,
+                  border: `1px solid ${accentColors.border}`,
                   borderRadius: '10px',
                   height: '44px',
                   paddingLeft: '24px',
@@ -218,12 +224,10 @@ function Analytics() {
                   whiteSpace: 'nowrap',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#E4D2FF';
-                  e.currentTarget.style.borderColor = '#C9B0FF';
+                  e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#EDE0FF';
-                  e.currentTarget.style.borderColor = '#D7BDFF';
+                  e.currentTarget.style.backgroundColor = accentColors.background;
                 }}
               >
                 Sign Up Free
@@ -290,15 +294,15 @@ function Analytics() {
                 </div>
               </div>
               <div className="flex items-center justify-start pl-8 mb-3" style={{ minHeight: '60px' }}>
-                <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+                <p className="text-5xl font-bold tabular-nums text-primary">
                   {Math.round(stats.totalVolume).toLocaleString()}
                 </p>
-                <span className="text-base tabular-nums ml-2" style={{ color: '#6B7280' }}>{weightUnit}</span>
+                <span className="text-base tabular-nums ml-2 text-muted">{weightUnit}</span>
               </div>
               <div>
                 <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#111216'
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)'
                 }}>Lifetime</span>
               </div>
             </div>
@@ -312,14 +316,14 @@ function Analytics() {
                 </div>
               </div>
               <div className="flex items-center justify-start pl-8 mb-3" style={{ minHeight: '60px' }}>
-                <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+                <p className="text-5xl font-bold tabular-nums text-primary">
                   {stats.totalWorkouts}
                 </p>
               </div>
               <div>
                 <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#111216'
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)'
                 }}>All time</span>
               </div>
             </div>
@@ -333,14 +337,14 @@ function Analytics() {
                 </div>
               </div>
               <div className="flex items-center justify-start pl-8 mb-3" style={{ minHeight: '60px' }}>
-                <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+                <p className="text-5xl font-bold tabular-nums text-primary">
                   {recentPRs.length}
                 </p>
               </div>
               <div>
                 <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#111216'
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)'
                 }}>Last 30 days</span>
               </div>
             </div>
@@ -354,14 +358,14 @@ function Analytics() {
                 </div>
               </div>
               <div className="flex items-center justify-start pl-8 mb-3" style={{ minHeight: '60px' }}>
-                <p className="text-5xl font-bold tabular-nums" style={{ color: '#111216' }}>
+                <p className="text-5xl font-bold tabular-nums text-primary">
                   {streak}
                 </p>
               </div>
               <div>
                 <span className="inline-block px-2 py-0.5 text-xs font-medium rounded" style={{
-                  backgroundColor: '#EDE0FF',
-                  color: '#111216'
+                  backgroundColor: 'var(--surface-accent)',
+                  color: 'var(--text-primary)'
                 }}>Active streak</span>
               </div>
             </div>
@@ -386,9 +390,9 @@ function Analytics() {
                 onClick={() => setTimeFilter(filter)}
                 className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
                 style={{
-                  backgroundColor: timeFilter === filter ? '#EDE0FF' : 'transparent',
-                  color: timeFilter === filter ? '#7E29FF' : 'var(--text-secondary)',
-                  border: `1px solid ${timeFilter === filter ? '#D7BDFF' : 'var(--border-subtle)'}`,
+                  backgroundColor: timeFilter === filter ? selectedColors.background : 'transparent',
+                  color: timeFilter === filter ? selectedColors.text : 'var(--text-secondary)',
+                  border: `1px solid ${timeFilter === filter ? selectedColors.border : 'var(--border-subtle)'}`,
                 }}
                 onMouseEnter={(e) => {
                   if (timeFilter !== filter) {
@@ -425,7 +429,7 @@ function Analytics() {
                   formatter={(value: number) => [Math.round(value).toLocaleString(), `Volume (${weightUnit})`]}
                 />
                 <Legend wrapperStyle={{ fontSize: '14px' }} />
-                <Bar dataKey="volume" fill="#B482FF" name={`Volume (${weightUnit})`} />
+                <Bar dataKey="volume" fill={chartColors.primary} name={`Volume (${weightUnit})`} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -472,19 +476,19 @@ function Analytics() {
                   yAxisId="left"
                   type="monotone"
                   dataKey="weight"
-                  stroke="#B482FF"
+                  stroke={chartColors.primary}
                   name={`Weight (${weightUnit})`}
                   strokeWidth={2}
-                  dot={{ fill: '#B482FF', r: 4 }}
+                  dot={{ fill: chartColors.primary, r: 4 }}
                 />
                 <Line
                   yAxisId="right"
                   type="monotone"
                   dataKey="estimated1RM"
-                  stroke="#7E29FF"
+                  stroke={chartColors.secondary}
                   name={`Est. 1RM (${weightUnit})`}
                   strokeWidth={2}
-                  dot={{ fill: '#7E29FF', r: 4 }}
+                  dot={{ fill: chartColors.secondary, r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -500,7 +504,7 @@ function Analytics() {
       {user && (
         <div className="card-elevated">
         <h2 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
-          <Trophy size={20} style={{ color: '#B482FF' }} strokeWidth={1.5} />
+          <Trophy size={20} style={{ color: accentColors.primary }} strokeWidth={1.5} />
           Personal Records Timeline
         </h2>
 
@@ -512,7 +516,7 @@ function Analytics() {
                 border: '1px solid var(--border-subtle)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#B482FF40';
+                e.currentTarget.style.borderColor = accentColors.border;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-subtle)';
@@ -523,14 +527,14 @@ function Analytics() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-primary">{pr.exerciseName}</h3>
-                        <span className="text-xs font-bold uppercase tracking-wide" style={{ color: '#B482FF' }}>
+                        <span className="text-xs font-bold uppercase tracking-wide" style={{ color: accentColors.primary }}>
                           {prTypeLabel(pr.type)}
                         </span>
                       </div>
                       <div className="text-sm text-secondary">
                         {pr.type === 'weight' && (
                           <p>
-                            <span className="font-bold" style={{ color: '#B482FF' }}>{pr.weight}{weightUnit}</span> × {pr.reps} reps
+                            <span className="font-bold" style={{ color: accentColors.primary }}>{pr.weight}{weightUnit}</span> × {pr.reps} reps
                             {pr.previousRecord && (
                               <span className="text-muted ml-2">
                                 (+{(pr.improvement || 0).toFixed(1)}{weightUnit})
@@ -540,7 +544,7 @@ function Analytics() {
                         )}
                         {pr.type === 'reps' && (
                           <p>
-                            <span className="font-bold" style={{ color: '#B482FF' }}>{pr.reps} reps</span> at {pr.weight}{weightUnit}
+                            <span className="font-bold" style={{ color: accentColors.primary }}>{pr.reps} reps</span> at {pr.weight}{weightUnit}
                             {pr.previousRecord && (
                               <span className="text-muted ml-2">
                                 (+{pr.improvement} reps)
@@ -550,7 +554,7 @@ function Analytics() {
                         )}
                         {pr.type === 'volume' && (
                           <p>
-                            <span className="font-bold" style={{ color: '#B482FF' }}>{pr.value.toFixed(0)} {weightUnit}</span> single-set volume
+                            <span className="font-bold" style={{ color: accentColors.primary }}>{pr.value.toFixed(0)} {weightUnit}</span> single-set volume
                             {pr.previousRecord && (
                               <span className="text-muted ml-2">
                                 (+{(pr.improvement || 0).toFixed(0)}{weightUnit})
@@ -560,7 +564,7 @@ function Analytics() {
                         )}
                         {pr.type === '1rm' && (
                           <p>
-                            <span className="font-bold" style={{ color: '#B482FF' }}>{pr.value.toFixed(1)}{weightUnit}</span> estimated 1RM
+                            <span className="font-bold" style={{ color: accentColors.primary }}>{pr.value.toFixed(1)}{weightUnit}</span> estimated 1RM
                             {pr.previousRecord && (
                               <span className="text-muted ml-2">
                                 (+{(pr.improvement || 0).toFixed(1)}{weightUnit})
@@ -624,7 +628,7 @@ function Analytics() {
                       <div
                         className="h-2 rounded-full"
                         style={{
-                          backgroundColor: '#B482FF',
+                          backgroundColor: chartColors.primary,
                           width: `${(ex.count / stats.mostFrequentExercises[0].count) * 100}%`,
                         }}
                       ></div>
@@ -702,19 +706,19 @@ function Analytics() {
                   <div className="grid grid-cols-3 gap-4 mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface)' }}>
                     <div>
                       <div className="text-xs text-muted mb-1">Volume</div>
-                      <div className="text-lg font-bold" style={{ color: '#B482FF' }}>
+                      <div className="text-lg font-bold" style={{ color: accentColors.primary }}>
                         {workout.totalVolume.toFixed(0)} {weightUnit}
                       </div>
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">Exercises</div>
-                      <div className="text-lg font-bold" style={{ color: '#9D6FFF' }}>
+                      <div className="text-lg font-bold" style={{ color: accentColors.secondary }}>
                         {workout.exercises.length}
                       </div>
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">Sets</div>
-                      <div className="text-lg font-bold" style={{ color: '#7E29FF' }}>
+                      <div className="text-lg font-bold" style={{ color: accentColors.primary }}>
                         {workout.exercises.reduce((sum, ex) => sum + ex.sets.filter(s => !s.isWarmup).length, 0)}
                       </div>
                     </div>

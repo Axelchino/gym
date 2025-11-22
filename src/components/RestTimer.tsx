@@ -16,10 +16,10 @@ export function RestTimer() {
   const seconds = timeRemaining % 60;
 
   return (
-    <div className="fixed bottom-20 right-4 bg-gray-900 border-2 border-gray-700 rounded-lg p-4 shadow-xl z-40">
+    <div className="fixed bottom-20 right-4 rounded-lg p-4 shadow-xl z-40" style={{ backgroundColor: 'var(--surface-elevated)', border: '2px solid var(--border-subtle)' }}>
       <div className="text-center mb-3">
-        <p className="text-xs text-gray-400 mb-1">Rest Timer</p>
-        <p className={`text-3xl font-bold ${timeRemaining <= 10 && isRunning ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+        <p className="text-xs text-secondary mb-1">Rest Timer</p>
+        <p className={`text-3xl font-bold ${timeRemaining <= 10 && isRunning ? 'text-red-400 animate-pulse' : 'text-primary'}`}>
           {minutes}:{seconds.toString().padStart(2, '0')}
         </p>
       </div>
@@ -28,14 +28,16 @@ export function RestTimer() {
       <div className="flex gap-2 mb-3">
         <button
           onClick={() => addTime(-15)}
-          className="flex-1 bg-gray-800 hover:bg-gray-700 text-white rounded px-2 py-1.5 text-xs transition-colors"
+          className="flex-1 rounded px-2 py-1.5 text-xs transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
         >
           <Minus size={14} className="inline mr-1" />
           15s
         </button>
         <button
           onClick={() => addTime(15)}
-          className="flex-1 bg-gray-800 hover:bg-gray-700 text-white rounded px-2 py-1.5 text-xs transition-colors"
+          className="flex-1 rounded px-2 py-1.5 text-xs transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
         >
           <Plus size={14} className="inline mr-1" />
           15s
@@ -63,14 +65,16 @@ export function RestTimer() {
         )}
         <button
           onClick={resetTimer}
-          className="bg-gray-800 hover:bg-gray-700 text-white rounded px-3 py-2 transition-colors"
+          className="rounded px-3 py-2 transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
           title="Reset"
         >
           <RotateCcw size={16} />
         </button>
         <button
           onClick={skipTimer}
-          className="bg-gray-800 hover:bg-gray-700 text-white rounded px-3 py-2 transition-colors"
+          className="rounded px-3 py-2 transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
           title="Skip"
         >
           <FastForward size={16} />
@@ -81,19 +85,22 @@ export function RestTimer() {
       <div className="grid grid-cols-3 gap-2 mt-3">
         <button
           onClick={() => startTimer(60)}
-          className="bg-gray-800 hover:bg-gray-700 text-white rounded px-2 py-1.5 text-xs transition-colors"
+          className="rounded px-2 py-1.5 text-xs transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
         >
           1:00
         </button>
         <button
           onClick={() => startTimer(90)}
-          className="bg-gray-800 hover:bg-gray-700 text-white rounded px-2 py-1.5 text-xs transition-colors"
+          className="rounded px-2 py-1.5 text-xs transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
         >
           1:30
         </button>
         <button
           onClick={() => startTimer(120)}
-          className="bg-gray-800 hover:bg-gray-700 text-white rounded px-2 py-1.5 text-xs transition-colors"
+          className="rounded px-2 py-1.5 text-xs transition-colors text-primary"
+          style={{ backgroundColor: 'var(--surface-accent)' }}
         >
           2:00
         </button>

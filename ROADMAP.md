@@ -754,7 +754,437 @@ This is a personal project with zero monetization requirements, laser-focused on
 - Program marketplace (buy/sell templates from coaches)
 - White-label solution for personal trainers
 - Corporate wellness licensing
+- **AI Program Generation (see detailed spec below)**
 - **Note:** NOT pursuing monetization currently, but architecture supports it
+
+---
+
+## AI Program Generation - Premium Feature Spec
+
+### Overview
+AI-powered workout program generation using LLM APIs (OpenAI/Anthropic). This is a premium feature requiring subscription due to API costs.
+
+### The Competitive Advantage
+Unlike Fitbod/Juggernaut AI that start from scratch with a questionnaire, we have:
+- **Actual workout history** (months/years of real data)
+- **PR records and strength progression**
+- **Training frequency patterns**
+- **Exercise preferences** (what they actually do vs skip)
+- **Volume tolerance** (how much they can handle)
+
+This makes our AI recommendations significantly more accurate and personalized.
+
+### User Flow
+
+**1. Entry Point:**
+- Button on Dashboard or Templates page: "Generate AI Program"
+- Free users see upsell modal explaining the feature
+- Pro users proceed to configuration
+
+**2. Configuration Screen:**
+```
+Program Type:
+[ ] Strength (5x5, powerlifting focus)
+[ ] Hypertrophy (8-12 reps, bodybuilding)
+[ ] General Fitness (balanced)
+[ ] Sport-Specific (optional input)
+
+Duration: [4 weeks] [8 weeks] [12 weeks]
+
+Days per week: [3] [4] [5] [6]
+
+Equipment available:
+[x] Barbell  [x] Dumbbells  [ ] Cables
+[x] Machines [ ] Bodyweight [ ] Kettlebells
+
+Focus areas (optional):
+[ ] Weak points: ___________
+[ ] Upcoming competition: ___________
+[ ] Injury considerations: ___________
+
+[Generate Program] - Uses 1 credit
+```
+
+**3. Generation Process:**
+- Show loading state with progress messages
+- "Analyzing your 127 workouts..."
+- "Identifying strength patterns..."
+- "Building periodized program..."
+- Takes 5-15 seconds depending on API
+
+**4. Output:**
+- Full program with weekly structure
+- Each workout as a template
+- Progressive overload built in (weight increases over weeks)
+- Deload weeks if program is 8+ weeks
+- Notes explaining exercise selection
+- "Why this program" summary
+
+**5. Post-Generation:**
+- Preview all workouts
+- Edit any exercise/set/rep before saving
+- "Regenerate" option (uses another credit)
+- Save to My Programs
+- Start program immediately
+
+### Technical Implementation
+
+**API Integration:**
+```typescript
+// services/aiProgramService.ts
+
+interface ProgramConfig {
+  type: 'strength' | 'hypertrophy' | 'general';
+  durationWeeks: number;
+  daysPerWeek: number;
+  equipment: Equipment[];
+  focusAreas?: string;
+  userId: string;
+}
+
+interface GeneratedProgram {
+  name: string;
+  description: string;
+  weeks: WeekPlan[];
+  reasoning: string;
+}
+
+async function generateProgram(config: ProgramConfig): Promise<GeneratedProgram> {
+  // 1. Fetch user data
+  const userData = await getUserTrainingData(config.userId);
+
+  // 2. Build context-rich prompt
+  const prompt = buildProgramPrompt(config, userData);
+
+  // 3. Call AI API
+  const response = await callAIAPI(prompt);
+
+  // 4. Parse and validate response
+  const program = parseAIResponse(response);
+
+  // 5. Map exercises to our database IDs
+  const mappedProgram = mapExercisesToDatabase(program);
+
+  return mappedProgram;
+}
+```
+
+**Prompt Engineering (Critical):**
+```typescript
+function buildProgramPrompt(config: ProgramConfig, userData: UserData): string {
+  return `
+You are an expert strength coach creating a personalized program.
+
+USER PROFILE:
+- Sex: ${userData.sex}
+- Bodyweight: ${userData.weight}kg
+- Experience: ${userData.experienceLevel}
+- Goal: ${config.type}
+
+TRAINING HISTORY (last 3 months):
+- Workouts completed: ${userData.workoutCount}
+- Avg sessions/week: ${userData.avgFrequency}
+- Total volume: ${userData.totalVolume}kg
+
+CURRENT STRENGTH LEVELS:
+${userData.strengthLevels.map(l => `- ${l.exercise}: ${l.weight}kg x ${l.reps} (${l.level})`).join('\n')}
+
+EXERCISE PREFERENCES:
+Most performed: ${userData.topExercises.join(', ')}
+Never performed: ${userData.availableButUnused.join(', ')}
+
+AVAILABLE EQUIPMENT:
+${config.equipment.join(', ')}
+
+PROGRAM REQUIREMENTS:
+- Duration: ${config.durationWeeks} weeks
+- Frequency: ${config.daysPerWeek} days/week
+- Type: ${config.type}
+${config.focusAreas ? `- Special focus: ${config.focusAreas}` : ''}
+
+Generate a complete program in the following JSON format:
+{
+  "name": "Program name",
+  "description": "Brief description",
+  "reasoning": "Why this program suits this user",
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "theme": "Accumulation",
+      "workouts": [
+        {
+          "dayNumber": 1,
+          "name": "Push Day",
+          "exercises": [
+            {
+              "name": "Bench Press",
+              "sets": 4,
+              "reps": 8,
+              "rirTarget": 2,
+              "notes": "Focus on controlled eccentric"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+IMPORTANT:
+- Use progressive overload (increase weight/reps each week)
+- Include deload in week ${config.durationWeeks} if program is 8+ weeks
+- Balance push/pull/legs appropriately
+- Consider user's demonstrated volume tolerance
+- Only use exercises from user's available equipment
+`;
+}
+```
+
+**Response Parsing:**
+```typescript
+function parseAIResponse(response: string): GeneratedProgram {
+  // Extract JSON from response
+  const jsonMatch = response.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('Invalid AI response format');
+
+  const program = JSON.parse(jsonMatch[0]);
+
+  // Validate structure
+  validateProgramStructure(program);
+
+  return program;
+}
+
+function mapExercisesToDatabase(program: GeneratedProgram): GeneratedProgram {
+  // Map exercise names to our database IDs
+  // Handle fuzzy matching for variations
+  // e.g., "Flat Bench Press" → "Bench Press" (id: xyz)
+
+  for (const week of program.weeks) {
+    for (const workout of week.workouts) {
+      for (const exercise of workout.exercises) {
+        const match = findExerciseByName(exercise.name);
+        if (match) {
+          exercise.exerciseId = match.id;
+        } else {
+          // Fallback: ask AI to suggest alternative or flag for user
+          exercise.needsMapping = true;
+        }
+      }
+    }
+  }
+
+  return program;
+}
+```
+
+### Monetization Model
+
+**Option A: Subscription Tiers**
+```
+Free Tier:
+- All current features
+- 0 AI generations
+
+Pro Tier ($7.99/month or $59.99/year):
+- Unlimited AI generations
+- Priority support
+- Early access to new features
+```
+
+**Option B: Credit System**
+```
+Free Tier:
+- All current features
+- 1 free AI generation to try
+
+Credits:
+- 5 credits: $4.99
+- 15 credits: $9.99
+- 50 credits: $24.99
+
+1 credit = 1 program generation
+Regeneration = 1 credit
+```
+
+**Option C: Hybrid (Recommended)**
+```
+Free: 1 generation/month
+Pro ($5.99/mo): 10 generations/month
+Unlimited ($9.99/mo): Unlimited generations
+```
+
+### Cost Analysis
+
+**Per-generation cost:**
+- GPT-4 Turbo: ~$0.03-0.08 (depending on context size)
+- Claude 3 Sonnet: ~$0.02-0.05
+- Average with user data context: ~$0.05
+
+**Break-even analysis (Hybrid model @ $5.99/mo):**
+- 10 generations/month allowed
+- Cost: 10 × $0.05 = $0.50
+- Payment processing (Stripe): ~$0.47
+- Profit margin: $5.99 - $0.50 - $0.47 = $5.02/user/month
+
+**At scale:**
+- 100 Pro users: $502/month profit
+- 1,000 Pro users: $5,020/month profit
+- Even with heavy usage, margins are healthy
+
+### Technical Requirements
+
+**Backend additions:**
+- API key management (secure storage)
+- Usage tracking per user
+- Rate limiting
+- Subscription/credit system
+- Payment integration (Stripe)
+
+**Database additions:**
+```sql
+-- User subscriptions
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  plan TEXT, -- 'free', 'pro', 'unlimited'
+  status TEXT, -- 'active', 'canceled', 'past_due'
+  current_period_end TIMESTAMP,
+  stripe_subscription_id TEXT
+);
+
+-- AI generation history
+CREATE TABLE ai_generations (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  config JSONB,
+  result JSONB,
+  tokens_used INTEGER,
+  cost_cents INTEGER,
+  created_at TIMESTAMP
+);
+
+-- Credits (if using credit system)
+CREATE TABLE user_credits (
+  user_id UUID PRIMARY KEY REFERENCES users(id),
+  balance INTEGER DEFAULT 0,
+  lifetime_purchased INTEGER DEFAULT 0
+);
+```
+
+**Frontend additions:**
+- Subscription management UI
+- Credit balance display
+- Generation history
+- Upgrade prompts (tasteful, not aggressive)
+
+### Risks & Mitigations
+
+**Risk: AI generates bad programs**
+- Mitigation: Curated prompt engineering, user can edit before saving
+- Mitigation: "Report issue" button to flag bad generations
+- Mitigation: Human review of reported programs to improve prompts
+
+**Risk: API costs spike unexpectedly**
+- Mitigation: Hard rate limits per user
+- Mitigation: Cost alerts in monitoring
+- Mitigation: Can switch between GPT-4/Claude based on pricing
+
+**Risk: Users abuse free tier**
+- Mitigation: 1/month is generous but limited
+- Mitigation: Account creation required
+- Mitigation: Can detect multi-account abuse
+
+**Risk: Competitors copy the feature**
+- Mitigation: Our historical data is the moat
+- Mitigation: Prompt engineering is defensible IP
+- Mitigation: First-mover advantage in the niche
+
+### Success Metrics
+
+**Adoption:**
+- % of users who try AI generation
+- Conversion rate from free generation to paid
+- Retention of Pro subscribers (month over month)
+
+**Quality:**
+- % of generated programs saved (vs discarded)
+- % of generated programs actually started
+- Completion rate of AI-generated programs
+- User ratings of generated programs
+
+**Financial:**
+- MRR (Monthly Recurring Revenue)
+- CAC (Customer Acquisition Cost)
+- LTV (Lifetime Value)
+- Churn rate
+
+### Implementation Timeline
+
+**Week 1-2: Foundation**
+- API integration (OpenAI/Anthropic)
+- Prompt engineering and testing
+- Response parsing and validation
+
+**Week 3-4: Core Feature**
+- Configuration UI
+- Generation flow
+- Program preview and editing
+- Save to database
+
+**Week 5-6: Monetization**
+- Stripe integration
+- Subscription management
+- Credit system (if applicable)
+- Usage tracking
+
+**Week 7-8: Polish & Launch**
+- Error handling
+- Loading states
+- Analytics
+- A/B testing setup
+- Beta testing with select users
+
+### Competitive Analysis
+
+**Fitbod ($12.99/mo):**
+- AI-generated workouts (daily, not programs)
+- Generic questionnaire input
+- No historical data consideration
+- Very popular, proves market exists
+
+**Juggernaut AI ($12.99/mo):**
+- Powerlifting focused
+- Block periodization
+- RPE-based auto-regulation
+- Niche but loyal user base
+
+**Dr. Muscle ($9.99/mo):**
+- Science-based recommendations
+- Auto-adjusts based on performance
+- Academic approach
+
+**Our differentiation:**
+- We use ACTUAL workout history (not questionnaire)
+- Full program (not just daily workouts)
+- Transparent reasoning ("Why this program")
+- Lower price point with generous free tier
+- Integrated with superior tracking app
+
+### The Pitch
+
+> "Stop following cookie-cutter programs. Get a training plan built on YOUR data - your actual lifts, your real progress, your proven volume tolerance. Our AI has seen every workout you've ever logged and creates programs that fit how YOU actually train."
+
+### Questions to Resolve
+
+1. **Which AI provider?** OpenAI vs Anthropic vs both
+2. **Subscription vs credits?** Or hybrid approach
+3. **Price point?** $5.99 vs $7.99 vs $9.99/month
+4. **Free tier allowance?** 1/month vs 1 ever vs none
+5. **Program length limits?** Cap at 12 weeks or allow longer?
+6. **Regeneration policy?** Costs credit or free tweaking?
+
+---
 
 ---
 

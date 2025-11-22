@@ -126,8 +126,8 @@ function Profile() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Profile</h1>
-        <p className="text-gray-400">Manage your account and preferences</p>
+        <h1 className="text-3xl font-bold mb-2 text-primary">Profile</h1>
+        <p className="text-secondary">Manage your account and preferences</p>
       </div>
 
       {/* User Info Card */}
@@ -137,8 +137,8 @@ function Profile() {
             <User size={32} className="text-primary-blue" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-            <p className="text-sm text-gray-400">{email}</p>
+            <h2 className="text-xl font-semibold text-primary">{displayName}</h2>
+            <p className="text-sm text-secondary">{email}</p>
           </div>
         </div>
         <button onClick={() => setShowEditModal(true)} className="btn-secondary w-full flex items-center justify-center gap-2">
@@ -149,25 +149,25 @@ function Profile() {
 
       {/* Stats Summary */}
       <div className="card-elevated">
-        <h3 className="font-semibold mb-3">Your Stats</h3>
+        <h3 className="font-semibold mb-3 text-primary">Your Stats</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-2xl font-bold text-primary-blue">{stats.totalWorkouts}</p>
-            <p className="text-sm text-gray-400">Total Workouts</p>
+            <p className="text-sm text-secondary">Total Workouts</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-primary-green">{stats.personalRecords}</p>
-            <p className="text-sm text-gray-400">Personal Records</p>
+            <p className="text-sm text-secondary">Personal Records</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-primary-yellow">{stats.dayStreak}</p>
-            <p className="text-sm text-gray-400">Recent Workouts (7d)</p>
+            <p className="text-sm text-secondary">Recent Workouts (7d)</p>
           </div>
           <div>
-            <p className="text-2xl font-bold">
+            <p className="text-2xl font-bold text-primary">
               {Math.round(convertWeight(stats.totalVolume)).toLocaleString()} {getWeightUnit()}
             </p>
-            <p className="text-sm text-gray-400">Total Volume</p>
+            <p className="text-sm text-secondary">Total Volume</p>
           </div>
         </div>
       </div>
@@ -176,17 +176,16 @@ function Profile() {
       <div className="card-elevated">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Scale size={20} className="text-gray-400" />
+            <Scale size={20} className="text-secondary" />
             <div>
-              <h3 className="font-semibold">Unit Preference</h3>
-              <p className="text-sm text-gray-400">Weight display units</p>
+              <h3 className="font-semibold text-primary">Unit Preference</h3>
+              <p className="text-sm text-secondary">Weight display units</p>
             </div>
           </div>
           <button
             onClick={toggleUnitPreference}
-            className={`relative w-16 h-8 rounded-full transition-colors ${
-              userProfile?.unitPreference === 'imperial' ? 'bg-primary-blue' : 'bg-gray-700'
-            }`}
+            className="relative w-16 h-8 rounded-full transition-colors"
+            style={{ backgroundColor: userProfile?.unitPreference === 'imperial' ? 'var(--brand-blue)' : 'var(--surface-accent)' }}
           >
             <div
               className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
@@ -195,18 +194,18 @@ function Profile() {
             />
           </button>
         </div>
-        <div className="mt-3 text-sm text-gray-400">
-          Current: <span className="text-white font-medium">{userProfile?.unitPreference === 'imperial' ? 'Imperial (lbs)' : 'Metric (kg)'}</span>
+        <div className="mt-3 text-sm text-secondary">
+          Current: <span className="text-primary font-medium">{userProfile?.unitPreference === 'imperial' ? 'Imperial (lbs)' : 'Metric (kg)'}</span>
         </div>
       </div>
 
       {/* Theme Selector */}
       <div className="card-elevated">
         <div className="flex items-center gap-3 mb-4">
-          <Palette size={20} className="text-gray-400" />
+          <Palette size={20} className="text-secondary" />
           <div>
-            <h3 className="font-semibold">Theme</h3>
-            <p className="text-sm text-gray-400">Choose your preferred color theme</p>
+            <h3 className="font-semibold text-primary">Theme</h3>
+            <p className="text-sm text-secondary">Choose your preferred color theme</p>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-3">
@@ -215,12 +214,13 @@ function Profile() {
             className={`p-4 rounded-lg border-2 transition-all ${
               theme === 'light'
                 ? 'border-primary-blue bg-primary-blue/10'
-                : 'border-gray-700 hover:border-gray-600'
+                : ''
             }`}
+            style={theme !== 'light' ? { borderColor: 'var(--border-subtle)' } : undefined}
           >
             <div className="text-center">
               <div className="text-2xl mb-1">☀️</div>
-              <div className="font-medium text-sm">Light</div>
+              <div className="font-medium text-sm text-primary">Light</div>
               {theme === 'light' && <div className="text-xs text-primary-blue mt-1">Active</div>}
             </div>
           </button>
@@ -229,12 +229,13 @@ function Profile() {
             className={`p-4 rounded-lg border-2 transition-all ${
               theme === 'dark'
                 ? 'border-primary-blue bg-primary-blue/10'
-                : 'border-gray-700 hover:border-gray-600'
+                : ''
             }`}
+            style={theme !== 'dark' ? { borderColor: 'var(--border-subtle)' } : undefined}
           >
             <div className="text-center">
               <div className="text-2xl mb-1">🌙</div>
-              <div className="font-medium text-sm">Dark</div>
+              <div className="font-medium text-sm text-primary">Dark</div>
               {theme === 'dark' && <div className="text-xs text-primary-blue mt-1">Active</div>}
             </div>
           </button>
@@ -243,12 +244,13 @@ function Profile() {
             className={`p-4 rounded-lg border-2 transition-all ${
               theme === 'amoled'
                 ? 'border-primary-blue bg-primary-blue/10'
-                : 'border-gray-700 hover:border-gray-600'
+                : ''
             }`}
+            style={theme !== 'amoled' ? { borderColor: 'var(--border-subtle)' } : undefined}
           >
             <div className="text-center">
               <div className="text-2xl mb-1">⬛</div>
-              <div className="font-medium text-sm">AMOLED</div>
+              <div className="font-medium text-sm text-primary">AMOLED</div>
               {theme === 'amoled' && <div className="text-xs text-primary-blue mt-1">Active</div>}
             </div>
           </button>
@@ -257,17 +259,18 @@ function Profile() {
 
       {/* Actions */}
       <div className="space-y-3">
-        <button className="w-full card hover:border-gray-600 transition-colors flex items-center gap-3 p-4">
-          <Settings className="text-gray-400" size={20} />
+        <button className="w-full card transition-colors flex items-center gap-3 p-4 text-primary" style={{ borderColor: 'var(--border-subtle)' }}>
+          <Settings className="text-secondary" size={20} />
           <span>Settings</span>
         </button>
-        <button className="w-full card hover:border-gray-600 transition-colors flex items-center gap-3 p-4">
-          <Download className="text-gray-400" size={20} />
+        <button className="w-full card transition-colors flex items-center gap-3 p-4 text-primary" style={{ borderColor: 'var(--border-subtle)' }}>
+          <Download className="text-secondary" size={20} />
           <span>Export Data</span>
         </button>
         <button
           onClick={handleSignOut}
           className="w-full card hover:border-red-500 transition-colors flex items-center gap-3 p-4 text-red-400"
+          style={{ borderColor: 'var(--border-subtle)' }}
         >
           <LogOut size={20} />
           <span>Sign Out</span>
@@ -275,8 +278,8 @@ function Profile() {
       </div>
 
       {/* Account Info */}
-      <div className="card bg-gray-800/50 border border-gray-700">
-        <p className="text-sm text-gray-400">
+      <div className="card" style={{ backgroundColor: 'var(--surface-accent)', borderColor: 'var(--border-subtle)' }}>
+        <p className="text-sm text-secondary">
           <span className="text-primary-green font-medium">✓ Authenticated:</span> Your data is securely linked to your account and ready for cloud sync
         </p>
       </div>
@@ -334,29 +337,31 @@ function EditProfileModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-lg max-w-md w-full p-6">
-        <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
+      <div className="rounded-lg max-w-md w-full p-6" style={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)' }}>
+        <h2 className="text-2xl font-bold mb-4 text-primary">Edit Profile</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium mb-2">Name</label>
+            <label className="block text-sm font-medium mb-2 text-primary">Name</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+              className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary"
+              style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
               required
             />
           </div>
 
           {/* Training Goal */}
           <div>
-            <label className="block text-sm font-medium mb-2">Training Goal</label>
+            <label className="block text-sm font-medium mb-2 text-primary">Training Goal</label>
             <select
               value={formData.goal}
               onChange={(e) => setFormData({ ...formData, goal: e.target.value as any })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+              className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary"
+              style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
             >
               <option value="strength">Strength</option>
               <option value="hypertrophy">Hypertrophy (Muscle Growth)</option>
@@ -367,11 +372,12 @@ function EditProfileModal({
 
           {/* Experience Level */}
           <div>
-            <label className="block text-sm font-medium mb-2">Experience Level</label>
+            <label className="block text-sm font-medium mb-2 text-primary">Experience Level</label>
             <select
               value={formData.experienceLevel}
               onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value as any })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+              className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary"
+              style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
             >
               <option value="beginner">Beginner</option>
               <option value="intermediate">Intermediate</option>
@@ -381,9 +387,9 @@ function EditProfileModal({
 
           {/* Bodyweight */}
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 text-primary">
               Bodyweight (optional)
-              <span className="text-xs text-gray-400 ml-2">Used for strength standards</span>
+              <span className="text-xs text-secondary ml-2">Used for strength standards</span>
             </label>
             <input
               type="number"
@@ -391,26 +397,28 @@ function EditProfileModal({
               value={formData.currentWeight || ''}
               onChange={(e) => setFormData({ ...formData, currentWeight: e.target.value ? parseFloat(e.target.value) : undefined })}
               placeholder={profile.unitPreference === 'imperial' ? 'lbs' : 'kg'}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+              className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary placeholder:text-muted"
+              style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
             />
           </div>
 
           {/* Sex */}
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 text-primary">
               Sex (optional)
-              <span className="text-xs text-gray-400 ml-2">Used for strength standards</span>
+              <span className="text-xs text-secondary ml-2">Used for strength standards</span>
             </label>
             <select
               value={formData.sex || 'prefer-not-to-say'}
               onChange={(e) => setFormData({ ...formData, sex: e.target.value as any })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+              className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent text-primary"
+              style={{ backgroundColor: 'var(--surface-accent)', border: '1px solid var(--border-subtle)' }}
             >
               <option value="prefer-not-to-say">Prefer not to say</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </select>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               We respect your privacy. This data stays on your device and is only used for personalized strength comparisons.
             </p>
           </div>
@@ -420,7 +428,8 @@ function EditProfileModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg transition-colors text-primary"
+              style={{ backgroundColor: 'var(--surface-accent)' }}
             >
               Cancel
             </button>
