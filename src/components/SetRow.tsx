@@ -7,11 +7,10 @@ interface SetRowProps {
   onDelete: () => void;
   isPreviousSet?: boolean;
   weightUnit?: string;
-  previousSet?: Set; // Previous workout data for this set number
   readOnly?: boolean;
 }
 
-export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightUnit = 'kg', previousSet, readOnly = false }: SetRowProps) {
+export function SetRow({ set, onUpdate, onDelete, isPreviousSet = false, weightUnit = 'kg', readOnly = false }: SetRowProps) {
   // Determine set type for display and styling
   const setType = set.isWarmup ? 'W' : set.isFailure ? 'UF' : 'N';
   const borderColor = set.isWarmup

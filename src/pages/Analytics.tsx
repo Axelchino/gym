@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
-import { TrendingUp, BarChart3, Award, Trophy, Zap, Dumbbell, Calendar, Filter, Download, X, Flame } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { TrendingUp, BarChart3, Award, Trophy, Zap, Dumbbell, Filter, Download, X, Flame } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { calculateWorkoutStats, calculateStreak, getExerciseProgressionByName, calculate1RM } from '../utils/analytics';
+import { calculateWorkoutStats, calculateStreak, getExerciseProgressionByName } from '../utils/analytics';
 import type { PersonalRecord } from '../utils/analytics';
 import type { WorkoutLog } from '../types/workout';
 import { useUserSettings } from '../hooks/useUserSettings';
@@ -25,7 +25,7 @@ function Analytics() {
   const selectedColors = getSelectedColors(theme);
 
   // REACT QUERY: Fetch all workouts with automatic caching
-  const { data: workouts = [], isLoading } = useAllWorkouts();
+  const { data: workouts = [] } = useAllWorkouts();
 
   const [recentPRs, setRecentPRs] = useState<PersonalRecord[]>([]);
   const [allPRs, setAllPRs] = useState<PersonalRecord[]>([]);
@@ -693,7 +693,7 @@ function Analytics() {
 
             {/* Workouts */}
             <div className="space-y-4">
-              {selectedDateWorkouts.workouts.map((workout, idx) => (
+              {selectedDateWorkouts.workouts.map((workout) => (
                 <div key={workout.id} className="card" style={{ backgroundColor: 'var(--surface-accent)' }}>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-lg text-primary">{workout.name}</h3>

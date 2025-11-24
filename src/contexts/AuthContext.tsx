@@ -4,14 +4,19 @@ import type { User } from '@supabase/supabase-js';
 import { authService } from '../services/authService';
 import { migrationService } from '../services/migrationService';
 
+interface AuthError {
+  message: string;
+  status?: number;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name?: string) => {
-    const { error, user: newUser } = await authService.signUp({ email, password, name });
+    const { error } = await authService.signUp({ email, password, name });
 
     // Migration will be triggered automatically by onAuthStateChange
 
@@ -75,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error, user: signedInUser } = await authService.signIn({ email, password });
+    const { error } = await authService.signIn({ email, password });
 
     // Migration will be triggered automatically by onAuthStateChange
 

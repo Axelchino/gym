@@ -25,7 +25,7 @@ export function StreakDisplay({ workouts, compact = false }: StreakDisplayProps)
     currentWeekStart.setHours(0, 0, 0, 0);
 
     let streak = 0;
-    let checkingWeek = new Date(currentWeekStart);
+    const checkingWeek = new Date(currentWeekStart);
 
     // Check each week going backwards
     while (true) {

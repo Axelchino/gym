@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Calendar, Save, Copy } from 'lucide-react';
+import { X, Trash2, Calendar, Save, Copy } from 'lucide-react';
 import { db } from '../services/database';
 import { getWorkoutTemplates } from '../services/supabaseDataService';
 import type { Program, ProgramWeek, ScheduledWorkout, WorkoutTemplate, ProgramGoal } from '../types/workout';
@@ -39,12 +39,12 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
     try {
       const userTemplates = await getWorkoutTemplates();
       // Merge user templates with built-in templates
-      const allTemplates = [...userTemplates, ...BUILTIN_WORKOUT_TEMPLATES as any[]];
+      const allTemplates = [...userTemplates, ...BUILTIN_WORKOUT_TEMPLATES as WorkoutTemplate[]];
       setTemplates(allTemplates);
     } catch (error) {
       console.error('Error loading templates:', error);
       // Fall back to just built-in templates if Supabase fails
-      setTemplates(BUILTIN_WORKOUT_TEMPLATES as any[]);
+      setTemplates(BUILTIN_WORKOUT_TEMPLATES as WorkoutTemplate[]);
     }
   }
 
@@ -330,7 +330,7 @@ export function ProgramBuilder({ onClose, onSave }: ProgramBuilderProps) {
         {/* Week Navigation */}
         <div className="mb-4">
           <div className="flex items-center gap-2 overflow-x-auto pb-2">
-            {weeks.map((week, idx) => (
+            {weeks.map((week) => (
               <button
                 key={week.weekNumber}
                 onClick={() => setCurrentWeek(week.weekNumber)}

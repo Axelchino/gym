@@ -52,7 +52,7 @@ function levenshteinDistance(a: string, b: string): number {
  * Fuzzy match with Levenshtein distance
  * Returns score: 1.0 (exact) → 0.9 (1 edit) → 0.7 (2 edits) → 0 (too different)
  */
-function fuzzyMatch(query: string, target: string, maxDistance = 2): number {
+function fuzzyMatch(query: string, target: string): number {
   const distance = levenshteinDistance(query.toLowerCase(), target.toLowerCase());
 
   if (distance === 0) return 1.0;  // Exact match

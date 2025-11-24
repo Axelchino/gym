@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Flame, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import type { WorkoutLog } from '../types/workout';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';

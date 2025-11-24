@@ -14,11 +14,6 @@ interface TemplateBuilderProps {
   templateId?: string; // For editing existing templates
 }
 
-interface ExerciseWithDetails extends WorkoutExercise {
-  name: string;
-  equipment: string;
-}
-
 export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExercises = [], templateId }: TemplateBuilderProps) {
   const [templateName, setTemplateName] = useState(initialName);
   const [exercises, setExercises] = useState<WorkoutExercise[]>(initialExercises);
@@ -57,6 +52,7 @@ export function TemplateBuilder({ onSave, onCancel, initialName = '', initialExe
 
   useEffect(() => {
     loadExerciseDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercises]);
 
   async function loadExerciseDetails() {

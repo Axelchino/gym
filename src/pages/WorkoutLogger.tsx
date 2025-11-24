@@ -14,7 +14,7 @@ import { TemplateBuilder } from '../components/TemplateBuilder';
 import { db } from '../services/database';
 import { v4 as uuidv4 } from 'uuid';
 import type { Exercise } from '../types/exercise';
-import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
+import type { WorkoutTemplate, WorkoutExercise, Set } from '../types/workout';
 import { exportTemplatesToCSV, importTemplatesFromCSV, downloadCSV, readCSVFile } from '../utils/csvExport';
 import { BUILTIN_WORKOUT_TEMPLATES, isBuiltinTemplate } from '../data/workoutTemplates';
 import { findExerciseByName } from '../utils/exerciseNameMatcher';
@@ -63,8 +63,8 @@ function WorkoutLogger() {
   } = useRestTimer(90);
 
   // REACT QUERY: Fetch templates and workouts with automatic caching
-  const { data: templates = [], isLoading: templatesLoading } = useWorkoutTemplates();
-  const { data: allWorkouts = [], isLoading: workoutsLoading } = useAllWorkouts();
+  const { data: templates = [] } = useWorkoutTemplates();
+  const { data: allWorkouts = [] } = useAllWorkouts();
   const [templateExerciseNames, setTemplateExerciseNames] = useState<Map<string, Map<string, string>>>(new Map());
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
@@ -72,8 +72,9 @@ function WorkoutLogger() {
   const [showTimer, setShowTimer] = useState(false);
   const [showTemplateBuilder, setShowTemplateBuilder] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<WorkoutTemplate | null>(null);
-  const [previousWorkoutData, setPreviousWorkoutData] = useState<Map<string, any[]>>(new Map());
+  const [previousWorkoutData, setPreviousWorkoutData] = useState<Map<string, Set[]>>(new Map());
   const [showPRCelebration, setShowPRCelebration] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [detectedPRs, setDetectedPRs] = useState<any[]>([]);
   const [hasLoadedFromUrl, setHasLoadedFromUrl] = useState(false);
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
@@ -84,12 +85,14 @@ function WorkoutLogger() {
 
   useEffect(() => {
     loadTemplateExerciseNames();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templates]);
 
   useEffect(() => {
     if (activeWorkout) {
       loadPreviousWorkoutData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkout?.exercises.length]);
 
   // Auto-load template from URL parameter
@@ -107,6 +110,7 @@ function WorkoutLogger() {
         handleStartFromTemplate(template);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, hasLoadedFromUrl, isWorkoutActive, templates]);
 
   async function loadPreviousWorkoutData() {
@@ -275,9 +279,9 @@ function WorkoutLogger() {
 
       if (exercise) {
         // Find previous workout data for this exercise
-        let previousSets: any[] = [];
+        let previousSets: Set[] = [];
         for (const workout of recentWorkouts) {
-          const exerciseData = workout.exercises.find((ex: any) => ex.exerciseId === exercise.id);
+          const exerciseData = workout.exercises.find((ex) => ex.exerciseId === exercise.id);
           if (exerciseData && exerciseData.sets.length > 0) {
             previousSets = exerciseData.sets;
             break; // Found the most recent
@@ -423,8 +427,8 @@ function WorkoutLogger() {
         // Remap exercise IDs by looking up exercises by name
         const remappedExercises = [];
         for (const exercise of template.exercises) {
-          const exerciseName = (exercise as any).exerciseName;
-          const localExercise = exercisesByName.get(exerciseName.toLowerCase());
+          const exerciseName = (exercise as { exerciseName?: string }).exerciseName;
+          const localExercise = exerciseName ? exercisesByName.get(exerciseName.toLowerCase()) : undefined;
 
           if (localExercise) {
             // Found matching exercise - use local database ID
@@ -745,7 +749,7 @@ function WorkoutLogger() {
                           {user && (
                             <button
                               onClick={() => {
-                                setEditingTemplate(template as any);
+                                setEditingTemplate(template as WorkoutTemplate);
                                 setShowTemplateBuilder(true);
                               }}
                               className="transition-colors"
@@ -809,7 +813,7 @@ function WorkoutLogger() {
                         </div>
 
                         <button
-                          onClick={() => handleStartFromTemplate(template as any)}
+                          onClick={() => handleStartFromTemplate(template as WorkoutTemplate)}
                           className="w-full btn-primary py-2 text-sm flex items-center justify-center gap-2 mt-auto"
                         >
                           <Play size={16} />
@@ -1086,24 +1090,17 @@ function WorkoutLogger() {
               <div></div>
             </div>
 
-            {/* Current Sets - with previous workout data as placeholders */}
+            {/* Current Sets */}
             <div className="space-y-2">
-              {exercise.sets.map((set, idx) => {
-                // Get corresponding previous set (if available)
-                const previousSets = previousWorkoutData.get(exercise.exerciseId);
-                const previousSet = previousSets && previousSets[idx] ? previousSets[idx] : undefined;
-
-                return (
-                  <SetRow
-                    key={set.id}
-                    set={set}
-                    onUpdate={(updates) => updateSet(exercise.exerciseId, set.id, updates)}
-                    onDelete={() => deleteSet(exercise.exerciseId, set.id)}
-                    weightUnit={weightUnit}
-                    previousSet={previousSet}
-                  />
-                );
-              })}
+              {exercise.sets.map((set) => (
+                <SetRow
+                  key={set.id}
+                  set={set}
+                  onUpdate={(updates) => updateSet(exercise.exerciseId, set.id, updates)}
+                  onDelete={() => deleteSet(exercise.exerciseId, set.id)}
+                  weightUnit={weightUnit}
+                />
+              ))}
             </div>
 
             {/* Add Set Button */}
@@ -1326,7 +1323,7 @@ function WorkoutLogger() {
             {/* PR List */}
             <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
               {detectedPRs.map((pr, index) => {
-                const prIconMap: Record<string, any> = {
+                const prIconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
                   weight: TrendingUp,
                   reps: Zap,
                   volume: Dumbbell,

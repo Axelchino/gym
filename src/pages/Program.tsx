@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Calendar, Plus, ChevronLeft, ChevronRight, Play, X, Check, TrendingUp, CheckCircle2, Wrench, Trash2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { db } from '../services/database';
-import type { Program, WorkoutTemplate, WorkoutLog } from '../types/workout';
+import type { Program } from '../types/workout';
 import { PROGRAM_TEMPLATES } from '../data/programTemplates';
 import { useNavigate } from 'react-router-dom';
 import { ProgramBuilder } from '../components/ProgramBuilder';
@@ -11,9 +10,21 @@ import {
   updateProgram,
   deleteProgram,
 } from '../services/supabaseDataService';
-import { usePrograms, useWorkoutTemplates, useAllWorkouts } from '../hooks/useWorkoutData';
+import { usePrograms, useAllWorkouts } from '../hooks/useWorkoutData';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
+
+// Types for program week structure
+interface ProgramWeekWorkout {
+  dayOfWeek: number;
+  templateId?: string;
+  templateName?: string;
+}
+
+interface ProgramWeek {
+  weekNumber: number;
+  workouts: ProgramWeekWorkout[];
+}
 
 function Program() {
   const navigate = useNavigate();
@@ -23,9 +34,8 @@ function Program() {
   const selectedColors = getSelectedColors(theme);
 
   // REACT QUERY: Fetch data with automatic caching
-  const { data: programs = [], isLoading: programsLoading } = usePrograms();
-  const { data: templates = [], isLoading: templatesLoading } = useWorkoutTemplates();
-  const { data: workoutLogs = [], isLoading: logsLoading } = useAllWorkouts();
+  const { data: programs = [] } = usePrograms();
+  const { data: workoutLogs = [] } = useAllWorkouts();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
@@ -158,10 +168,10 @@ function Program() {
 
     if (weekNumber > activeProgram.duration) return null; // Program finished
 
-    const programWeek = activeProgram.weeks.find((w: any) => w.weekNumber === weekNumber);
+    const programWeek = (activeProgram.weeks as ProgramWeek[]).find((w) => w.weekNumber === weekNumber);
     if (!programWeek) return null;
 
-    const scheduledWorkout = programWeek.workouts.find((w: any) => w.dayOfWeek === dayOfWeek);
+    const scheduledWorkout = programWeek.workouts.find((w) => w.dayOfWeek === dayOfWeek);
     return scheduledWorkout || null;
   }
 
@@ -201,7 +211,7 @@ function Program() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   }
 
-  function handleStartWorkout(templateId: string, templateName: string) {
+  function handleStartWorkout(templateId: string) {
     // Navigate to workout logger with template ID
     navigate(`/workout?templateId=${templateId}`);
   }
@@ -243,11 +253,11 @@ function Program() {
       const weekNumber = Math.floor(dayOffset / 7) + 1;
       if (weekNumber > activeProgram.duration) break;
 
-      const programWeek = activeProgram.weeks.find((w: any) => w.weekNumber === weekNumber);
+      const programWeek = (activeProgram.weeks as ProgramWeek[]).find((w) => w.weekNumber === weekNumber);
       if (!programWeek) continue;
 
       const dayOfWeek = checkDate.getDay();
-      const hasScheduledWorkout = programWeek.workouts.some((w: any) => w.dayOfWeek === dayOfWeek);
+      const hasScheduledWorkout = programWeek.workouts.some((w) => w.dayOfWeek === dayOfWeek);
 
       if (hasScheduledWorkout) {
         scheduledCount++;
@@ -504,7 +514,7 @@ function Program() {
                     e.currentTarget.style.backgroundColor = theme === 'amoled' ? 'rgba(212, 160, 23, 0.12)' : 'rgba(180, 130, 255, 0.12)';
                   }
                 }}
-                onClick={() => scheduledWorkout && handleStartWorkout(scheduledWorkout.templateId, scheduledWorkout.templateName)}
+                onClick={() => scheduledWorkout?.templateId && handleStartWorkout(scheduledWorkout.templateId)}
               >
                 <span
                   className="text-xs"

@@ -16,18 +16,6 @@ import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 import { Chip } from '../components/ui';
 import { useThemeTokens } from '../utils/themeHelpers';
 
-interface DashboardStats {
-  workoutsLast7Days: number;
-  workoutsPrev7Days: number;
-  volumeLast7Days: number;
-  volumePrev7Days: number;
-  currentStreak: number;
-  prsLast30Days: number;
-  recentWorkouts: WorkoutLog[];
-  allWorkouts: WorkoutLog[];
-  volumeSparklineData: number[];
-}
-
 function Dashboard() {
   const { weightUnit } = useUserSettings();
   const { user } = useAuth();
@@ -81,14 +69,14 @@ function Dashboard() {
     fourteenDaysAgo.setHours(0, 0, 0, 0);
 
     // Last 7 days
-    const workoutsLast7Days = allWorkouts.filter(w => {
+    const workoutsLast7Days = allWorkouts.filter((w) => {
       const workoutDate = new Date(w.date);
       return workoutDate >= sevenDaysAgo && workoutDate <= today;
     });
     const volumeLast7Days = workoutsLast7Days.reduce((sum, w) => sum + w.totalVolume, 0);
 
     // Previous 7 days (for comparison)
-    const workoutsPrev7Days = allWorkouts.filter(w => {
+    const workoutsPrev7Days = allWorkouts.filter((w) => {
       const workoutDate = new Date(w.date);
       return workoutDate >= fourteenDaysAgo && workoutDate < sevenDaysAgo;
     });
@@ -125,7 +113,7 @@ function Dashboard() {
       const dayEnd = new Date(dayStart);
       dayEnd.setHours(23, 59, 59, 999);
 
-      const dayWorkouts = allWorkouts.filter(w => {
+      const dayWorkouts = allWorkouts.filter((w) => {
         const workoutDate = new Date(w.date);
         return workoutDate >= dayStart && workoutDate <= dayEnd;
       });
@@ -138,10 +126,7 @@ function Dashboard() {
   }, [allWorkouts, today]);
 
   // OPTIMIZATION 3: Memoize filtered workouts (avoid unnecessary re-renders)
-  const recentWorkouts = useMemo(() =>
-    allWorkouts.slice(0, 5),
-    [allWorkouts]
-  );
+  const recentWorkouts = useMemo(() => allWorkouts.slice(0, 5), [allWorkouts]);
 
   // Days since last PR
   const daysSinceLastPR = useMemo(() => {
@@ -157,7 +142,7 @@ function Dashboard() {
 
     // Aggregate volume by day
     const dayVolumes: Record<string, number> = {};
-    allWorkouts.forEach(w => {
+    allWorkouts.forEach((w) => {
       const dateKey = new Date(w.date).toDateString();
       dayVolumes[dateKey] = (dayVolumes[dateKey] || 0) + w.totalVolume;
     });
@@ -172,43 +157,20 @@ function Dashboard() {
       }
     });
 
-    const formattedDate = new Date(bestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const formattedDate = new Date(bestDate).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
     // Format volume with "k" abbreviation for thousands
-    const volumeK = bestVolume >= 1000
-      ? `${(bestVolume / 1000).toFixed(bestVolume >= 10000 ? 0 : 1)}k`
-      : Math.round(bestVolume).toString();
+    const volumeK =
+      bestVolume >= 1000
+        ? `${(bestVolume / 1000).toFixed(bestVolume >= 10000 ? 0 : 1)}k`
+        : Math.round(bestVolume).toString();
     return {
       date: formattedDate,
-      volume: volumeK
+      volume: volumeK,
     };
   }, [allWorkouts]);
-
-  const avgSetVolume = useMemo(() => {
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(today.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-
-    const recentWorkouts = allWorkouts.filter(w => {
-      const workoutDate = new Date(w.date);
-      return workoutDate >= sevenDaysAgo && workoutDate <= today;
-    });
-
-    let totalSets = 0;
-    let totalVolume = 0;
-
-    recentWorkouts.forEach(workout => {
-      workout.exercises.forEach(exercise => {
-        exercise.sets.forEach(set => {
-          if (set.completed && set.weight && set.reps) {
-            totalSets++;
-            totalVolume += set.weight * set.reps;
-          }
-        });
-      });
-    });
-
-    return totalSets > 0 ? totalVolume / totalSets : 0;
-  }, [allWorkouts, today]);
 
   function formatDate(date: Date): string {
     const d = new Date(date);
@@ -231,7 +193,7 @@ function Dashboard() {
 
   // Toggle workout expansion
   function toggleWorkoutExpansion(workoutId: string) {
-    setExpandedWorkouts(prev => {
+    setExpandedWorkouts((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(workoutId)) {
         newSet.delete(workoutId);
@@ -241,7 +203,6 @@ function Dashboard() {
       return newSet;
     });
   }
-
 
   // Convert workout to template
   function handleConvertToTemplate(workout: WorkoutLog) {
@@ -274,7 +235,7 @@ function Dashboard() {
           className="col-span-2 rounded-xl p-2.5 transition-all"
           style={{
             backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
+            border: `1px solid ${tokens.statCard.border}`,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
@@ -284,29 +245,42 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
             <div className="flex items-center gap-1.5">
               <TrendingUp className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-              <span className="text-xs uppercase text-muted font-medium tracking-wide">Total Volume</span>
+              <span className="text-xs uppercase text-muted font-medium tracking-wide">
+                Total Volume
+              </span>
             </div>
             {!isLoading && bestWorkout && (
               <div className="text-right">
                 <p className="text-xs text-secondary">Best, {bestWorkout.date}</p>
-                <p className="text-xs text-muted">{bestWorkout.volume} {weightUnit}</p>
+                <p className="text-xs text-muted">
+                  {bestWorkout.volume} {weightUnit}
+                </p>
               </div>
             )}
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
+          <div
+            className="flex items-baseline justify-start pl-8 mb-1"
+            style={{ minHeight: '50px' }}
+          >
             <p className="text-5xl font-bold tabular-nums text-primary">
-              {isLoading ? <span className="shimmer"></span> : Math.round(animatedVolume).toLocaleString()}
+              {isLoading ? (
+                <span className="shimmer"></span>
+              ) : (
+                Math.round(animatedVolume).toLocaleString()
+              )}
             </p>
-            {!isLoading && <span className="text-base tabular-nums ml-2 text-secondary">{weightUnit}</span>}
+            {!isLoading && (
+              <span className="text-base tabular-nums ml-2 text-secondary">{weightUnit}</span>
+            )}
           </div>
 
           {/* Sparkline + Delta */}
-          <div className="mb-3" style={{ height: '28px' }}>
+          <div className="mb-3" style={{ height: '24px' }}>
             {!isLoading && volumeSparklineData.length > 0 ? (
               <div className="flex items-center justify-between h-full">
                 <div className="flex-1">
@@ -321,12 +295,22 @@ function Dashboard() {
                   />
                 </div>
                 {stats.volumePrev7Days > 0 && (
-                  <div className="ml-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold" style={{
-                    backgroundColor: stats.volumeLast7Days > stats.volumePrev7Days ? 'rgba(22, 163, 74, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    color: stats.volumeLast7Days > stats.volumePrev7Days ? '#16A34A' : '#EF4444'
-                  }}>
+                  <div
+                    className="ml-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold"
+                    style={{
+                      backgroundColor:
+                        stats.volumeLast7Days > stats.volumePrev7Days
+                          ? 'rgba(22, 163, 74, 0.1)'
+                          : 'rgba(239, 68, 68, 0.1)',
+                      color: stats.volumeLast7Days > stats.volumePrev7Days ? '#16A34A' : '#EF4444',
+                    }}
+                  >
                     {stats.volumeLast7Days > stats.volumePrev7Days ? '↑' : '↓'}
-                    {Math.abs(((stats.volumeLast7Days - stats.volumePrev7Days) / stats.volumePrev7Days) * 100).toFixed(0)}%
+                    {Math.abs(
+                      ((stats.volumeLast7Days - stats.volumePrev7Days) / stats.volumePrev7Days) *
+                        100
+                    ).toFixed(0)}
+                    %
                   </div>
                 )}
               </div>
@@ -346,7 +330,7 @@ function Dashboard() {
           className="rounded-xl p-2.5 transition-all"
           style={{
             backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
+            border: `1px solid ${tokens.statCard.border}`,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
@@ -356,10 +340,12 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
             <div className="flex items-center gap-1.5">
               <Calendar className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-              <span className="text-xs uppercase text-muted font-medium tracking-wide">Workouts</span>
+              <span className="text-xs uppercase text-muted font-medium tracking-wide">
+                Workouts
+              </span>
             </div>
           </div>
 
@@ -384,7 +370,7 @@ function Dashboard() {
           className="rounded-xl p-2.5 transition-all"
           style={{
             backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
+            border: `1px solid ${tokens.statCard.border}`,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
@@ -394,7 +380,7 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
             <div className="flex items-center gap-1.5">
               <Award className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">PRs</span>
@@ -425,7 +411,7 @@ function Dashboard() {
           className="rounded-xl p-2.5 transition-all"
           style={{
             backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
+            border: `1px solid ${tokens.statCard.border}`,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
@@ -435,7 +421,7 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
             <div className="flex items-center gap-1.5">
               <Flame className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">Streak</span>
@@ -459,7 +445,7 @@ function Dashboard() {
             {!isLoading && (
               <StreakVisualization
                 currentStreak={stats.currentStreak}
-                workoutDates={allWorkouts.map(w => w.date)}
+                workoutDates={allWorkouts.map((w) => w.date)}
                 animate={true}
               />
             )}
@@ -475,7 +461,9 @@ function Dashboard() {
       {/* Recent Activity - Diary format */}
       <div className="mt-12">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-primary uppercase tracking-wide">Recent Activity</h2>
+          <h2 className="text-lg font-semibold text-primary uppercase tracking-wide">
+            Recent Activity
+          </h2>
 
           {/* Feed Controls */}
           {!isLoading && recentWorkouts.length > 0 && (
@@ -483,11 +471,12 @@ function Dashboard() {
               {/* Period Filter */}
               <select
                 value={periodFilter}
-                onChange={(e) => setPeriodFilter(e.target.value as any)}
+                onChange={(e) => setPeriodFilter(e.target.value as '7d' | '30d' | '90d')}
                 className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
                 style={{
-                  '--tw-ring-color': '#6F5AE8'
-                } as any}
+                  // @ts-expect-error CSS custom property for Tailwind
+                  '--tw-ring-color': '#6F5AE8',
+                }}
                 onFocus={(e) => {
                   e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
                 }}
@@ -503,7 +492,7 @@ function Dashboard() {
               {/* Type Filter */}
               <select
                 value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value as any)}
+                onChange={(e) => setTypeFilter(e.target.value as 'all' | 'program' | 'free')}
                 className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
                 onFocus={(e) => {
                   e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
@@ -520,7 +509,7 @@ function Dashboard() {
               {/* Sort */}
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'newest' | 'heaviest' | 'duration')}
                 className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
                 onFocus={(e) => {
                   e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
@@ -546,15 +535,20 @@ function Dashboard() {
             {!user ? (
               <div className="max-w-md mx-auto space-y-4">
                 <p className="text-base font-medium text-primary">Start your fitness journey</p>
-                <p className="text-sm text-secondary">Sign up to track your workouts and save your progress</p>
+                <p className="text-sm text-secondary">
+                  Sign up to track your workouts and save your progress
+                </p>
                 <div className="flex items-center justify-center gap-3 pt-2">
                   <button
-                    onClick={() => window.location.href = '/auth'}
+                    onClick={() => (window.location.href = '/auth')}
                     className="text-sm font-semibold px-5 py-2.5 rounded-md transition-all"
                     style={{
                       backgroundColor: tokens.button.primaryBg,
                       color: tokens.button.primaryText,
-                      border: tokens.button.primaryBorder === 'none' ? 'none' : `1px solid ${tokens.button.primaryBorder}`,
+                      border:
+                        tokens.button.primaryBorder === 'none'
+                          ? 'none'
+                          : `1px solid ${tokens.button.primaryBorder}`,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = tokens.button.primaryHover;
@@ -566,7 +560,7 @@ function Dashboard() {
                     Sign Up Free
                   </button>
                   <button
-                    onClick={() => window.location.href = '/workout'}
+                    onClick={() => (window.location.href = '/workout')}
                     className="text-sm font-medium px-5 py-2.5 rounded-md transition-all"
                     style={{
                       backgroundColor: 'transparent',
@@ -604,7 +598,7 @@ function Dashboard() {
                   onClick={() => setViewingWorkoutId(workout.id)}
                   className="bg-card border border-border-subtle rounded-md transition-all group relative cursor-pointer"
                   style={{
-                    borderColor: 'var(--border-subtle)'
+                    borderColor: 'var(--border-subtle)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = tokens.interactive.hoverPurple;
@@ -621,16 +615,15 @@ function Dashboard() {
                       <div className="flex items-baseline gap-2">
                         <h3 className="font-semibold text-primary text-sm">{workout.name}</h3>
                         <span className="text-xs text-muted">
-                          · {workout.totalVolume.toFixed(0)} {weightUnit} · {formatDuration(workout.duration)}
+                          · {workout.totalVolume.toFixed(0)} {weightUnit} ·{' '}
+                          {formatDuration(workout.duration)}
                         </span>
                       </div>
 
                       {/* Line 2: Exercise tags */}
                       <div className="flex items-center gap-2 flex-wrap">
                         {firstFourExercises.map((exercise, idx) => (
-                          <Chip key={idx}>
-                            {exercise.exerciseName}
-                          </Chip>
+                          <Chip key={idx}>{exercise.exerciseName}</Chip>
                         ))}
                         {remainingCount > 0 && !isExpanded && (
                           <button
@@ -662,17 +655,20 @@ function Dashboard() {
                       {isExpanded && workout.exercises.length > 4 && (
                         <div className="flex items-center gap-2 flex-wrap pt-1">
                           {workout.exercises.slice(4).map((exercise, idx) => (
-                            <Chip key={idx}>
-                              {exercise.exerciseName}
-                            </Chip>
+                            <Chip key={idx}>{exercise.exerciseName}</Chip>
                           ))}
                         </div>
                       )}
                     </div>
 
                     {/* Right column: Date and actions */}
-                    <div className="flex flex-col items-end justify-between" style={{ width: '120px' }}>
-                      <span className="text-xs text-muted tabular-nums">{formatDate(workout.date)}</span>
+                    <div
+                      className="flex flex-col items-end justify-between"
+                      style={{ width: '120px' }}
+                    >
+                      <span className="text-xs text-muted tabular-nums">
+                        {formatDate(workout.date)}
+                      </span>
 
                       {/* Row actions (visible on hover) */}
                       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -698,7 +694,12 @@ function Dashboard() {
                             }
                           }}
                         >
-                          <Edit2 size={14} strokeWidth={1.5} className="text-secondary transition-all" style={{ opacity: 0.6 }} />
+                          <Edit2
+                            size={14}
+                            strokeWidth={1.5}
+                            className="text-secondary transition-all"
+                            style={{ opacity: 0.6 }}
+                          />
                         </button>
                         <button
                           onClick={(e) => {
@@ -722,7 +723,12 @@ function Dashboard() {
                             }
                           }}
                         >
-                          <Copy size={14} strokeWidth={1.5} className="text-secondary transition-all" style={{ opacity: 0.6 }} />
+                          <Copy
+                            size={14}
+                            strokeWidth={1.5}
+                            className="text-secondary transition-all"
+                            style={{ opacity: 0.6 }}
+                          />
                         </button>
                         <button
                           onClick={(e) => {
@@ -747,7 +753,12 @@ function Dashboard() {
                             }
                           }}
                         >
-                          <Share2 size={14} strokeWidth={1.5} className="text-secondary transition-all" style={{ opacity: 0.6 }} />
+                          <Share2
+                            size={14}
+                            strokeWidth={1.5}
+                            className="text-secondary transition-all"
+                            style={{ opacity: 0.6 }}
+                          />
                         </button>
                       </div>
                     </div>

@@ -4,14 +4,13 @@ import type { WorkoutLog, LoggedExercise, Set } from '../types/workout';
 import type { Exercise } from '../types/exercise';
 import { db } from '../services/database';
 import { detectPR } from '../utils/analytics';
-import { supabase } from '../services/supabase';
 import {
   getWorkoutLogs,
-  createWorkoutLog,
   createPersonalRecord,
 } from '../services/supabaseDataService';
 import { useAuth } from '../contexts/AuthContext';
 import { syncManager } from '../services/syncManager';
+import { appendMuscleEffortData } from '../services/muscleEffortService';
 
 const ACTIVE_WORKOUT_KEY = 'gym-tracker-active-workout';
 const GUEST_WORKOUTS_KEY = 'gym-tracker-guest-workouts';
@@ -406,7 +405,15 @@ export function useActiveWorkout() {
 
       console.log('✅ Personal records saved:', allPRs.length);
 
-      // STEP 5: Only clear workout AFTER successful save
+      // STEP 5: Save muscle effort data for radar chart (non-blocking)
+      try {
+        await appendMuscleEffortData(savedWorkout, user.id);
+      } catch (muscleError) {
+        // Don't fail workout save if muscle effort save fails
+        console.warn('Failed to save muscle effort data:', muscleError);
+      }
+
+      // STEP 6: Only clear workout AFTER successful save
       setActiveWorkout(null);
       setIsWorkoutActive(false);
       setIsSaving(false);

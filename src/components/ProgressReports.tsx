@@ -208,6 +208,7 @@ export function ProgressReports({ workouts, allPRs }: ProgressReportsProps) {
       currentPRs,
       frequencyData,
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workouts, allPRs, selectedPeriod]);
 
   const periodLabel = {

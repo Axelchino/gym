@@ -22,6 +22,18 @@ export function Sparkline({
   const [pathLength, setPathLength] = useState(0);
   const [shouldAnimate, setShouldAnimate] = useState(animate);
 
+  useEffect(() => {
+    if (animate && data.length >= 2) {
+      // Measure path length for animation
+      const path = document.getElementById('sparkline-path') as SVGPathElement | null;
+      if (path && path.getTotalLength) {
+        const length = path.getTotalLength();
+        setPathLength(length);
+        setShouldAnimate(true);
+      }
+    }
+  }, [data, animate]);
+
   if (data.length < 2) {
     return null;
   }
@@ -50,18 +62,6 @@ export function Sparkline({
   // Find peak point
   const peakIndex = data.indexOf(max);
   const peakPoint = points[peakIndex];
-
-  useEffect(() => {
-    if (animate) {
-      // Measure path length for animation
-      const path = document.getElementById('sparkline-path') as SVGPathElement | null;
-      if (path && path.getTotalLength) {
-        const length = path.getTotalLength();
-        setPathLength(length);
-        setShouldAnimate(true);
-      }
-    }
-  }, [data, animate]);
 
   return (
     <svg

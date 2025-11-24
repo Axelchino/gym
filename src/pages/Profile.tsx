@@ -1,13 +1,32 @@
-import { User, Settings, Download, LogOut, Edit2, Scale, Palette, ChevronDown, Dumbbell, Trophy, Activity, Weight } from 'lucide-react';
+import {
+  User,
+  Settings,
+  Download,
+  LogOut,
+  Edit2,
+  Scale,
+  Palette,
+  ChevronDown,
+  Dumbbell,
+  Trophy,
+  Activity,
+  Weight,
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { db } from '../services/database';
 import type { UserProfile, UnitSystem } from '../types/user';
-import { getWorkoutLogs, getPersonalRecords, getUserProfile, updateUserProfile } from '../services/supabaseDataService';
+import {
+  getWorkoutLogs,
+  getPersonalRecords,
+  getUserProfile,
+  updateUserProfile,
+} from '../services/supabaseDataService';
 import { useTheme, type Theme } from '../contexts/ThemeContext';
 import { useThemeTokens } from '../utils/themeHelpers';
 import { Chip } from '../components/ui';
+import TrainingFocusChart from '../components/TrainingFocusChart';
 
 function Profile() {
   const { user, signOut } = useAuth();
@@ -28,6 +47,7 @@ function Profile() {
   useEffect(() => {
     loadProfile();
     loadStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Close dropdown when clicking outside
@@ -64,7 +84,7 @@ function Profile() {
     await updateUserProfile({ unitPreference: newUnit });
     await db.users.update(user.id, {
       unitPreference: newUnit,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
 
     setUserProfile({ ...userProfile, unitPreference: newUnit });
@@ -102,7 +122,7 @@ function Profile() {
 
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const recentWorkouts = logs.filter(log => new Date(log.date) >= sevenDaysAgo).length;
+      const recentWorkouts = logs.filter((log) => new Date(log.date) >= sevenDaysAgo).length;
 
       setStats({
         totalWorkouts,
@@ -127,9 +147,12 @@ function Profile() {
 
   const getThemeLabel = (t: Theme) => {
     switch (t) {
-      case 'light': return 'Light';
-      case 'dark': return 'Dark';
-      case 'amoled': return 'AMOLED';
+      case 'light':
+        return 'Light';
+      case 'dark':
+        return 'Dark';
+      case 'amoled':
+        return 'AMOLED';
     }
   };
 
@@ -137,9 +160,10 @@ function Profile() {
   const email = user?.email || 'No email';
 
   // Format volume with k abbreviation
-  const formattedVolume = stats.totalVolume >= 1000
-    ? `${(convertWeight(stats.totalVolume) / 1000).toFixed(stats.totalVolume >= 10000 ? 0 : 1)}k`
-    : Math.round(convertWeight(stats.totalVolume)).toString();
+  const formattedVolume =
+    stats.totalVolume >= 1000
+      ? `${(convertWeight(stats.totalVolume) / 1000).toFixed(stats.totalVolume >= 10000 ? 0 : 1)}k`
+      : Math.round(convertWeight(stats.totalVolume)).toString();
 
   return (
     <div className="space-y-6 pb-8">
@@ -148,7 +172,7 @@ function Profile() {
         className="rounded-xl p-5 transition-all"
         style={{
           backgroundColor: tokens.statCard.background,
-          border: `1px solid ${tokens.statCard.border}`
+          border: `1px solid ${tokens.statCard.border}`,
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
@@ -161,18 +185,19 @@ function Profile() {
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center"
             style={{
-              backgroundColor: theme === 'amoled' ? '#1A1A1A' :
-                              theme === 'dark' ? '#083B73' :
-                              'rgba(180, 130, 255, 0.15)',
-              border: `1px solid ${tokens.border.subtle}`
+              backgroundColor:
+                theme === 'amoled'
+                  ? '#1A1A1A'
+                  : theme === 'dark'
+                    ? '#083B73'
+                    : 'rgba(180, 130, 255, 0.15)',
+              border: `1px solid ${tokens.border.subtle}`,
             }}
           >
             <User
               size={32}
               style={{
-                color: theme === 'amoled' ? '#F0F0F0' :
-                       theme === 'dark' ? '#FFFFFF' :
-                       '#B482FF'
+                color: theme === 'amoled' ? '#F0F0F0' : theme === 'dark' ? '#FFFFFF' : '#B482FF',
               }}
             />
           </div>
@@ -186,7 +211,7 @@ function Profile() {
             style={{
               backgroundColor: tokens.button.secondaryBg,
               border: `1px solid ${tokens.button.secondaryBorder}`,
-              color: tokens.button.secondaryText
+              color: tokens.button.secondaryText,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = tokens.surface.hover;
@@ -202,106 +227,122 @@ function Profile() {
         </div>
       </div>
 
-      {/* Stats Grid - Dashboard Style */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Total Workouts */}
-        <div
-          className="rounded-xl p-4 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          <div className="flex items-center gap-1.5 mb-3">
-            <Dumbbell className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-            <span className="text-xs uppercase text-muted font-medium tracking-wide">Workouts</span>
+      {/* Stats and Training Focus - Side by Side on Desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Stats Grid - 2x2 on left */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Total Workouts */}
+          <div
+            className="rounded-xl p-4 transition-all"
+            style={{
+              backgroundColor: tokens.statCard.background,
+              border: `1px solid ${tokens.statCard.border}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.border;
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Dumbbell className="text-muted opacity-50" size={16} strokeWidth={1.5} />
+              <span className="text-xs uppercase text-muted font-semibold tracking-wider">
+                Workouts
+              </span>
+            </div>
+            <p className="text-4xl font-bold tabular-nums text-primary mb-2">
+              {stats.totalWorkouts}
+            </p>
+            <div>
+              <Chip>All time</Chip>
+            </div>
           </div>
-          <p className="text-3xl font-bold tabular-nums text-primary">{stats.totalWorkouts}</p>
-          <div className="mt-2">
-            <Chip>All time</Chip>
+
+          {/* Personal Records */}
+          <div
+            className="rounded-xl p-4 transition-all"
+            style={{
+              backgroundColor: tokens.statCard.background,
+              border: `1px solid ${tokens.statCard.border}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.border;
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="text-muted opacity-50" size={16} strokeWidth={1.5} />
+              <span className="text-xs uppercase text-muted font-semibold tracking-wider">PRs</span>
+            </div>
+            <p className="text-4xl font-bold tabular-nums text-primary mb-2">
+              {stats.personalRecords}
+            </p>
+            <div>
+              <Chip>All time</Chip>
+            </div>
+          </div>
+
+          {/* This Week */}
+          <div
+            className="rounded-xl p-4 transition-all"
+            style={{
+              backgroundColor: tokens.statCard.background,
+              border: `1px solid ${tokens.statCard.border}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.border;
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="text-muted opacity-50" size={16} strokeWidth={1.5} />
+              <span className="text-xs uppercase text-muted font-semibold tracking-wider">
+                This Week
+              </span>
+            </div>
+            <p className="text-4xl font-bold tabular-nums text-primary mb-2">{stats.dayStreak}</p>
+            <div>
+              <Chip>Last 7 days</Chip>
+            </div>
+          </div>
+
+          {/* Total Volume */}
+          <div
+            className="rounded-xl p-4 transition-all"
+            style={{
+              backgroundColor: tokens.statCard.background,
+              border: `1px solid ${tokens.statCard.border}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = tokens.statCard.border;
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Weight className="text-muted opacity-50" size={16} strokeWidth={1.5} />
+              <span className="text-xs uppercase text-muted font-semibold tracking-wider">
+                Volume
+              </span>
+            </div>
+            <div className="flex items-baseline gap-1.5 mb-2">
+              <p className="text-4xl font-bold tabular-nums text-primary">{formattedVolume}</p>
+              <span className="text-sm text-secondary font-medium">{getWeightUnit()}</span>
+            </div>
+            <div>
+              <Chip>All time</Chip>
+            </div>
           </div>
         </div>
 
-        {/* Personal Records */}
-        <div
-          className="rounded-xl p-4 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          <div className="flex items-center gap-1.5 mb-3">
-            <Trophy className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-            <span className="text-xs uppercase text-muted font-medium tracking-wide">PRs</span>
-          </div>
-          <p className="text-3xl font-bold tabular-nums text-primary">{stats.personalRecords}</p>
-          <div className="mt-2">
-            <Chip>All time</Chip>
-          </div>
-        </div>
-
-        {/* This Week */}
-        <div
-          className="rounded-xl p-4 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          <div className="flex items-center gap-1.5 mb-3">
-            <Activity className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-            <span className="text-xs uppercase text-muted font-medium tracking-wide">This Week</span>
-          </div>
-          <p className="text-3xl font-bold tabular-nums text-primary">{stats.dayStreak}</p>
-          <div className="mt-2">
-            <Chip>Last 7 days</Chip>
-          </div>
-        </div>
-
-        {/* Total Volume */}
-        <div
-          className="rounded-xl p-4 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          <div className="flex items-center gap-1.5 mb-3">
-            <Weight className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-            <span className="text-xs uppercase text-muted font-medium tracking-wide">Volume</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <p className="text-3xl font-bold tabular-nums text-primary">{formattedVolume}</p>
-            <span className="text-sm text-secondary">{getWeightUnit()}</span>
-          </div>
-          <div className="mt-2">
-            <Chip>All time</Chip>
-          </div>
-        </div>
+        {/* Training Focus Radar Chart - on right */}
+        {user && <TrainingFocusChart userId={user.id} />}
       </div>
 
       {/* Preferences Card */}
@@ -309,7 +350,7 @@ function Profile() {
         className="rounded-xl"
         style={{
           backgroundColor: tokens.statCard.background,
-          border: `1px solid ${tokens.statCard.border}`
+          border: `1px solid ${tokens.statCard.border}`,
         }}
       >
         {/* Unit Preference */}
@@ -330,15 +371,21 @@ function Profile() {
             onClick={toggleUnitPreference}
             className="relative w-11 h-6 rounded-full transition-colors"
             style={{
-              backgroundColor: userProfile?.unitPreference === 'imperial'
-                ? (theme === 'amoled' ? '#E1BB62' : theme === 'dark' ? '#0092E6' : '#B482FF')
-                : tokens.surface.accent
+              backgroundColor:
+                userProfile?.unitPreference === 'imperial'
+                  ? theme === 'amoled'
+                    ? '#E1BB62'
+                    : theme === 'dark'
+                      ? '#0092E6'
+                      : '#B482FF'
+                  : tokens.surface.accent,
             }}
           >
             <div
               className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm"
               style={{
-                transform: userProfile?.unitPreference === 'imperial' ? 'translateX(20px)' : 'translateX(0)'
+                transform:
+                  userProfile?.unitPreference === 'imperial' ? 'translateX(20px)' : 'translateX(0)',
               }}
             />
           </button>
@@ -360,7 +407,7 @@ function Profile() {
               style={{
                 backgroundColor: tokens.surface.accent,
                 border: `1px solid ${tokens.border.subtle}`,
-                color: tokens.text.primary
+                color: tokens.text.primary,
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = tokens.surface.hover;
@@ -374,7 +421,7 @@ function Profile() {
                 size={14}
                 style={{
                   transform: showThemeDropdown ? 'rotate(180deg)' : 'rotate(0)',
-                  transition: 'transform 0.2s'
+                  transition: 'transform 0.2s',
                 }}
               />
             </button>
@@ -387,7 +434,7 @@ function Profile() {
               style={{
                 backgroundColor: tokens.surface.elevated,
                 border: `1px solid ${tokens.border.medium}`,
-                zIndex: 9999
+                zIndex: 9999,
               }}
             >
               {(['light', 'dark', 'amoled'] as Theme[]).map((t) => (
@@ -396,16 +443,22 @@ function Profile() {
                   onClick={() => handleThemeChange(t)}
                   className="w-full px-3 py-2.5 text-left text-sm font-medium transition-colors"
                   style={{
-                    backgroundColor: theme === t
-                      ? (theme === 'amoled' ? '#1A1A1A' :
-                         theme === 'dark' ? '#083B73' :
-                         'rgba(180, 130, 255, 0.15)')
-                      : 'transparent',
-                    color: theme === t
-                      ? (theme === 'amoled' ? '#F0F0F0' :
-                         theme === 'dark' ? '#FFFFFF' :
-                         '#B482FF')
-                      : tokens.text.primary
+                    backgroundColor:
+                      theme === t
+                        ? theme === 'amoled'
+                          ? '#1A1A1A'
+                          : theme === 'dark'
+                            ? '#083B73'
+                            : 'rgba(180, 130, 255, 0.15)'
+                        : 'transparent',
+                    color:
+                      theme === t
+                        ? theme === 'amoled'
+                          ? '#F0F0F0'
+                          : theme === 'dark'
+                            ? '#FFFFFF'
+                            : '#B482FF'
+                        : tokens.text.primary,
                   }}
                   onMouseEnter={(e) => {
                     if (theme !== t) {
@@ -431,7 +484,7 @@ function Profile() {
         className="rounded-xl overflow-hidden"
         style={{
           backgroundColor: tokens.statCard.background,
-          border: `1px solid ${tokens.statCard.border}`
+          border: `1px solid ${tokens.statCard.border}`,
         }}
       >
         <button
@@ -525,12 +578,15 @@ function EditProfileModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+    <div
+      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4"
+      style={{ zIndex: 9999 }}
+    >
       <div
         className="rounded-xl max-w-md w-full p-6"
         style={{
           backgroundColor: tokens.surface.elevated,
-          border: `1px solid ${tokens.border.medium}`
+          border: `1px solid ${tokens.border.medium}`,
         }}
       >
         <h2 className="text-xl font-bold mb-5 text-primary">Edit Profile</h2>
@@ -538,7 +594,9 @@ function EditProfileModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">Name</label>
+            <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">
+              Name
+            </label>
             <input
               type="text"
               value={formData.name}
@@ -546,7 +604,7 @@ function EditProfileModal({
               className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none text-primary"
               style={{
                 backgroundColor: tokens.surface.accent,
-                border: `1px solid ${tokens.border.subtle}`
+                border: `1px solid ${tokens.border.subtle}`,
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = tokens.interactive.focusRing;
@@ -560,14 +618,16 @@ function EditProfileModal({
 
           {/* Training Goal */}
           <div>
-            <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">Goal</label>
+            <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">
+              Goal
+            </label>
             <select
               value={formData.goal}
-              onChange={(e) => setFormData({ ...formData, goal: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, goal: e.target.value as 'strength' | 'hypertrophy' | 'endurance' | 'general' })}
               className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none text-primary"
               style={{
                 backgroundColor: tokens.surface.accent,
-                border: `1px solid ${tokens.border.subtle}`
+                border: `1px solid ${tokens.border.subtle}`,
               }}
             >
               <option value="strength">Strength</option>
@@ -579,14 +639,16 @@ function EditProfileModal({
 
           {/* Experience Level */}
           <div>
-            <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">Experience</label>
+            <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">
+              Experience
+            </label>
             <select
               value={formData.experienceLevel}
-              onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value as 'beginner' | 'intermediate' | 'advanced' })}
               className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none text-primary"
               style={{
                 backgroundColor: tokens.surface.accent,
-                border: `1px solid ${tokens.border.subtle}`
+                border: `1px solid ${tokens.border.subtle}`,
               }}
             >
               <option value="beginner">Beginner</option>
@@ -599,18 +661,25 @@ function EditProfileModal({
           <div>
             <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">
               Bodyweight
-              <span className="normal-case font-normal ml-1 text-secondary">(for strength standards)</span>
+              <span className="normal-case font-normal ml-1 text-secondary">
+                (for strength standards)
+              </span>
             </label>
             <input
               type="number"
               step="0.1"
               value={formData.currentWeight || ''}
-              onChange={(e) => setFormData({ ...formData, currentWeight: e.target.value ? parseFloat(e.target.value) : undefined })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  currentWeight: e.target.value ? parseFloat(e.target.value) : undefined,
+                })
+              }
               placeholder={profile.unitPreference === 'imperial' ? 'lbs' : 'kg'}
               className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none text-primary placeholder:text-muted"
               style={{
                 backgroundColor: tokens.surface.accent,
-                border: `1px solid ${tokens.border.subtle}`
+                border: `1px solid ${tokens.border.subtle}`,
               }}
             />
           </div>
@@ -619,15 +688,17 @@ function EditProfileModal({
           <div>
             <label className="block text-xs font-medium mb-1.5 text-muted uppercase tracking-wide">
               Sex
-              <span className="normal-case font-normal ml-1 text-secondary">(for strength standards)</span>
+              <span className="normal-case font-normal ml-1 text-secondary">
+                (for strength standards)
+              </span>
             </label>
             <select
               value={formData.sex || 'prefer-not-to-say'}
-              onChange={(e) => setFormData({ ...formData, sex: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, sex: e.target.value as 'male' | 'female' | 'prefer-not-to-say' })}
               className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none text-primary"
               style={{
                 backgroundColor: tokens.surface.accent,
-                border: `1px solid ${tokens.border.subtle}`
+                border: `1px solid ${tokens.border.subtle}`,
               }}
             >
               <option value="prefer-not-to-say">Prefer not to say</option>
@@ -645,10 +716,11 @@ function EditProfileModal({
               style={{
                 backgroundColor: tokens.button.secondaryBg,
                 border: `1px solid ${tokens.button.secondaryBorder}`,
-                color: tokens.button.secondaryText
+                color: tokens.button.secondaryText,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = tokens.button.secondaryHoverBg || tokens.surface.hover;
+                e.currentTarget.style.backgroundColor =
+                  tokens.button.secondaryHoverBg || tokens.surface.hover;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = tokens.button.secondaryBg;
@@ -662,7 +734,7 @@ function EditProfileModal({
               style={{
                 backgroundColor: tokens.button.primaryBg,
                 color: tokens.button.primaryText,
-                border: theme === 'amoled' ? `1px solid ${tokens.button.primaryBorder}` : 'none'
+                border: theme === 'amoled' ? `1px solid ${tokens.button.primaryBorder}` : 'none',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = tokens.button.primaryHover;

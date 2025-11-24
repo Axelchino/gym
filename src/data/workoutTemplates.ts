@@ -1,4 +1,4 @@
-import type { WorkoutTemplate, WorkoutExercise } from '../types/workout';
+import type { WorkoutTemplate } from '../types/workout';
 import { BUILTIN_STRENGTH_WORKOUT_TEMPLATES } from './builtin_strength_programs';
 import { BUILTIN_HYPERTROPHY_WORKOUT_TEMPLATES } from './builtin_hypertrophy_programs';
 

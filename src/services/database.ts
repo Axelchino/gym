@@ -10,7 +10,7 @@ export interface SyncQueueItem {
   id: string;
   type: 'workout' | 'template' | 'program' | 'pr';
   operation: 'create' | 'update' | 'delete';
-  data: any;
+  data: WorkoutLog | WorkoutTemplate | Program | PersonalRecord;
   recordId: string; // ID of the record being synced
   createdAt: Date;
   attempts: number;
@@ -52,7 +52,7 @@ export class GymTrackerDatabase extends Dexie {
     this.version(2).stores({
       exercises:
         'id, name, category, equipment, difficulty, movementType, popularityRank, isCustom, createdAt, [category+equipment], [movementType+popularityRank]',
-    }).upgrade(async (tx) => {
+    }).upgrade(async () => {
       // Migration: Add new fields to existing exercises
       // New exercises from enhancedExercises.ts already have these fields
       // This migration ensures any custom exercises get default values
@@ -72,7 +72,7 @@ export class GymTrackerDatabase extends Dexie {
       achievements: 'id, category, unlockedAt',
       programs: 'id, userId, isActive, createdAt, [userId+isActive]',
       syncQueue: 'id, type, operation, recordId, createdAt, attempts, [type+operation]',
-    }).upgrade(async (tx) => {
+    }).upgrade(async () => {
       console.log('Upgrading to v3: Adding syncQueue table for offline-first support');
     });
   }

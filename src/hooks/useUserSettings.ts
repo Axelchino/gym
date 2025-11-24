@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../services/database';
-import type { UserProfile } from '../types/user';
 import { useAuth } from '../contexts/AuthContext';
 
 type UnitPreference = 'metric' | 'imperial';
@@ -12,6 +11,7 @@ export function useUserSettings() {
 
   useEffect(() => {
     loadUserPreference();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function loadUserPreference() {

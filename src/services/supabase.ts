@@ -19,8 +19,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 // Type definitions for database tables (will expand as we create tables)
 export type Database = {
   public: {
-    Tables: {
-      // We'll add table definitions here as we create them
-    };
+    Tables: Record<string, unknown>;
   };
 };

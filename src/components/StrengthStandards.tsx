@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Trophy, TrendingUp, User } from 'lucide-react';
 import type { WorkoutLog } from '../types/workout';
 import { calculate1RM } from '../utils/analytics';
-import { calculateStrengthLevel, getLevelColor, getLevelBadgeColor, getLevelBadgeColorHex, getLevelTextColor, type StrengthLevel, type StandardType } from '../utils/strengthStandards';
+import { calculateStrengthLevel, getLevelBadgeColorHex, getLevelTextColor, type StrengthLevel } from '../utils/strengthStandards';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserSettings } from '../hooks/useUserSettings';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,6 +25,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
 
   useEffect(() => {
     loadUserProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadUserProfile = async () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Trash2, Plus } from 'lucide-react';
+import { X, Save, Plus } from 'lucide-react';
 import { SetRow } from './SetRow';
 import { db } from '../services/database';
 import { getWorkoutLogs, updateWorkoutLog } from '../services/supabaseDataService';
@@ -27,6 +27,7 @@ export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false 
 
   useEffect(() => {
     loadWorkout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workoutId]);
 
   async function loadWorkout() {
