@@ -160,12 +160,12 @@ class SyncManager {
   private async syncWorkout(item: SyncQueueItem): Promise<void> {
     switch (item.operation) {
       case 'create':
-        await createWorkoutLog(item.data);
+        await createWorkoutLog(item.data as any);
         // Mark as synced in local DB
         await db.workoutLogs.update(item.recordId, { synced: true });
         break;
       case 'update':
-        await updateWorkoutLog(item.recordId, item.data);
+        await updateWorkoutLog(item.recordId, item.data as any);
         await db.workoutLogs.update(item.recordId, { synced: true });
         break;
       case 'delete':
@@ -182,10 +182,10 @@ class SyncManager {
   private async syncTemplate(item: SyncQueueItem): Promise<void> {
     switch (item.operation) {
       case 'create':
-        await createWorkoutTemplate(item.data);
+        await createWorkoutTemplate(item.data as any);
         break;
       case 'update':
-        await updateWorkoutTemplate(item.recordId, item.data);
+        await updateWorkoutTemplate(item.recordId, item.data as any);
         break;
       case 'delete':
         await deleteWorkoutTemplate(item.recordId);
