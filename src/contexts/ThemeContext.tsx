@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { getUserProfile, updateUserProfile } from '../services/supabaseDataService';
+import { updateUserProfile } from '../services/supabaseDataService';
+import { useUserProfile } from '../hooks/useUserProfile';
 
 export type Theme = 'light' | 'dark' | 'amoled';
 
@@ -33,34 +34,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Initial: Use OS detection for guests
     return getSystemTheme();
   });
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
-  // Load theme from profile when user logs in
+  // Use React Query to get profile - will be instant if prefetched by AuthContext
+  const { data: profile, isLoading: isLoadingProfile } = useUserProfile(user?.id || null);
+
+  // Apply theme from profile when available
   useEffect(() => {
-    async function loadThemeFromProfile() {
-      if (!user) {
-        // User logged out - revert to OS detection
-        const systemTheme = getSystemTheme();
-        setThemeState(systemTheme);
-        return;
-      }
-
-      // User logged in - load theme from profile
-      setIsLoadingProfile(true);
-      try {
-        const profile = await getUserProfile();
-        if (profile?.themePreference) {
-          setThemeState(profile.themePreference as Theme);
-        }
-      } catch (error) {
-        console.error('Failed to load theme from profile:', error);
-      } finally {
-        setIsLoadingProfile(false);
-      }
+    if (!user) {
+      // User logged out - revert to OS detection
+      const systemTheme = getSystemTheme();
+      setThemeState(systemTheme);
+      return;
     }
 
-    loadThemeFromProfile();
-  }, [user]);
+    // User logged in - apply theme from profile (instant if cached)
+    if (profile?.themePreference) {
+      setThemeState(profile.themePreference as Theme);
+    }
+  }, [user, profile]);
 
   // Update document class when theme changes
   useEffect(() => {

@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/authService';
 import { migrationService } from '../services/migrationService';
+import { getUserProfile } from '../services/supabaseDataService';
 
 interface AuthError {
   message: string;
@@ -24,6 +26,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -31,8 +34,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
 
-      // If user is logged in, check for data migration
+      // If user is logged in, prefetch profile and check for data migration
       if (session?.user) {
+        // Prefetch profile immediately for instant theme/profile data access
+        queryClient.prefetchQuery({
+          queryKey: ['userProfile', session.user.id],
+          queryFn: getUserProfile,
+          staleTime: 5 * 60 * 1000,
+        });
+
         handleDataMigration(session.user.id);
       }
     });
@@ -41,9 +51,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { unsubscribe } = authService.onAuthStateChange((user) => {
       setUser(user);
 
-      // When user signs in/up, migrate their data
+      // When user signs in/up, prefetch profile and migrate their data
       if (user) {
+        // Prefetch profile immediately for instant theme/profile data access
+        queryClient.prefetchQuery({
+          queryKey: ['userProfile', user.id],
+          queryFn: getUserProfile,
+          staleTime: 5 * 60 * 1000,
+        });
+
         handleDataMigration(user.id);
+      } else {
+        // User logged out - clear profile cache
+        queryClient.removeQueries({ queryKey: ['userProfile'] });
       }
     });
 
