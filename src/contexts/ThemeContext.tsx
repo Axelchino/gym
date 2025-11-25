@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { getUserProfile, updateUserProfile } from '../services/supabaseDataService';
 
 export type Theme = 'light' | 'dark' | 'amoled';
 
@@ -9,8 +11,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Detect OS theme preference
-function getSystemTheme(): Theme {
+// Detect OS theme preference (light or dark only - no AMOLED for guests)
+function getSystemTheme(): 'light' | 'dark' {
   try {
     if (typeof window === 'undefined' || !window.matchMedia) {
       return 'light';
@@ -26,17 +28,41 @@ function getSystemTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Try to load theme from localStorage, or detect OS preference
+  const { user } = useAuth();
   const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem('gym-tracker-theme');
-    if (saved) {
-      return saved as Theme;
-    }
-    // No saved preference - detect OS theme
+    // Initial: Use OS detection for guests
     return getSystemTheme();
   });
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
-  // Update document class and save to localStorage when theme changes
+  // Load theme from profile when user logs in
+  useEffect(() => {
+    async function loadThemeFromProfile() {
+      if (!user) {
+        // User logged out - revert to OS detection
+        const systemTheme = getSystemTheme();
+        setThemeState(systemTheme);
+        return;
+      }
+
+      // User logged in - load theme from profile
+      setIsLoadingProfile(true);
+      try {
+        const profile = await getUserProfile();
+        if (profile?.themePreference) {
+          setThemeState(profile.themePreference as Theme);
+        }
+      } catch (error) {
+        console.error('Failed to load theme from profile:', error);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    }
+
+    loadThemeFromProfile();
+  }, [user]);
+
+  // Update document class when theme changes
   useEffect(() => {
     // Remove all theme classes
     document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-amoled');
@@ -44,12 +70,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Add current theme class
     document.documentElement.classList.add(`theme-${theme}`);
 
-    // Save to localStorage
+    // Save to localStorage as backup (for guests)
     localStorage.setItem('gym-tracker-theme', theme);
   }, [theme]);
 
-  const setTheme = (newTheme: Theme) => {
+  const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
+
+    // If user is logged in, save to profile
+    if (user && !isLoadingProfile) {
+      try {
+        await updateUserProfile({
+          themePreference: newTheme,
+        });
+      } catch (error) {
+        console.error('Failed to save theme to profile:', error);
+      }
+    }
+    // If guest, theme is already saved to localStorage by useEffect above
   };
 
   return (

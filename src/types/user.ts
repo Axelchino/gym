@@ -2,6 +2,7 @@ export type TrainingGoal = 'strength' | 'hypertrophy' | 'endurance' | 'general';
 export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
 export type UnitSystem = 'metric' | 'imperial';
 export type Sex = 'male' | 'female' | 'prefer-not-to-say';
+export type ThemePreference = 'light' | 'dark' | 'amoled';
 
 export interface UserProfile {
   id: string;
@@ -15,6 +16,7 @@ export interface UserProfile {
   goal: TrainingGoal;
   experienceLevel: ExperienceLevel;
   unitPreference: UnitSystem;
+  themePreference?: ThemePreference;
   avatarUrl?: string;
   createdAt: Date;
   updatedAt: Date;

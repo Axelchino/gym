@@ -586,6 +586,7 @@ export async function getUserProfile(): Promise<any> {
     experienceLevel: data.experience_level,
     sex: data.sex,
     unitPreference: data.unit_preference === 'metric' ? 'metric' : 'imperial',
+    themePreference: data.theme_preference,
     actual1rm: data.actual_1rm,
     createdAt: new Date(data.created_at),
     updatedAt: new Date(data.updated_at),
@@ -611,6 +612,7 @@ export async function updateUserProfile(updates: any): Promise<void> {
   if (updates.unitPreference !== undefined) {
     updateData.unit_preference = updates.unitPreference === 'metric' ? 'metric' : 'imperial';
   }
+  if (updates.themePreference !== undefined) updateData.theme_preference = updates.themePreference;
   if (updates.actual1rm !== undefined) updateData.actual_1rm = updates.actual1rm;
 
   const { error } = await supabase
