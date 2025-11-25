@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
 
 // Eager load: Layout and Auth (critical for initial render)
 import { Layout } from './components/layout/Layout';
@@ -33,9 +32,8 @@ function PageLoader() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
             {/* Public route */}
             <Route path="/auth" element={<Auth />} />
 
@@ -54,9 +52,8 @@ function App() {
               <Route path="exercises" element={<ExerciseLibrary />} />
               <Route path="profile" element={<Profile />} />
             </Route>
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
