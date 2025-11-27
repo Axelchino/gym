@@ -8,6 +8,7 @@ interface SparklineProps {
   peakDotColor?: string;
   strokeWidth?: number;
   animate?: boolean;
+  showPeakDot?: boolean;
 }
 
 export function Sparkline({
@@ -18,6 +19,7 @@ export function Sparkline({
   peakDotColor,
   strokeWidth = 1,
   animate = true,
+  showPeakDot = true,
 }: SparklineProps) {
   const [pathLength, setPathLength] = useState(0);
   const [shouldAnimate, setShouldAnimate] = useState(animate);
@@ -84,8 +86,8 @@ export function Sparkline({
           animation: 'drawPath 400ms ease-out forwards',
         } : undefined}
       />
-      {/* Small dot at peak - hide when data is flat */}
-      {!isFlat && (
+      {/* Small dot at peak - hide when data is flat or showPeakDot is false */}
+      {!isFlat && showPeakDot && (
         <circle
           cx={peakPoint.x}
           cy={peakPoint.y}

@@ -245,7 +245,7 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
+          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
             <div className="flex items-center gap-1.5">
               <TrendingUp className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">
@@ -255,9 +255,6 @@ function Dashboard() {
             {!isLoading && bestWorkout && (
               <div className="text-right">
                 <p className="text-xs text-secondary">Best, {bestWorkout.date}</p>
-                <p className="text-xs text-muted">
-                  {bestWorkout.volume} {weightUnit}
-                </p>
               </div>
             )}
           </div>
@@ -265,9 +262,9 @@ function Dashboard() {
           {/* Number - slightly offset */}
           <div
             className="flex items-baseline justify-start pl-8 mb-1"
-            style={{ minHeight: '50px' }}
+            style={{ minHeight: '64px' }}
           >
-            <p className="text-5xl font-bold tabular-nums text-primary">
+            <p className="text-6xl font-bold tabular-nums text-primary">
               {isLoading ? (
                 <span className="shimmer"></span>
               ) : (
@@ -275,7 +272,7 @@ function Dashboard() {
               )}
             </p>
             {!isLoading && (
-              <span className="text-base tabular-nums ml-2 text-secondary">{weightUnit}</span>
+              <span className="text-lg tabular-nums ml-2 text-secondary">{weightUnit}</span>
             )}
           </div>
 
@@ -340,7 +337,7 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon */}
-          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
+          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
             <div className="flex items-center gap-1.5">
               <Calendar className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">
@@ -350,14 +347,19 @@ function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums text-primary">
+          <div
+            className="flex items-baseline justify-start pl-8 mb-1"
+            style={{ minHeight: '64px' }}
+          >
+            <p className="text-6xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedWorkouts)}
             </p>
           </div>
 
-          {/* Spacer */}
-          <div className="mb-3" style={{ height: '28px' }}></div>
+          {/* Visual zone - fixed height */}
+          <div className="mb-3" style={{ height: '24px' }}>
+            <div className="h-full"></div>
+          </div>
 
           {/* Label chip - bottom anchor */}
           <div>
@@ -380,7 +382,7 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
+          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
             <div className="flex items-center gap-1.5">
               <Award className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">PRs</span>
@@ -391,14 +393,19 @@ function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums text-primary">
+          <div
+            className="flex items-baseline justify-start pl-8 mb-1"
+            style={{ minHeight: '64px' }}
+          >
+            <p className="text-6xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedPRs)}
             </p>
           </div>
 
-          {/* Spacer */}
-          <div className="mb-3" style={{ height: '28px' }}></div>
+          {/* Visual zone - fixed height */}
+          <div className="mb-3" style={{ height: '24px' }}>
+            <div className="h-full"></div>
+          </div>
 
           {/* Label chip - bottom anchor */}
           <div>
@@ -421,7 +428,7 @@ function Dashboard() {
           }}
         >
           {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-4" style={{ minHeight: '32px' }}>
+          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
             <div className="flex items-center gap-1.5">
               <Flame className="text-muted opacity-60" size={14} strokeWidth={1.5} />
               <span className="text-xs uppercase text-muted font-medium tracking-wide">Streak</span>
@@ -434,21 +441,26 @@ function Dashboard() {
           </div>
 
           {/* Number - slightly offset */}
-          <div className="flex items-center justify-start pl-8 mb-1" style={{ minHeight: '60px' }}>
-            <p className="text-5xl font-bold tabular-nums text-primary">
+          <div
+            className="flex items-baseline justify-start pl-8 mb-1"
+            style={{ minHeight: '64px' }}
+          >
+            <p className="text-6xl font-bold tabular-nums text-primary">
               {isLoading ? <span className="shimmer"></span> : Math.round(animatedStreak)}
             </p>
           </div>
 
           {/* Visual zone: Duolingo-style streak visualization */}
-          <div className="mb-3 flex justify-center items-center" style={{ height: '28px' }}>
-            {!isLoading && (
-              <StreakVisualization
-                currentStreak={stats.currentStreak}
-                workoutDates={allWorkouts.map((w) => w.date)}
-                animate={true}
-              />
-            )}
+          <div className="mb-3" style={{ height: '24px' }}>
+            <div className="flex justify-center items-center h-full">
+              {!isLoading && (
+                <StreakVisualization
+                  currentStreak={stats.currentStreak}
+                  workoutDates={allWorkouts.map((w) => w.date)}
+                  animate={true}
+                />
+              )}
+            </div>
           </div>
 
           {/* Label chip - bottom anchor */}

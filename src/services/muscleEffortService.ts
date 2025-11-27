@@ -107,11 +107,14 @@ export async function appendMuscleEffortData(
       continue;
     }
 
-    // Calculate normalized weights
-    // Primary = 1.0, Secondary = 0.2, then normalize to sum to 1
-    const rawSum = muscles.primary.length * 1.0 + muscles.secondary.length * 0.2;
+    // Calculate fixed 80/20 split
+    // Primary muscles collectively get 80% of effort (divided equally among them)
+    // Secondary muscles collectively get 20% of effort (divided equally among them)
+    const primaryWeight = muscles.primary.length > 0 ? 0.8 / muscles.primary.length : 0;
+    const secondaryWeight = muscles.secondary.length > 0 ? 0.2 / muscles.secondary.length : 0;
 
-    if (rawSum === 0) continue;
+    // Skip if no muscles have weight
+    if (primaryWeight === 0 && secondaryWeight === 0) continue;
 
     for (const set of exercise.sets) {
       // Skip incomplete sets
@@ -128,7 +131,7 @@ export async function appendMuscleEffortData(
           workout_date: workoutDate,
           muscle_group: muscle,
           effort_score: effort,
-          muscle_weight: 1.0 / rawSum
+          muscle_weight: primaryWeight
         });
       }
 
@@ -139,7 +142,7 @@ export async function appendMuscleEffortData(
           workout_date: workoutDate,
           muscle_group: muscle,
           effort_score: effort,
-          muscle_weight: 0.2 / rawSum
+          muscle_weight: secondaryWeight
         });
       }
     }
