@@ -23,7 +23,7 @@ const CardHeader = ({ children, className = '' }: { children: React.ReactNode; c
 );
 
 const CardTitle = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`text-2xl font-semibold leading-none tracking-tight ${className}`}>
+  <div className={`text-3xl font-semibold leading-none tracking-tight ${className}`}>
     {children}
   </div>
 );
@@ -230,7 +230,7 @@ function Dashboard2() {
         >
         {/* Volume Card + Sparkline */}
         <Card className="flex flex-col h-full col-span-2 xl:col-span-1">
-            <CardHeader className="relative flex-1 overflow-hidden">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
               <div className="flex items-center justify-between">
                 <CardDescription>Total Volume</CardDescription>
                 {!isLoading && stats.bestWorkout && (
@@ -271,9 +271,9 @@ function Dashboard2() {
                       <Area
                         type="monotone"
                         dataKey="value"
-                        stroke="rgba(147, 51, 234, 0.95)"
+                        stroke="none"
                         fill="url(#miniVolumeGradient)"
-                        strokeWidth={1}
+                        strokeWidth={0}
                         isAnimationActive
                       />
                     </AreaChart>
@@ -282,14 +282,14 @@ function Dashboard2() {
               )}
             </CardHeader>
 
-            <CardFooter className="text-xs text-muted-foreground">
+            <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
               Last 7 days
             </CardFooter>
           </Card>
 
         {/* Workouts Card */}
         <Card className="flex flex-col h-full">
-          <CardHeader className="flex-1">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
             <CardDescription>Workouts</CardDescription>
             <CardTitle className="text-2xl tabular-nums">
               {isLoading ? '...' : Math.round(animatedWorkouts)}
@@ -303,14 +303,14 @@ function Dashboard2() {
               </div>
             )}
           </CardHeader>
-          <CardFooter className="text-xs text-muted-foreground">
+          <CardFooter className="text-xs text-muted-foreground pb-2 px-3">
             Last 7 days
           </CardFooter>
         </Card>
 
         {/* PRs Card */}
         <Card className="flex flex-col h-full">
-          <CardHeader className="flex-1">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
             <div className="flex items-center justify-between">
               <CardDescription>PRs</CardDescription>
               {!isLoading && stats.daysSinceLastPR !== null && (
@@ -323,14 +323,14 @@ function Dashboard2() {
               {isLoading ? '...' : Math.round(animatedPRs)}
             </CardTitle>
           </CardHeader>
-          <CardFooter className="text-xs text-muted-foreground">
+          <CardFooter className="text-xs text-muted-foreground pb-2 px-3">
             Last 30 days
           </CardFooter>
         </Card>
 
         {/* Streak Card + Visualization */}
           <Card className="flex flex-col h-full col-span-2 xl:col-span-1">
-            <CardHeader className="relative flex-1">
+            <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
               <div className="flex items-center justify-between">
                 <CardDescription>Current Streak</CardDescription>
                 {!isLoading && (
@@ -347,7 +347,7 @@ function Dashboard2() {
 
               {/* Right streak pills: now absolutely positioned */}
               {!isLoading && (
-                  <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[46px]">
+                  <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
                     <StreakVisualization
                       currentStreak={stats.currentStreak}
                       workoutDates={allWorkouts.map((w) => w.date)}
@@ -357,13 +357,13 @@ function Dashboard2() {
               )}
             </CardHeader>
 
-            <CardFooter className="text-xs text-muted-foreground">
+            <CardFooter className="text-xs text-muted-foreground pb-2 px-3">
               Keep it going!
             </CardFooter>
           </Card>
       </div>
 
-      {/* Volume Progression Chart - The Sexy One */}
+      {/* Volume Progression Chart */}
       <Card>
         <CardHeader>
           <CardDescription>Volume Progression</CardDescription>
