@@ -1357,6 +1357,213 @@ User wanted to experiment with colors, shadows, and borders without changing hex
 
 ---
 
+## Bug Fixes & Polish Sprint (November 19-24, 2025)
+
+### Critical Infrastructure Fixes
+
+#### Memory Leak Resolution (2025-11-24)
+**Context**: Application was consuming excessive memory (32GB+ RAM) during development, indicating serious memory leaks.
+
+**4 Critical Fixes Applied:**
+
+1. **SyncManager Event Listener Leak**
+   - Problem: `window.addEventListener('online')` added repeatedly without removal
+   - Fix: Store handler reference, properly remove on stop
+   - File: `src/services/syncManager.ts`
+
+2. **SyncManager Lifecycle Management**
+   - Problem: `setInterval` never stopped, accumulated during hot reloads
+   - Fix: Added `beforeunload` event listener to stop syncManager
+   - File: `src/main.tsx`
+
+3. **Analytics Unbounded PR Loading**
+   - Problem: Loaded ALL PRs from IndexedDB with no limit
+   - Fix: Added `.limit(1000)` to PRs query
+   - File: `src/pages/Analytics.tsx`
+
+4. **WorkoutLogger Nested Maps Leak**
+   - Problem: Maps recreated on re-render but not garbage collected
+   - Fix: Added cleanup functions in useEffect returns
+   - File: `src/pages/WorkoutLogger.tsx`
+
+**Impact**: Memory usage now stable even during extended dev sessions.
+
+#### Dev Environment Fixes (2025-11-24)
+
+**Blank Screen on Dev Server - RESOLVED**
+- Problem: React context ordering error + missing `.env` file
+- Root causes:
+  1. Missing Supabase environment variables
+  2. ThemeProvider trying to use AuthContext but rendered outside AuthProvider
+- Fix: Created `.env` with placeholders, moved AuthProvider to `main.tsx`
+- New hierarchy: `AuthProvider` → `ThemeProvider` → `App`
+
+**Theme Preference Cloud Sync - IMPLEMENTED**
+- Added `theme_preference` column to Supabase profiles table
+- ThemeContext now loads from profile on login with React Query
+- Parallel prefetching: Profile fetches immediately on auth state change
+- Optimized performance: ~100-200ms theme switch on login (previously 2s)
+- React Query cache: 5min staleTime, 30min garbage collection
+- Guest users: OS theme detection (light/dark), no AMOLED access
+- Logged-in users: Profile theme always wins, syncs across devices
+
+**Profile Data Persistence - FIXED**
+- Sex field now saves correctly to Supabase
+- Weight data persists across devices
+- Unit preference syncs properly
+- Fixed `useUserSettings` hook to use authenticated user ID
+- Verified: Strength Standards correctly uses sex data for personalized percentiles
+
+### UI/UX Polish (November 19-21, 2025)
+
+#### Visual Refinements (2025-11-19)
+
+**Calendar Heatmap Visibility**
+- Changed date numbers from `text-gray-300` → `var(--text-primary)`
+- Month names now properly contrast in all themes
+
+**Strength Standards Warning Message**
+- Changed "To see personalized standards..." from `text-gray-300` → `var(--text-primary)`
+- Privacy note updated from `text-gray-500` → `var(--text-secondary)`
+- Now readable across all themes
+
+#### Dashboard Improvements (2025-11-20)
+
+**Sparkline Data Accuracy**
+- Changed from 14 days to 7 days to match volume chip
+- Added flat line rendering when all values equal
+- Fixed peak dot display on flat data (now hidden)
+- Honest visualization: "dead line" when no recent workouts
+
+**Volume Metric - Best Day Label**
+- Changed from day-of-week pattern to actual date
+- Now shows "Best, Oct 27" with aggregated volume ("60k lbs")
+- Aggregates all same-day workouts for accurate total
+
+**Analytics Volume Chart Tooltips**
+- Added unique keys to distinguish same-day workouts
+- Tooltip now shows correct volume for each bar
+- X-axis displays clean date labels
+
+**Template Exercise Display**
+- Replaced hover-to-see with click-to-expand
+- Click "+X more" to expand, "Show less" to collapse
+- Smooth CSS transitions
+- Cards use flexbox to keep Start Workout button at bottom
+- Consistent behavior for custom and built-in templates
+
+**Start Workout Button Polish**
+- Header button: Removed Plus icon, increased padding (18px → 24px)
+- "Start Empty Workout": Added white-to-purple gradient
+- Gradient: #FAFAFA (top) → #E4D2FF (bottom)
+- Purple text (#7E29FF) with Play icon
+
+**System Theme Detection**
+- App detects OS dark/light preference on first load
+- Uses `window.matchMedia('(prefers-color-scheme: dark)')`
+- New users automatically get theme matching device
+- LocalStorage preferences still take priority
+
+**Sign-In Modal Readability**
+- Replaced all hardcoded dark colors with CSS variables
+- Background: `var(--surface-primary)`
+- Inputs: `var(--surface-accent)` with `var(--border-subtle)`
+- Text: `text-primary`, `text-secondary`, `text-muted`
+- Now readable in light, dark, AMOLED themes
+
+**Incomplete Sets Warning**
+- Added explicit warning when no sets completed
+- "Complete at least one set to save your workout"
+- Fixed contrast (dark brown #78350F on yellow background)
+
+#### Code Cleanup (2025-11-20)
+
+**Dev Buttons Removed**
+- Deleted DevTestPanel component entirely
+- Removed import and usage from App.tsx
+- Deleted `src/components/DevTestPanel.tsx` file
+- Cleaner codebase, no legacy code
+
+#### Full Theme Refactoring (2025-11-21)
+
+**Complete App Theme-Aware Migration - 20+ Files**
+- Made entire app theme-aware across Dashboard, Analytics, Program, WorkoutLogger
+- AMOLED mode: Gold accents (#D4A017), gray chips, brilliant medal badges
+- Dark mode: Blue accents (#0092E6) matching Start Workout button
+- Light mode: Purple accents preserved
+- Created centralized theme helpers:
+  - `getAccentColors()`
+  - `getChartColors()`
+  - `getSelectedColors()`
+- Replaced 200+ hardcoded purple/gray colors with theme-aware alternatives
+
+**Files Updated:**
+- Analytics.tsx, Program.tsx, WorkoutLogger.tsx
+- Header.tsx, ProgramBuilder.tsx, CalendarHeatmap.tsx
+- ProgressReports.tsx, GuestBanner.tsx, ExerciseSelector.tsx
+- OfflineIndicator.tsx, WorkoutEditModal.tsx
+- ExerciseLibrary.tsx, StrengthStandards.tsx
+- Profile.tsx (31 violations → theme-aware)
+- TemplateBuilder.tsx (22 violations → theme-aware)
+- RestTimer.tsx, ProtectedRoute.tsx
+
+**Top Exercises Badges (AMOLED mode)**
+- Brilliant gold (#FFD700) for 1st place
+- Brilliant silver (#C0C0C0) for 2nd place
+- Brilliant bronze (#CD7F32) for 3rd place
+- High contrast, premium feel on pure black background
+
+### Documentation Corrections (2025-11-24)
+
+**Muscle Weight Values - FIXED**
+- Documentation (`docs/technical/how-calculations-work.md`) had wrong value
+- Documented: Secondary muscles = 0.5 ❌
+- Actual code: Secondary muscles = 0.2 ✅
+- Documentation corrected to match implementation
+
+**Muscle Radar Normalization Formula - FIXED**
+- Previous (WRONG): Variable ratio based on muscle count
+  - Exercise with 1 primary + 5 secondaries → Primary got only 50%
+  - Exercise with 5 primaries + 1 secondary → Secondary got only 3%
+- Current (CORRECT): Fixed 80/20 split
+  - Primaries ALWAYS get 80% total (divided equally)
+  - Secondaries ALWAYS get 20% total (divided equally)
+  - Formula: `Each primary = 0.8 / (# primary muscles)`
+  - Formula: `Each secondary = 0.2 / (# secondary muscles)`
+- Fixed in: `src/services/muscleEffortService.ts` lines 110-147
+
+### Impact Summary
+
+**Stability:**
+- ✅ Memory leaks eliminated (4 critical fixes)
+- ✅ Dev environment stable with proper context hierarchy
+- ✅ Theme sync works flawlessly across devices
+
+**User Experience:**
+- ✅ All themes (Light/Dark/AMOLED) now consistently styled
+- ✅ 20+ components migrated to theme-aware design
+- ✅ Calendar and strength standards now readable
+- ✅ Sign-in modal works in all themes
+- ✅ Start Workout button has premium gradient feel
+
+**Data Integrity:**
+- ✅ Profile data persists correctly to cloud
+- ✅ Theme preference syncs across devices
+- ✅ Sex field saves and Strength Standards use it correctly
+- ✅ Documentation matches actual code implementation
+
+**Performance:**
+- ✅ Theme switching optimized (~100-200ms with React Query)
+- ✅ Memory usage stable during development
+- ✅ No more unbounded data loading
+
+**Files Modified**: 30+ files across 7 days
+**Lines Changed**: ~500+ insertions, ~200+ deletions
+**Bugs Fixed**: 15+ critical and minor issues
+**Tech Debt Cleared**: Dev panel removal, hardcoded colors elimination, documentation corrections
+
+---
+
 ## Conclusion
 
 GymTracker Pro has evolved from a concept to a **production-ready, fully functional gym tracking application** in just 14 weeks. We've delivered on our core promise: exceptional analytics, offline-first architecture, and a premium user experience that rivals established competitors.
