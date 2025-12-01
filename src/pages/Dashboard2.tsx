@@ -73,7 +73,6 @@ function Dashboard2() {
   const [viewingWorkoutId, setViewingWorkoutId] = useState<string | null>(null);
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [periodFilter, setPeriodFilter] = useState<'7d' | '30d' | '90d'>('7d');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'program' | 'free'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'heaviest' | 'duration'>('newest');
   const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutLog | null>(null);
@@ -85,21 +84,21 @@ function Dashboard2() {
     return d;
   }, []);
 
-  const thirtyDaysAgo = useMemo(() => {
+  const ninetyDaysAgo = useMemo(() => {
     const d = new Date(today);
-    d.setDate(today.getDate() - 30);
+    d.setDate(today.getDate() - 90);
     d.setHours(0, 0, 0, 0);
     return d;
   }, [today]);
 
   // Fetch data
   const { data: allWorkouts = [], isLoading: workoutsLoading } = useWorkouts(
-    user ? thirtyDaysAgo : undefined,
+    user ? ninetyDaysAgo : undefined,
     user ? today : undefined
   );
 
   const { data: allPRs = [], isLoading: prsLoading } = usePersonalRecords(
-    user ? thirtyDaysAgo : undefined,
+    user ? ninetyDaysAgo : undefined,
     user ? today : undefined
   );
 
@@ -201,8 +200,32 @@ function Dashboard2() {
   const workoutsTrend = getTrendPercentage(stats.workoutsLast7Days, stats.workoutsPrev7Days);
   const workoutsUp = stats.workoutsLast7Days > stats.workoutsPrev7Days;
 
-  // Recent workouts for activity feed
-  const recentWorkouts = useMemo(() => allWorkouts.slice(0, 5), [allWorkouts]);
+  // Recent workouts for activity feed - filtered and sorted
+  const recentWorkouts = useMemo(() => {
+    // Calculate period cutoff date
+    const cutoffDate = new Date(today);
+    const daysToSubtract = periodFilter === '7d' ? 7 : periodFilter === '30d' ? 30 : 90;
+    cutoffDate.setDate(today.getDate() - daysToSubtract);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    // Filter by period
+    let filtered = allWorkouts.filter((w) => {
+      const workoutDate = new Date(w.date);
+      return workoutDate >= cutoffDate && workoutDate <= today;
+    });
+
+    // Sort
+    if (sortBy === 'newest') {
+      filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } else if (sortBy === 'heaviest') {
+      filtered.sort((a, b) => b.totalVolume - a.totalVolume);
+    } else if (sortBy === 'duration') {
+      filtered.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+    }
+
+    // Limit to 10
+    return filtered.slice(0, 10);
+  }, [allWorkouts, periodFilter, sortBy, today]);
 
   // Helper functions
   function formatDate(date: Date): string {
@@ -308,7 +331,7 @@ function Dashboard2() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={volumeSparklineData.map((vol, i) => ({ value: vol, index: i }))}
-                    margin={{ top: 2, right: 0, left: 0, bottom: 3 }}
+                    margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                   >
                     <defs>
                       <linearGradient id="miniVolumeGradient" x1="0" y1="0" x2="0" y2="1">
@@ -317,17 +340,6 @@ function Dashboard2() {
                       </linearGradient>
                     </defs>
 
-                    {/* Invisible Y-axis to establish scale starting at 0 */}
-                    <YAxis domain={[0, 'dataMax']} hide />
-
-                    {/* Zero baseline - visible reference line */}
-                    <ReferenceLine
-                      y={0}
-                      stroke="#a78bfa"
-                      strokeWidth={2}
-                      strokeDasharray="0"
-                    />
-
                     <Area
                       type="monotone"
                       dataKey="value"
@@ -335,7 +347,6 @@ function Dashboard2() {
                       strokeWidth={1.5}
                       fill="url(#miniVolumeGradient)"
                       isAnimationActive
-                      baseValue={0}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -453,23 +464,6 @@ function Dashboard2() {
                 <option value="7d">7 days</option>
                 <option value="30d">30 days</option>
                 <option value="90d">90 days</option>
-              </select>
-
-              {/* Type Filter */}
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value as 'all' | 'program' | 'free')}
-                className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
-                onFocus={(e) => {
-                  e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.boxShadow = 'none';
-                }}
-              >
-                <option value="all">All</option>
-                <option value="program">Program</option>
-                <option value="free">Free</option>
               </select>
 
               {/* Sort */}
