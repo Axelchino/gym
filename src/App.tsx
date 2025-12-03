@@ -7,7 +7,7 @@ import { Auth } from './pages/Auth';
 
 // Lazy load: All page components (code-split into separate chunks)
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Dashboard2 = lazy(() => import('./pages/Dashboard2'));
+const Dashboard1 = lazy(() => import('./pages/Dashboard1'));
 const WorkoutLogger = lazy(() => import('./pages/WorkoutLogger'));
 const Program = lazy(() => import('./pages/Program'));
 const Analytics = lazy(() => import('./pages/Analytics'));
@@ -43,7 +43,7 @@ function App() {
             <Route path="/3-modes" element={<ThreeModesDemo />} />
             <Route path="/theme-demo" element={<ThemeDemo />} />
             <Route path="/streak-test" element={<StreakTest />} />
-            <Route path="/dashboard2" element={<Dashboard2 />} />
+            <Route path="/dashboard1" element={<Dashboard1 />} />
 
             {/* Main routes - accessible to guests and authenticated users */}
             <Route path="/" element={<Layout />}>

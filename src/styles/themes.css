@@ -262,7 +262,7 @@
   --chart-primary: #B0B0B0;
   --chart-secondary: #D8D8D8;
   --chart-tertiary: #8A8A8A;
-  --chart-grid: #1A1A1A;
+  --chart-grid: #000000;              /* Pure black grid for AMOLED */
   --chart-text: var(--text-muted);
 }
 

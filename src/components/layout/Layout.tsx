@@ -14,8 +14,8 @@ export function Layout() {
       {/* Guest mode banner - only shown for unauthenticated users */}
       {!user && <GuestBanner />}
 
-      {/* Main content - Centered container with 1280px max width */}
-      <main className="mx-auto px-6 py-8" style={{ maxWidth: '1280px' }}>
+      {/* Main content - Centered container with 1536px max width */}
+      <main className="mx-auto px-6 py-8" style={{ maxWidth: '1536px' }}>
         <Outlet />
       </main>
     </div>

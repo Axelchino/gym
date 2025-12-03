@@ -51,18 +51,17 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-      <div className="mx-auto px-6 py-3" style={{ maxWidth: '1280px' }}>
-        <div className="flex items-center">
-          {/* Left: Logo */}
-          <div className="flex items-center justify-start" style={{ width: '260px' }}>
+      <div className="mx-auto px-6 py-3" style={{ maxWidth: '1536px' }}>
+        <div className="flex items-center justify-between">
+          {/* Left: Logo + Navigation */}
+          <div className="flex items-center gap-6">
+            {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <Dumbbell className="text-secondary opacity-60 group-hover:opacity-100 transition-opacity" size={24} strokeWidth={1.5} />
               <span className="text-lg font-semibold text-primary tracking-tight">GymTracker Pro</span>
             </Link>
-          </div>
 
-          {/* Center: Navigation Tabs & Search */}
-          <div className="flex-1 flex items-center justify-center gap-6">
+            {/* Navigation */}
             <nav className="flex items-center gap-1">
               {navLinks.map(({ to, label }) => {
                 const isActive = location.pathname === to;
@@ -80,22 +79,20 @@ export function Header() {
                 );
               })}
             </nav>
-
-            {/* Search */}
-            <div style={{ width: '200px' }}>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted opacity-50" size={16} strokeWidth={1.5} />
-                <input
-                  type="text"
-                  placeholder="Search exercises..."
-                  className="w-full pl-10 pr-4 py-2 bg-card text-primary text-sm border border-card rounded-md focus:outline-none focus:ring-2 focus:ring-brand-purple/50 focus:border-transparent transition-all placeholder:text-muted"
-                />
-              </div>
-            </div>
           </div>
 
-          {/* Right: Actions */}
-          <div className="flex items-center gap-3" style={{ width: '260px', justifyContent: 'flex-end' }}>
+          {/* Right: Search + Actions */}
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted opacity-50" size={16} strokeWidth={1.5} />
+              <input
+                type="text"
+                placeholder="Search exercises..."
+                style={{ width: '320px' }}
+                className="pl-10 pr-4 py-2 bg-card text-primary text-sm border border-card rounded-md focus:outline-none focus:ring-2 focus:ring-brand-purple/50 focus:border-transparent transition-all placeholder:text-muted"
+              />
+            </div>
             {/* Offline Indicator */}
             <OfflineIndicator />
 

@@ -1,26 +1,80 @@
-import { useState, useMemo } from 'react';
-import { TrendingUp, Calendar, Award, Flame, Edit2, Share2, Copy } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { TrendingUp, Calendar, Award, Edit2, Share2, Copy } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useUserSettings } from '../hooks/useUserSettings';
 import { useAuth } from '../contexts/AuthContext';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber';
 import { useWorkouts, usePersonalRecords } from '../hooks/useWorkoutData';
-import { WorkoutEditModal } from '../components/WorkoutEditModal';
-import { Sparkline } from '../components/Sparkline';
+import { useUserSettings } from '../hooks/useUserSettings';
 import { StreakVisualization } from '../components/StreakVisualization';
 import { calculateStreak } from '../utils/analytics';
-import type { WorkoutLog } from '../types/workout';
-import { createWorkoutTemplate } from '../services/supabaseDataService';
+import { Area, AreaChart, YAxis, ResponsiveContainer } from 'recharts';
+import { WorkoutEditModal } from '../components/WorkoutEditModal';
 import { SaveTemplateModal } from '../components/SaveTemplateModal';
-import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 import { Chip } from '../components/ui';
 import { useThemeTokens } from '../utils/themeHelpers';
+import type { WorkoutLog } from '../types/workout';
+import { createWorkoutTemplate } from '../services/supabaseDataService';
+import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
+
+// shadcn-style Card components (minimal version for now)
+const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden ${className}`}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>
+    {children}
+  </div>
+);
+
+const CardTitle = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`text-3xl font-semibold leading-none tracking-tight ${className}`}>
+    {children}
+  </div>
+);
+
+const CardDescription = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`text-sm text-muted-foreground ${className}`}>
+    {children}
+  </div>
+);
+
+const CardContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`p-6 pt-0 ${className}`}>
+    {children}
+  </div>
+);
+
+const CardFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`flex items-center p-6 pt-0 ${className}`}>
+    {children}
+  </div>
+);
+
+const Badge = ({ children, variant = 'default' }: { children: React.ReactNode; variant?: string }) => (
+  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold ${
+    variant === 'outline' ? 'border bg-background' : 'bg-primary text-primary-foreground'
+  }`}>
+    {children}
+  </span>
+);
 
 function Dashboard() {
   const { weightUnit } = useUserSettings();
   const { user } = useAuth();
   const tokens = useThemeTokens();
   const queryClient = useQueryClient();
+
+  // Recent Activity state
+  const [editingWorkoutId, setEditingWorkoutId] = useState<string | null>(null);
+  const [viewingWorkoutId, setViewingWorkoutId] = useState<string | null>(null);
+  const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
+  const [periodFilter, setPeriodFilter] = useState<'7d' | '30d' | '90d'>('7d');
+  const [sortBy, setSortBy] = useState<'newest' | 'heaviest' | 'duration'>('newest');
+  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutLog | null>(null);
 
   // Calculate date ranges
   const today = useMemo(() => {
@@ -29,36 +83,27 @@ function Dashboard() {
     return d;
   }, []);
 
-  const thirtyDaysAgo = useMemo(() => {
+  const ninetyDaysAgo = useMemo(() => {
     const d = new Date(today);
-    d.setDate(today.getDate() - 30);
+    d.setDate(today.getDate() - 90);
     d.setHours(0, 0, 0, 0);
     return d;
   }, [today]);
 
-  // REACT QUERY: Fetch data with automatic caching
+  // Fetch data
   const { data: allWorkouts = [], isLoading: workoutsLoading } = useWorkouts(
-    user ? thirtyDaysAgo : undefined,
+    user ? ninetyDaysAgo : undefined,
     user ? today : undefined
   );
 
   const { data: allPRs = [], isLoading: prsLoading } = usePersonalRecords(
-    user ? thirtyDaysAgo : undefined,
+    user ? ninetyDaysAgo : undefined,
     user ? today : undefined
   );
 
   const isLoading = workoutsLoading || prsLoading;
 
-  const [editingWorkoutId, setEditingWorkoutId] = useState<string | null>(null);
-  const [viewingWorkoutId, setViewingWorkoutId] = useState<string | null>(null);
-  const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
-  const [periodFilter, setPeriodFilter] = useState<'7d' | '30d' | '90d'>('7d');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'program' | 'free'>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'heaviest' | 'duration'>('newest');
-  const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutLog | null>(null);
-
-  // Calculate stats from React Query data
+  // Calculate stats
   const stats = useMemo(() => {
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 7);
@@ -82,6 +127,18 @@ function Dashboard() {
     });
     const volumePrev7Days = workoutsPrev7Days.reduce((sum, w) => sum + w.totalVolume, 0);
 
+    // Best workout (highest volume)
+    const bestWorkout = allWorkouts.length > 0
+      ? allWorkouts.reduce((best, current) =>
+          current.totalVolume > best.totalVolume ? current : best
+        )
+      : null;
+
+    // Days since last PR
+    const daysSinceLastPR = allPRs.length > 0
+      ? Math.floor((today.getTime() - new Date(allPRs[0].date).getTime()) / (1000 * 60 * 60 * 24))
+      : null;
+
     return {
       workoutsLast7Days: workoutsLast7Days.length,
       workoutsPrev7Days: workoutsPrev7Days.length,
@@ -89,22 +146,27 @@ function Dashboard() {
       volumePrev7Days,
       currentStreak: calculateStreak(allWorkouts),
       prsLast30Days: allPRs.length,
+      bestWorkout,
+      daysSinceLastPR,
     };
   }, [allWorkouts, allPRs, today]);
 
-  // Animated numbers for hero tiles
+  // Format today's date
+  const todayFormatted = useMemo(() => {
+    return today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }, [today]);
+
+  // Animated numbers
   const animatedVolume = useAnimatedNumber(stats.volumeLast7Days, 400, !isLoading);
   const animatedWorkouts = useAnimatedNumber(stats.workoutsLast7Days, 350, !isLoading);
   const animatedPRs = useAnimatedNumber(stats.prsLast30Days, 350, !isLoading);
   const animatedStreak = useAnimatedNumber(stats.currentStreak, 350, !isLoading);
 
-  // OPTIMIZATION 2: Memoize sparkline calculation (only recalculates when allWorkouts changes)
-  // Shows last 7 days to match the volume chip
+  // Sparkline data
   const volumeSparklineData = useMemo(() => {
     if (allWorkouts.length === 0) return [];
 
     const data: number[] = [];
-
     for (let i = 6; i >= 0; i--) {
       const dayStart = new Date(today);
       dayStart.setDate(today.getDate() - i);
@@ -125,53 +187,53 @@ function Dashboard() {
     return data;
   }, [allWorkouts, today]);
 
-  // OPTIMIZATION 3: Memoize filtered workouts (avoid unnecessary re-renders)
-  const recentWorkouts = useMemo(() => allWorkouts.slice(0, 5), [allWorkouts]);
+  // Trend percentage calculation
+  const getTrendPercentage = (current: number, previous: number) => {
+    if (previous === 0) return null;
+    return Math.abs(((current - previous) / previous) * 100).toFixed(0);
+  };
 
-  // Days since last PR
-  const daysSinceLastPR = useMemo(() => {
-    if (allPRs.length === 0) return -1;
-    const lastPRDate = new Date(allPRs[0].date);
-    const diffTime = today.getTime() - lastPRDate.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  }, [allPRs, today]);
+  const volumeTrend = getTrendPercentage(stats.volumeLast7Days, stats.volumePrev7Days);
+  const volumeUp = stats.volumeLast7Days > stats.volumePrev7Days;
 
-  // OPTIMIZATION 4: Memoize best day calculation (aggregate same-day workouts)
-  const bestWorkout = useMemo(() => {
-    if (allWorkouts.length === 0) return null;
+  const workoutsTrend = getTrendPercentage(stats.workoutsLast7Days, stats.workoutsPrev7Days);
+  const workoutsUp = stats.workoutsLast7Days > stats.workoutsPrev7Days;
 
-    // Aggregate volume by day
-    const dayVolumes: Record<string, number> = {};
-    allWorkouts.forEach((w) => {
-      const dateKey = new Date(w.date).toDateString();
-      dayVolumes[dateKey] = (dayVolumes[dateKey] || 0) + w.totalVolume;
+  // Recent workouts for activity feed - filtered and sorted
+  const recentWorkouts = useMemo(() => {
+    // Calculate period cutoff date
+    const cutoffDate = new Date(today);
+    const daysToSubtract = periodFilter === '7d' ? 7 : periodFilter === '30d' ? 30 : 90;
+    cutoffDate.setDate(today.getDate() - daysToSubtract);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    // Filter by period
+    let filtered = allWorkouts.filter((w) => {
+      const workoutDate = new Date(w.date);
+      return workoutDate >= cutoffDate && workoutDate <= today;
     });
 
-    // Find best day
-    let bestDate = '';
-    let bestVolume = 0;
-    Object.entries(dayVolumes).forEach(([dateKey, vol]) => {
-      if (vol > bestVolume) {
-        bestVolume = vol;
-        bestDate = dateKey;
-      }
-    });
+    // Sort
+    if (sortBy === 'newest') {
+      filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } else if (sortBy === 'heaviest') {
+      filtered.sort((a, b) => b.totalVolume - a.totalVolume);
+    } else if (sortBy === 'duration') {
+      filtered.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+    }
 
-    const formattedDate = new Date(bestDate).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-    // Format volume with "k" abbreviation for thousands
-    const volumeK =
-      bestVolume >= 1000
-        ? `${(bestVolume / 1000).toFixed(bestVolume >= 10000 ? 0 : 1)}k`
-        : Math.round(bestVolume).toString();
-    return {
-      date: formattedDate,
-      volume: volumeK,
-    };
-  }, [allWorkouts]);
+    // Limit to 10
+    return filtered.slice(0, 10);
+  }, [allWorkouts, periodFilter, sortBy, today]);
 
+  // Auto-switch to 30d if less than 3 workouts in 7d
+  useEffect(() => {
+    if (periodFilter === '7d' && recentWorkouts.length < 3 && allWorkouts.length > 0) {
+      setPeriodFilter('30d');
+    }
+  }, [periodFilter, recentWorkouts.length, allWorkouts.length]);
+
+  // Helper functions
   function formatDate(date: Date): string {
     const d = new Date(date);
     return d.toLocaleDateString('en-US', {
@@ -227,247 +289,158 @@ function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 5-Tile Hero Row - Volume spans 2 columns */}
-      <div className="grid grid-cols-5 gap-6">
-        {/* Volume - 2 columns, hero metric */}
-        <div
-          className="col-span-2 rounded-xl p-2.5 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
+    <div className="space-y-8">
+      {/* Stats Grid - 4 cards, same height, different widths */}
+      <div
+          className="
+            grid gap-4
+            grid-cols-2                 /* default: two columns */
+            max-[480px]:grid-cols-1     /* only stack on very small screens */
+            xl:grid-cols-4
+            xl:[grid-template-columns:2fr_1fr_1fr_2fr]
+            auto-rows-fr
+          "
         >
-          {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
-            <div className="flex items-center gap-1.5">
-              <TrendingUp className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-              <span className="text-xs uppercase text-muted font-medium tracking-wide">
-                Total Volume
-              </span>
-            </div>
-            {!isLoading && bestWorkout && (
-              <div className="text-right">
-                <p className="text-xs text-secondary">Best, {bestWorkout.date}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Number - slightly offset */}
-          <div
-            className="flex items-baseline justify-start pl-8 mb-1"
-            style={{ minHeight: '64px' }}
-          >
-            <p className="text-6xl font-bold tabular-nums text-primary">
-              {isLoading ? (
-                <span className="shimmer"></span>
-              ) : (
-                Math.round(animatedVolume).toLocaleString()
-              )}
-            </p>
-            {!isLoading && (
-              <span className="text-lg tabular-nums ml-2 text-secondary">{weightUnit}</span>
-            )}
-          </div>
-
-          {/* Sparkline + Delta */}
-          <div className="mb-3" style={{ height: '24px' }}>
-            {!isLoading && volumeSparklineData.length > 0 ? (
-              <div className="flex items-center justify-between h-full">
-                <div className="flex-1">
-                  <Sparkline
-                    data={volumeSparklineData}
-                    width={200}
-                    height={28}
-                    color={tokens.sparkline.color}
-                    peakDotColor={tokens.sparkline.peakDot}
-                    strokeWidth={1}
-                    animate={true}
-                  />
-                </div>
-                {stats.volumePrev7Days > 0 && (
-                  <div
-                    className="ml-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold"
-                    style={{
-                      backgroundColor:
-                        stats.volumeLast7Days > stats.volumePrev7Days
-                          ? 'rgba(22, 163, 74, 0.1)'
-                          : 'rgba(239, 68, 68, 0.1)',
-                      color: stats.volumeLast7Days > stats.volumePrev7Days ? '#16A34A' : '#EF4444',
-                    }}
-                  >
-                    {stats.volumeLast7Days > stats.volumePrev7Days ? '↑' : '↓'}
-                    {Math.abs(
-                      ((stats.volumeLast7Days - stats.volumePrev7Days) / stats.volumePrev7Days) *
-                        100
-                    ).toFixed(0)}
-                    %
-                  </div>
+        {/* Volume Card + Sparkline */}
+        <Card className="flex flex-col h-full col-span-2 xl:col-span-1 overflow-visible">
+          <CardHeader className="relative flex-1 pt-2 px-3">
+              <div className="flex items-center justify-between">
+                <CardDescription>Total Volume</CardDescription>
+                {!isLoading && stats.bestWorkout && (
+                  <span className="text-xs text-muted-foreground">
+                    Best, {new Date(stats.bestWorkout.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
                 )}
               </div>
-            ) : (
-              <div></div>
+
+              <CardTitle className="text-2xl tabular-nums">
+                {isLoading ? '...' : Math.round(animatedVolume).toLocaleString()}
+                <span className="text-base text-muted-foreground ml-1">{weightUnit}</span>
+              </CardTitle>
+
+              {volumeTrend && (
+                <div className="mt-2">
+                  <Badge variant="outline">
+                    {volumeUp ? <TrendingUp size={12} /> : '↓'}
+                    {volumeTrend}%
+                  </Badge>
+                </div>
+              )}
+
+            {!isLoading && volumeSparklineData.length >= 2 && (() => {
+              const maxVal = Math.max(...volumeSparklineData);
+              const minVal = Math.min(...volumeSparklineData);
+              const yDomain = maxVal === 0 ? [0, 100] : [0, 'auto'];
+
+              return (
+                <div className="pointer-events-none absolute top-5 right-2 h-[95px] w-[245px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={volumeSparklineData.map((vol, i) => ({ value: vol, day: i }))}
+                      margin={{ top: 5, right: 5, left: 5, bottom: 15 }}
+                    >
+                      <defs>
+                        <linearGradient id="miniVolumeGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={tokens.sparkline.color} stopOpacity={1.0} />
+                          <stop offset="95%" stopColor={tokens.sparkline.color} stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
+                      <YAxis hide domain={yDomain} />
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke={tokens.sparkline.color}
+                        strokeWidth={1}
+                        fill="url(#miniVolumeGradient)"
+                        isAnimationActive={true}
+                        baseValue={0}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })()}
+            </CardHeader>
+
+            <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
+              Last 7 days
+            </CardFooter>
+          </Card>
+
+        {/* Workouts Card */}
+        <Card className="flex flex-col h-full">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
+            <CardDescription>Workouts</CardDescription>
+            <CardTitle className="text-2xl tabular-nums">
+              {isLoading ? '...' : Math.round(animatedWorkouts)}
+            </CardTitle>
+            {workoutsTrend && (
+              <div className="mt-2">
+                <Badge variant="outline">
+                  {workoutsUp ? <TrendingUp size={12} /> : '↓'}
+                  {workoutsTrend}%
+                </Badge>
+              </div>
             )}
-          </div>
+          </CardHeader>
+          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
+            Last 7 days
+          </CardFooter>
+        </Card>
 
-          {/* Label chip - bottom anchor */}
-          <div>
-            <Chip>Last 7 days</Chip>
-          </div>
-        </div>
-
-        {/* Workouts */}
-        <div
-          className="rounded-xl p-2.5 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          {/* Top: Label with icon */}
-          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-              <span className="text-xs uppercase text-muted font-medium tracking-wide">
-                Workouts
-              </span>
-            </div>
-          </div>
-
-          {/* Number - slightly offset */}
-          <div
-            className="flex items-baseline justify-start pl-8 mb-1"
-            style={{ minHeight: '64px' }}
-          >
-            <p className="text-6xl font-bold tabular-nums text-primary">
-              {isLoading ? <span className="shimmer"></span> : Math.round(animatedWorkouts)}
-            </p>
-          </div>
-
-          {/* Visual zone - fixed height */}
-          <div className="mb-3" style={{ height: '24px' }}>
-            <div className="h-full"></div>
-          </div>
-
-          {/* Label chip - bottom anchor */}
-          <div>
-            <Chip>Last 7 days</Chip>
-          </div>
-        </div>
-
-        {/* PRs */}
-        <div
-          className="rounded-xl p-2.5 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
-            <div className="flex items-center gap-1.5">
-              <Award className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-              <span className="text-xs uppercase text-muted font-medium tracking-wide">PRs</span>
-            </div>
-            {!isLoading && daysSinceLastPR >= 0 && (
-              <p className="text-xs text-secondary">Last PR {daysSinceLastPR}d ago</p>
-            )}
-          </div>
-
-          {/* Number - slightly offset */}
-          <div
-            className="flex items-baseline justify-start pl-8 mb-1"
-            style={{ minHeight: '64px' }}
-          >
-            <p className="text-6xl font-bold tabular-nums text-primary">
-              {isLoading ? <span className="shimmer"></span> : Math.round(animatedPRs)}
-            </p>
-          </div>
-
-          {/* Visual zone - fixed height */}
-          <div className="mb-3" style={{ height: '24px' }}>
-            <div className="h-full"></div>
-          </div>
-
-          {/* Label chip - bottom anchor */}
-          <div>
-            <Chip>Last 30 days</Chip>
-          </div>
-        </div>
-
-        {/* Streak */}
-        <div
-          className="rounded-xl p-2.5 transition-all"
-          style={{
-            backgroundColor: tokens.statCard.background,
-            border: `1px solid ${tokens.statCard.border}`,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.hoverBorder;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = tokens.statCard.border;
-          }}
-        >
-          {/* Top: Label with icon and microcopy */}
-          <div className="flex items-start justify-between mb-2" style={{ height: '32px' }}>
-            <div className="flex items-center gap-1.5">
-              <Flame className="text-muted opacity-60" size={14} strokeWidth={1.5} />
-              <span className="text-xs uppercase text-muted font-medium tracking-wide">Streak</span>
-            </div>
-            {!isLoading && (
-              <p className="text-xs text-secondary">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </p>
-            )}
-          </div>
-
-          {/* Number - slightly offset */}
-          <div
-            className="flex items-baseline justify-start pl-8 mb-1"
-            style={{ minHeight: '64px' }}
-          >
-            <p className="text-6xl font-bold tabular-nums text-primary">
-              {isLoading ? <span className="shimmer"></span> : Math.round(animatedStreak)}
-            </p>
-          </div>
-
-          {/* Visual zone: Duolingo-style streak visualization */}
-          <div className="mb-3" style={{ height: '24px' }}>
-            <div className="flex justify-center items-center h-full">
-              {!isLoading && (
-                <StreakVisualization
-                  currentStreak={stats.currentStreak}
-                  workoutDates={allWorkouts.map((w) => w.date)}
-                  animate={true}
-                />
+        {/* PRs Card */}
+        <Card className="flex flex-col h-full">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
+            <div className="flex items-center justify-between">
+              <CardDescription>PRs</CardDescription>
+              {!isLoading && stats.daysSinceLastPR !== null && (
+                <span className="text-xs text-muted-foreground">
+                  Last PR {stats.daysSinceLastPR}d ago
+                </span>
               )}
             </div>
-          </div>
+            <CardTitle className="text-2xl tabular-nums">
+              {isLoading ? '...' : Math.round(animatedPRs)}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
+            Last 30 days
+          </CardFooter>
+        </Card>
 
-          {/* Label chip - bottom anchor */}
-          <div>
-            <Chip>Weekly</Chip>
-          </div>
-        </div>
+        {/* Streak Card + Visualization */}
+          <Card className="flex flex-col h-full col-span-2 xl:col-span-1">
+            <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
+              <div className="flex items-center justify-between">
+                <CardDescription>Current Streak</CardDescription>
+                {!isLoading && (
+                  <span className="text-xs text-muted-foreground">
+                    {todayFormatted}
+                  </span>
+                )}
+              </div>
+
+              <CardTitle className="text-2xl tabular-nums">
+                {isLoading ? '...' : Math.round(animatedStreak)}
+                <span className="text-base text-muted-foreground ml-1">days</span>
+              </CardTitle>
+
+              {/* Right streak pills: now absolutely positioned */}
+              {!isLoading && (
+                  <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
+                    <StreakVisualization
+                      currentStreak={stats.currentStreak}
+                      workoutDates={allWorkouts.map((w) => w.date)}
+                      animate
+                    />
+                  </div>
+              )}
+            </CardHeader>
+
+            <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
+              Keep it going!
+            </CardFooter>
+          </Card>
       </div>
 
       {/* Recent Activity - Diary format */}
@@ -485,12 +458,8 @@ function Dashboard() {
                 value={periodFilter}
                 onChange={(e) => setPeriodFilter(e.target.value as '7d' | '30d' | '90d')}
                 className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
-                style={{
-                  // @ts-expect-error CSS custom property for Tailwind
-                  '--tw-ring-color': '#6F5AE8',
-                }}
                 onFocus={(e) => {
-                  e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
+                  e.target.style.boxShadow = `0 0 0 2px ${tokens.interactive.focusRing}40`;
                 }}
                 onBlur={(e) => {
                   e.target.style.boxShadow = 'none';
@@ -501,30 +470,13 @@ function Dashboard() {
                 <option value="90d">90 days</option>
               </select>
 
-              {/* Type Filter */}
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value as 'all' | 'program' | 'free')}
-                className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
-                onFocus={(e) => {
-                  e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.boxShadow = 'none';
-                }}
-              >
-                <option value="all">All</option>
-                <option value="program">Program</option>
-                <option value="free">Free</option>
-              </select>
-
               {/* Sort */}
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'newest' | 'heaviest' | 'duration')}
                 className="px-3 py-1.5 border border-border-subtle rounded-md bg-card text-primary text-xs focus:outline-none"
                 onFocus={(e) => {
-                  e.target.style.boxShadow = '0 0 0 2px rgba(126, 41, 255, 0.5)';
+                  e.target.style.boxShadow = `0 0 0 2px ${tokens.interactive.focusRing}40`;
                 }}
                 onBlur={(e) => {
                   e.target.style.boxShadow = 'none';
@@ -694,15 +646,15 @@ function Dashboard() {
                           onMouseEnter={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = tokens.interactive.hoverPurple;
-                              icon.style.opacity = '1';
+                              (icon as SVGElement).style.color = tokens.interactive.hoverPurple;
+                              (icon as SVGElement).style.opacity = '1';
                             }
                           }}
                           onMouseLeave={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = '';
-                              icon.style.opacity = '0.6';
+                              (icon as SVGElement).style.color = '';
+                              (icon as SVGElement).style.opacity = '0.6';
                             }
                           }}
                         >
@@ -723,15 +675,15 @@ function Dashboard() {
                           onMouseEnter={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = tokens.interactive.hoverPurple;
-                              icon.style.opacity = '1';
+                              (icon as SVGElement).style.color = tokens.interactive.hoverPurple;
+                              (icon as SVGElement).style.opacity = '1';
                             }
                           }}
                           onMouseLeave={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = '';
-                              icon.style.opacity = '0.6';
+                              (icon as SVGElement).style.color = '';
+                              (icon as SVGElement).style.opacity = '0.6';
                             }
                           }}
                         >
@@ -753,15 +705,15 @@ function Dashboard() {
                           onMouseEnter={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = tokens.interactive.hoverPurple;
-                              icon.style.opacity = '1';
+                              (icon as SVGElement).style.color = tokens.interactive.hoverPurple;
+                              (icon as SVGElement).style.opacity = '1';
                             }
                           }}
                           onMouseLeave={(e) => {
                             const icon = e.currentTarget.querySelector('svg');
                             if (icon) {
-                              icon.style.color = '';
-                              icon.style.opacity = '0.6';
+                              (icon as SVGElement).style.color = '';
+                              (icon as SVGElement).style.opacity = '0.6';
                             }
                           }}
                         >
