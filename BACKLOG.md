@@ -1,17 +1,19 @@
 # GymTracker Pro - Development Backlog
 
-**Last Updated:** 2025-11-28
+**Last Updated:** 2025-12-02
 **Current Phase:** Phase 5 Complete, Phase 5.5 Next
 **Version:** v0.6.0
 
-**Recent Activity (Nov 19-24):**
-- ✅ Fixed 4 critical memory leaks (syncManager, analytics, workoutLogger)
-- ✅ Resolved dev environment blank screen issue
-- ✅ Implemented theme preference cloud sync
-- ✅ Completed full app theme-aware refactoring (20+ files)
-- ✅ Fixed numerous UI/UX polish items (sparkline, tooltips, modals)
-- ✅ Corrected documentation and muscle radar formula
-- See PROGRESS.md for detailed changelog
+**Recent Activity (Dec 2):**
+- ✅ Made Dashboard2 the new default Dashboard (renamed Dashboard → Dashboard1 backup)
+- ✅ Fixed Dashboard volume chart rendering issues (flatline visibility, overflow, theme colors)
+- ✅ Added auto-switch to 30d filter when <3 workouts in Recent Activity
+- ✅ Made dropdown focus states theme-aware (removed hardcoded purple)
+- ✅ Reorganized Header layout (left-to-right flow, wider search bar)
+- ✅ Increased container widths from 1280px to 1536px (Layout, Header)
+- ✅ Code cleanup (removed unused imports, fixed naming)
+- ✅ Fixed TypeScript build error (YAxis domain type)
+- See KnownIssues-Dec-W1-2025.md and PROGRESS.md for details
 
 ---
 
@@ -132,11 +134,11 @@
       - Research-backed percentile mapping (1.0-1.5% confirmed)
       - Color scheme: Orange badge (RPG mythic tier convention)
 
-- [ ] **Dashboard Recent Activity - Filter Functionality Missing**
-  - [ ] Implement time period filter (7 days, 30 days, 90 days, All)
-  - [ ] Implement type filter (All, Program, Free)
-  - [ ] Implement sort options (Newest, Heaviest, Duration)
-  - [ ] Currently dropdowns exist but have no functionality
+- [x] **Dashboard Recent Activity - Filter Functionality** ✅ COMPLETE
+  - [x] Implement time period filter (7 days, 30 days, 90 days, All)
+  - [ ] Implement type filter (All, Program, Free) - NOT NEEDED (no program tracking yet)
+  - [x] Implement sort options (Newest, Heaviest, Duration)
+  - [x] Added auto-switch to 30d when <3 workouts in 7d (Dec 2)
 
 - [ ] **Dashboard Recent Activity - Share Feature**
   - [ ] Implement workout sharing (currently shows "Share feature coming soon!")

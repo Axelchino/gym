@@ -1,9 +1,53 @@
 # GymTracker Pro - Development Progress Report
 
-**Last Updated:** 2025-11-17
-**Current Version:** v0.6.0 (Offline-First)
+**Last Updated:** 2025-12-02
+**Current Version:** v0.6.1 (Dashboard Polish & UX Improvements)
 **Deployed:** https://gym-tracker-five-kappa.vercel.app
-**Development Timeline:** 15 weeks (October 1 - November 17, 2025)
+**Development Timeline:** 16 weeks (October 1 - December 2, 2025)
+
+---
+
+## Recent Updates
+
+### December 2, 2025 - Dashboard Polish & Layout Improvements
+
+**Dashboard Rename & Default Route:**
+- Renamed Dashboard2 to Dashboard (now the default at `/`)
+- Moved original Dashboard to Dashboard1 (`/dashboard1` as backup)
+- Updated all routes in App.tsx to reflect new structure
+
+**Volume Chart Fixes:**
+- Fixed flatline visibility issue (chart was invisible when all values were 0)
+- Implemented YAxis domain control: `[0, 100]` for flatlines, undefined for auto-scaling
+- Fixed overflow clipping (removed `overflow-hidden` from CardHeader, added `overflow-visible` to Card)
+- Made chart colors theme-aware using `tokens.sparkline.color` instead of hardcoded purple
+- Changed curve type to `monotone` with `baseValue={0}` to prevent dipping below baseline
+
+**UX Improvements:**
+- Added auto-switch logic: Recent Activity automatically switches from 7d to 30d filter when <3 workouts
+- Better experience for new users or users with training gaps
+- Made dropdown focus states theme-aware (replaced hardcoded purple with `tokens.interactive.focusRing`)
+
+**Layout & Navigation:**
+- Reorganized Header: changed from centered layout to left-to-right flow
+  - Left side: Logo + Navigation tabs (Home, Progress, Program, Exercises)
+  - Right side: Search (320px) + Actions (Offline indicator, Cache button, Profile, Start Workout)
+- Increased container widths from 1280px to 1536px (Layout and Header)
+- Better horizontal space utilization on wider screens
+
+**Code Quality:**
+- Removed unused imports from Dashboard.tsx (Sparkline, Flame, CartesianGrid, XAxis, Tooltip, ReferenceLine)
+- Fixed function naming: `Dashboard2()` → `Dashboard()`
+- Fixed export statement consistency
+- Fixed TypeScript build error (YAxis domain type compatibility)
+
+**Theme Polish:**
+- AMOLED theme: changed chart-grid to pure black (#000000)
+- All interactive elements now use theme tokens consistently
+
+**Commits:** `8740669`, `909900a`
+
+**Impact:** Dashboard now provides a more polished, theme-consistent experience with better chart visibility and smarter auto-filtering for sparse data periods.
 
 ---
 
