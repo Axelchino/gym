@@ -330,7 +330,7 @@ function Dashboard() {
             {!isLoading && volumeSparklineData.length >= 2 && (() => {
               const maxVal = Math.max(...volumeSparklineData);
               const minVal = Math.min(...volumeSparklineData);
-              const yDomain = maxVal === 0 ? [0, 100] : [0, 'auto'];
+              const yDomain: [number, number] | undefined = maxVal === 0 ? [0, 100] : undefined;
 
               return (
                 <div className="pointer-events-none absolute top-5 right-2 h-[95px] w-[245px]">
