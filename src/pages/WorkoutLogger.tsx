@@ -849,43 +849,6 @@ function WorkoutLogger() {
 
   return (
     <div className="space-y-6 pb-24">
-      {/* Guest Mode Warning Banner */}
-      {!user && isWorkoutActive && (
-        <div className="sticky top-0 z-20 px-4 py-3 rounded-md" style={{
-          backgroundColor: 'rgba(255, 193, 7, 0.1)',
-          border: '1px solid rgba(255, 193, 7, 0.3)'
-        }}>
-          <div className="flex items-center gap-3">
-            <AlertCircle size={18} strokeWidth={1.5} style={{ color: '#FFC107', flexShrink: 0 }} />
-            <div className="flex-1">
-              <p className="text-sm font-medium" style={{ color: '#FFC107' }}>
-                Demo Mode - Workout will only be saved locally
-              </p>
-              <p className="text-xs text-secondary mt-0.5">
-                Sign up to save permanently and sync across devices
-              </p>
-            </div>
-            <button
-              onClick={() => window.location.href = '/auth'}
-              className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors whitespace-nowrap"
-              style={{
-                backgroundColor: '#FFC107',
-                color: '#111216',
-                border: '1px solid #FFC107',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#FFB300';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#FFC107';
-              }}
-            >
-              Sign Up
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="sticky top-0 z-10 backdrop-blur-sm pb-4" style={{ backgroundColor: 'var(--surface-primary-translucent, var(--surface-primary))', borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="flex items-center justify-between mb-3">
