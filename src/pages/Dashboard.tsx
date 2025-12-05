@@ -234,8 +234,15 @@ function Dashboard() {
   }, [periodFilter, recentWorkouts.length, allWorkouts.length]);
 
   // Helper functions
-  function formatDate(date: Date): string {
-    const d = new Date(date);
+  function formatDate(dateStr: string | Date): string {
+    // Parse date string as local date to avoid timezone issues
+    let d: Date;
+    if (typeof dateStr === 'string') {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      d = new Date(year, month - 1, day);
+    } else {
+      d = dateStr;
+    }
     return d.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',

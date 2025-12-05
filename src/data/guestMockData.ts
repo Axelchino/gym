@@ -686,7 +686,7 @@ export function getGuestWorkouts() {
       const templateIndex = (week * 3 + idx) % mockWorkoutTemplate.length;
       const template = mockWorkoutTemplate[templateIndex];
 
-      workouts.push({
+      const workout = {
         id: `guest-workout-${week}-${idx}`,
         userId: 'guest',
         date: workoutDate.toISOString().split('T')[0],
@@ -697,7 +697,9 @@ export function getGuestWorkouts() {
         createdAt: workoutDate.toISOString(),
         updatedAt: workoutDate.toISOString(),
         syncStatus: 'synced' as const,
-      });
+      };
+
+      workouts.push(workout);
     });
   }
 
