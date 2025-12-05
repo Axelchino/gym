@@ -16,6 +16,15 @@ import type { WorkoutLog } from '../types/workout';
 import { createWorkoutTemplate } from '../services/supabaseDataService';
 import { convertWorkoutLogToTemplate } from '../utils/templateConverter';
 
+// Helper function to parse date strings in local timezone
+function parseLocalDate(dateStr: string | Date): Date {
+  if (typeof dateStr === 'string') {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(dateStr);
+}
+
 // shadcn-style Card components (minimal version for now)
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <div className={`rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden ${className}`}>
@@ -115,14 +124,14 @@ function Dashboard() {
 
     // Last 7 days
     const workoutsLast7Days = allWorkouts.filter((w: WorkoutLog) => {
-      const workoutDate = new Date(w.date);
+      const workoutDate = parseLocalDate(w.date);
       return workoutDate >= sevenDaysAgo && workoutDate <= today;
     });
     const volumeLast7Days = workoutsLast7Days.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
 
     // Previous 7 days (for comparison)
     const workoutsPrev7Days = allWorkouts.filter((w: WorkoutLog) => {
-      const workoutDate = new Date(w.date);
+      const workoutDate = parseLocalDate(w.date);
       return workoutDate >= fourteenDaysAgo && workoutDate < sevenDaysAgo;
     });
     const volumePrev7Days = workoutsPrev7Days.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
@@ -136,7 +145,7 @@ function Dashboard() {
 
     // Days since last PR
     const daysSinceLastPR = allPRs.length > 0
-      ? Math.floor((today.getTime() - new Date(allPRs[0].date).getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.floor((today.getTime() - parseLocalDate(allPRs[0].date).getTime()) / (1000 * 60 * 60 * 24))
       : null;
 
     return {
@@ -176,7 +185,7 @@ function Dashboard() {
       dayEnd.setHours(23, 59, 59, 999);
 
       const dayWorkouts = allWorkouts.filter((w: WorkoutLog) => {
-        const workoutDate = new Date(w.date);
+        const workoutDate = parseLocalDate(w.date);
         return workoutDate >= dayStart && workoutDate <= dayEnd;
       });
 
@@ -209,13 +218,13 @@ function Dashboard() {
 
     // Filter by period
     let filtered = allWorkouts.filter((w: WorkoutLog) => {
-      const workoutDate = new Date(w.date);
+      const workoutDate = parseLocalDate(w.date);
       return workoutDate >= cutoffDate && workoutDate <= today;
     });
 
     // Sort
     if (sortBy === 'newest') {
-      filtered.sort((a: WorkoutLog, b: WorkoutLog) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      filtered.sort((a: WorkoutLog, b: WorkoutLog) => parseLocalDate(b.date).getTime() - parseLocalDate(a.date).getTime());
     } else if (sortBy === 'heaviest') {
       filtered.sort((a: WorkoutLog, b: WorkoutLog) => b.totalVolume - a.totalVolume);
     } else if (sortBy === 'duration') {
@@ -315,7 +324,7 @@ function Dashboard() {
                 <CardDescription>Total Volume</CardDescription>
                 {!isLoading && stats.bestWorkout && (
                   <span className="text-xs text-muted-foreground">
-                    Best, {new Date(stats.bestWorkout.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    Best, {parseLocalDate(stats.bestWorkout.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                 )}
               </div>

@@ -4,6 +4,15 @@ import type { WorkoutLog } from '../types/workout';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 
+// Helper function to parse date strings in local timezone
+function parseLocalDate(dateStr: string | Date): Date {
+  if (typeof dateStr === 'string') {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(dateStr);
+}
+
 interface CalendarHeatmapProps {
   workouts: WorkoutLog[];
   onDateClick?: (date: Date, workouts: WorkoutLog[]) => void;
@@ -30,7 +39,7 @@ export function CalendarHeatmap({ workouts, onDateClick }: CalendarHeatmapProps)
   // Create workout map: date string -> workouts
   const workoutMap = new Map<string, WorkoutLog[]>();
   workouts.forEach(workout => {
-    const dateStr = new Date(workout.date).toDateString();
+    const dateStr = parseLocalDate(workout.date).toDateString();
     if (!workoutMap.has(dateStr)) {
       workoutMap.set(dateStr, []);
     }
