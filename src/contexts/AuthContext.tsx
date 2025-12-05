@@ -44,6 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // If user is logged in, prefetch profile and check for data migration
       if (session?.user) {
+        // User is authenticated - disable guest mode
+        exitGuestMode();
+
         // Prefetch profile immediately for instant theme/profile data access
         queryClient.prefetchQuery({
           queryKey: ['userProfile', session.user.id],
@@ -52,6 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         handleDataMigration(session.user.id);
+      } else {
+        // No authenticated user - automatically enable guest mode
+        enterGuestMode();
       }
     });
 
@@ -61,6 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // When user signs in/up, prefetch profile and migrate their data
       if (user) {
+        // User is authenticated - disable guest mode
+        exitGuestMode();
+
         // Prefetch profile immediately for instant theme/profile data access
         queryClient.prefetchQuery({
           queryKey: ['userProfile', user.id],
@@ -70,8 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         handleDataMigration(user.id);
       } else {
-        // User logged out - clear profile cache
+        // User logged out - clear profile cache and enable guest mode
         queryClient.removeQueries({ queryKey: ['userProfile'] });
+        enterGuestMode();
       }
     });
 
