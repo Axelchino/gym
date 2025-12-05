@@ -114,22 +114,22 @@ function Dashboard() {
     fourteenDaysAgo.setHours(0, 0, 0, 0);
 
     // Last 7 days
-    const workoutsLast7Days = allWorkouts.filter((w) => {
+    const workoutsLast7Days = allWorkouts.filter((w: WorkoutLog) => {
       const workoutDate = new Date(w.date);
       return workoutDate >= sevenDaysAgo && workoutDate <= today;
     });
-    const volumeLast7Days = workoutsLast7Days.reduce((sum, w) => sum + w.totalVolume, 0);
+    const volumeLast7Days = workoutsLast7Days.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
 
     // Previous 7 days (for comparison)
-    const workoutsPrev7Days = allWorkouts.filter((w) => {
+    const workoutsPrev7Days = allWorkouts.filter((w: WorkoutLog) => {
       const workoutDate = new Date(w.date);
       return workoutDate >= fourteenDaysAgo && workoutDate < sevenDaysAgo;
     });
-    const volumePrev7Days = workoutsPrev7Days.reduce((sum, w) => sum + w.totalVolume, 0);
+    const volumePrev7Days = workoutsPrev7Days.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
 
     // Best workout (highest volume)
     const bestWorkout = allWorkouts.length > 0
-      ? allWorkouts.reduce((best, current) =>
+      ? allWorkouts.reduce((best: WorkoutLog, current: WorkoutLog) =>
           current.totalVolume > best.totalVolume ? current : best
         )
       : null;
@@ -175,12 +175,12 @@ function Dashboard() {
       const dayEnd = new Date(dayStart);
       dayEnd.setHours(23, 59, 59, 999);
 
-      const dayWorkouts = allWorkouts.filter((w) => {
+      const dayWorkouts = allWorkouts.filter((w: WorkoutLog) => {
         const workoutDate = new Date(w.date);
         return workoutDate >= dayStart && workoutDate <= dayEnd;
       });
 
-      const dayVolume = dayWorkouts.reduce((sum, w) => sum + w.totalVolume, 0);
+      const dayVolume = dayWorkouts.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
       data.push(dayVolume);
     }
 
@@ -208,18 +208,18 @@ function Dashboard() {
     cutoffDate.setHours(0, 0, 0, 0);
 
     // Filter by period
-    let filtered = allWorkouts.filter((w) => {
+    let filtered = allWorkouts.filter((w: WorkoutLog) => {
       const workoutDate = new Date(w.date);
       return workoutDate >= cutoffDate && workoutDate <= today;
     });
 
     // Sort
     if (sortBy === 'newest') {
-      filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      filtered.sort((a: WorkoutLog, b: WorkoutLog) => new Date(b.date).getTime() - new Date(a.date).getTime());
     } else if (sortBy === 'heaviest') {
-      filtered.sort((a, b) => b.totalVolume - a.totalVolume);
+      filtered.sort((a: WorkoutLog, b: WorkoutLog) => b.totalVolume - a.totalVolume);
     } else if (sortBy === 'duration') {
-      filtered.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+      filtered.sort((a: WorkoutLog, b: WorkoutLog) => (b.duration || 0) - (a.duration || 0));
     }
 
     // Limit to 10
@@ -430,7 +430,7 @@ function Dashboard() {
                   <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
                     <StreakVisualization
                       currentStreak={stats.currentStreak}
-                      workoutDates={allWorkouts.map((w) => w.date)}
+                      workoutDates={allWorkouts.map((w: WorkoutLog) => w.date)}
                       animate
                     />
                   </div>
@@ -551,7 +551,7 @@ function Dashboard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {recentWorkouts.map((workout) => {
+            {recentWorkouts.map((workout: WorkoutLog) => {
               const isExpanded = expandedWorkouts.has(workout.id);
               const firstFourExercises = workout.exercises.slice(0, 4);
               const remainingCount = Math.max(0, workout.exercises.length - 4);
@@ -586,7 +586,7 @@ function Dashboard() {
 
                       {/* Line 2: Exercise tags */}
                       <div className="flex items-center gap-2 flex-wrap">
-                        {firstFourExercises.map((exercise, idx) => (
+                        {firstFourExercises.map((exercise: any, idx: number) => (
                           <Chip key={idx}>{exercise.exerciseName}</Chip>
                         ))}
                         {remainingCount > 0 && !isExpanded && (
@@ -618,7 +618,7 @@ function Dashboard() {
                       {/* Expanded exercise list */}
                       {isExpanded && workout.exercises.length > 4 && (
                         <div className="flex items-center gap-2 flex-wrap pt-1">
-                          {workout.exercises.slice(4).map((exercise, idx) => (
+                          {workout.exercises.slice(4).map((exercise: any, idx: number) => (
                             <Chip key={idx}>{exercise.exerciseName}</Chip>
                           ))}
                         </div>
