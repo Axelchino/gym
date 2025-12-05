@@ -18,6 +18,28 @@ import { getGuestWorkouts, getGuestPRs, getGuestTemplates, getGuestProgram } fro
  * - Shared cache across all components
  */
 export function useWorkouts(startDate?: Date, endDate?: Date) {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return filtered mock data
+  if (isGuest) {
+    const allWorkouts = getGuestWorkouts();
+    // Filter workouts by date range if provided
+    const filteredWorkouts = (startDate && endDate)
+      ? allWorkouts.filter(w => {
+          const workoutDate = new Date(w.date);
+          return workoutDate >= startDate && workoutDate <= endDate;
+        })
+      : allWorkouts;
+
+    return {
+      data: filteredWorkouts,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: filteredWorkouts }),
+    } as any;
+  }
+
   return useQuery({
     queryKey: ['workouts', startDate?.toISOString(), endDate?.toISOString()],
     queryFn: () => getWorkoutLogs(startDate, endDate),
@@ -61,6 +83,28 @@ export function useAllWorkouts() {
  * - Deduplication (multiple components can call this without extra requests)
  */
 export function usePersonalRecords(startDate?: Date, endDate?: Date) {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return filtered mock PRs
+  if (isGuest) {
+    const allPRs = getGuestPRs();
+    // Filter PRs by date range if provided
+    const filteredPRs = (startDate && endDate)
+      ? allPRs.filter(pr => {
+          const prDate = new Date(pr.date);
+          return prDate >= startDate && prDate <= endDate;
+        })
+      : allPRs;
+
+    return {
+      data: filteredPRs,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: filteredPRs }),
+    } as any;
+  }
+
   return useQuery({
     queryKey: ['prs', startDate?.toISOString(), endDate?.toISOString()],
     queryFn: () => getPersonalRecords(startDate, endDate),
