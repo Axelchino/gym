@@ -657,23 +657,44 @@ export const mockWorkoutTemplate = [
 // ============================================
 export function getGuestWorkouts() {
   const today = new Date();
+  const workouts: any[] = [];
 
-  return mockWorkoutTemplate.map((template, index) => {
-    const workoutDate = new Date(today.getTime() - template.daysAgo * 86400000);
+  // Helper: Get the most recent occurrence of a weekday (0=Sun, 1=Mon, ..., 6=Sat)
+  function getMostRecentWeekday(targetDay: number, weeksAgo: number = 0): Date {
+    const date = new Date(today);
+    const currentDay = date.getDay();
+    const daysToSubtract = (currentDay - targetDay + 7) % 7 + (weeksAgo * 7);
+    date.setDate(date.getDate() - daysToSubtract);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
 
-    return {
-      id: `guest-workout-${index}`,
-      userId: 'guest',
-      date: workoutDate.toISOString().split('T')[0], // YYYY-MM-DD format
-      name: template.name,
-      duration: template.duration,
-      exercises: template.exercises,
-      totalVolume: calculateVolume(template.exercises),
-      createdAt: workoutDate.toISOString(),
-      updatedAt: workoutDate.toISOString(),
-      syncStatus: 'synced' as const,
-    };
-  });
+  // Generate workouts for Mon/Wed/Fri going back 6 weeks
+  const workoutTypes = ['Push Day', 'Pull Day', 'Leg Day'];
+  const weekdays = [1, 3, 5]; // Monday, Wednesday, Friday
+
+  for (let week = 0; week < 6; week++) {
+    weekdays.forEach((day, idx) => {
+      const workoutDate = getMostRecentWeekday(day, week);
+      const templateIndex = (week * 3 + idx) % mockWorkoutTemplate.length;
+      const template = mockWorkoutTemplate[templateIndex];
+
+      workouts.push({
+        id: `guest-workout-${week}-${idx}`,
+        userId: 'guest',
+        date: workoutDate.toISOString().split('T')[0],
+        name: workoutTypes[idx],
+        duration: template.duration,
+        exercises: template.exercises,
+        totalVolume: calculateVolume(template.exercises),
+        createdAt: workoutDate.toISOString(),
+        updatedAt: workoutDate.toISOString(),
+        syncStatus: 'synced' as const,
+      });
+    });
+  }
+
+  return workouts;
 }
 
 // ============================================
