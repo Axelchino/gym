@@ -7,7 +7,7 @@ type AuthMode = 'signin' | 'signup' | 'reset';
 
 export function Auth() {
   const navigate = useNavigate();
-  const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
+  const { signIn, signUp, signInWithGoogle, resetPassword, enterGuestMode } = useAuth();
 
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
@@ -169,6 +169,21 @@ export function Auth() {
                 <span className="px-2 text-muted" style={{ backgroundColor: 'var(--surface-elevated)' }}>Or continue with</span>
               </div>
             </div>
+          )}
+
+          {/* Try Demo Button (only show for signin/signup) */}
+          {mode !== 'reset' && (
+            <button
+              onClick={() => {
+                enterGuestMode();
+                navigate('/');
+              }}
+              type="button"
+              className="w-full bg-gradient-to-br from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 mb-3"
+            >
+              <span className="text-2xl">🎯</span>
+              Try Demo - No Sign-Up Required
+            </button>
           )}
 
           {/* Google Sign-In Button (only show for signin/signup) */}

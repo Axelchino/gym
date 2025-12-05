@@ -14,11 +14,14 @@ interface AuthError {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isGuest: boolean;
   signUp: (email: string, password: string, name?: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+  enterGuestMode: () => void;
+  exitGuestMode: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,6 +29,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(() => {
+    // Check localStorage for persisted guest mode
+    const stored = localStorage.getItem('isGuestMode');
+    return stored === 'true';
+  });
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -91,7 +99,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const enterGuestMode = () => {
+    setIsGuest(true);
+    localStorage.setItem('isGuestMode', 'true');
+    setLoading(false);
+  };
+
+  const exitGuestMode = () => {
+    setIsGuest(false);
+    localStorage.removeItem('isGuestMode');
+  };
+
   const signUp = async (email: string, password: string, name?: string) => {
+    // Exit guest mode before creating real account
+    exitGuestMode();
+
     const { error } = await authService.signUp({ email, password, name });
 
     // Migration will be triggered automatically by onAuthStateChange
@@ -126,11 +148,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     loading,
+    isGuest,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     resetPassword,
+    enterGuestMode,
+    exitGuestMode,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

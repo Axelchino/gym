@@ -13,6 +13,7 @@ import {
 import { usePrograms, useAllWorkouts } from '../hooks/useWorkoutData';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
+import { useAuth } from '../contexts/AuthContext';
 
 // Types for program week structure
 interface ProgramWeekWorkout {
@@ -32,6 +33,7 @@ function Program() {
   const { theme } = useTheme();
   const accentColors = getAccentColors(theme);
   const selectedColors = getSelectedColors(theme);
+  const { isGuest } = useAuth();
 
   // REACT QUERY: Fetch data with automatic caching
   const { data: programs = [] } = usePrograms();
@@ -48,6 +50,12 @@ function Program() {
   }, [programs]);
 
   async function handleActivateTemplate(templateId: string) {
+    // GUEST MODE: Prevent activating programs
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to activate programs!\n\nYou\'re currently viewing demo data. Create a free account to start tracking your own training programs.');
+      return;
+    }
+
     const template = PROGRAM_TEMPLATES.find(t => t.id === templateId);
     if (!template) return;
 
@@ -81,6 +89,12 @@ function Program() {
   }
 
   async function handleActivateProgram(programId: string) {
+    // GUEST MODE: Prevent activating programs
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to activate programs!\n\nYou\'re currently viewing demo data. Create a free account to start tracking your own training programs.');
+      return;
+    }
+
     try {
       // Deactivate any active programs
       const activePrograms = programs.filter(p => p.isActive);
@@ -108,6 +122,12 @@ function Program() {
   }
 
   async function handleDeactivateProgram(programId: string) {
+    // GUEST MODE: Prevent deactivating programs
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to manage programs!\n\nYou\'re currently viewing demo data. Create a free account to customize your training schedule.');
+      return;
+    }
+
     try {
       await updateProgram(programId, { isActive: false });
       // Invalidate cache to refetch programs
@@ -119,6 +139,12 @@ function Program() {
   }
 
   async function handleDeleteProgram(programId: string) {
+    // GUEST MODE: Prevent deleting programs
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to manage programs!\n\nYou\'re currently viewing demo data. Create a free account to manage your own training programs.');
+      return;
+    }
+
     if (confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
       try {
         await deleteProgram(programId);
@@ -401,7 +427,13 @@ function Program() {
               Browse Templates
             </button>
             <button
-              onClick={() => setShowProgramBuilder(true)}
+              onClick={() => {
+                if (isGuest) {
+                  alert('🎯 Demo Mode - Sign up to create programs!\n\nYou\'re currently viewing demo data. Create a free account to build your own custom training programs.');
+                  return;
+                }
+                setShowProgramBuilder(true);
+              }}
               className="px-6 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2"
               style={{
                 backgroundColor: 'transparent',
@@ -563,7 +595,13 @@ function Program() {
           <h2 className="text-xl font-semibold text-primary">My Programs</h2>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowProgramBuilder(true)}
+              onClick={() => {
+                if (isGuest) {
+                  alert('🎯 Demo Mode - Sign up to create programs!\n\nYou\'re currently viewing demo data. Create a free account to build your own custom training programs.');
+                  return;
+                }
+                setShowProgramBuilder(true);
+              }}
               className="text-sm transition-colors flex items-center gap-1"
               style={{ color: accentColors.primary }}
               onMouseEnter={(e) => {
@@ -737,6 +775,10 @@ function Program() {
               </p>
               <button
                 onClick={() => {
+                  if (isGuest) {
+                    alert('🎯 Demo Mode - Sign up to create programs!\n\nYou\'re currently viewing demo data. Create a free account to build your own custom training programs.');
+                    return;
+                  }
                   setShowTemplateBrowser(false);
                   setShowProgramBuilder(true);
                 }}

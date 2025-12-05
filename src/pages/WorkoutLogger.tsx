@@ -30,7 +30,7 @@ import type { WorkoutLog } from '../types/workout';
 
 function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const queryClient = useQueryClient();
   const { theme } = useTheme();
   const accentColors = getAccentColors(theme);
@@ -157,6 +157,12 @@ function WorkoutLogger() {
   }
 
   function handleStartWorkout() {
+    // GUEST MODE: Prevent starting workouts
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to create your own workouts!\n\nYou\'re currently viewing demo data. Create a free account to track your real workouts.');
+      return;
+    }
+
     const name = new Date().toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -170,6 +176,12 @@ function WorkoutLogger() {
   }
 
   async function handleSaveWorkout() {
+    // GUEST MODE: Prevent saving
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to save your workouts!\n\nYou\'re currently viewing demo data. Create a free account to track your own progress.');
+      return;
+    }
+
     const result = await saveWorkout();
     setShowSaveConfirm(false);
 
@@ -252,6 +264,12 @@ function WorkoutLogger() {
   }
 
   async function handleStartFromTemplate(template: Pick<WorkoutTemplate, 'id' | 'name' | 'exercises'>) {
+    // GUEST MODE: Prevent starting workouts
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to create your own workouts!\n\nYou\'re currently viewing demo data. Create a free account to track your real workouts.');
+      return;
+    }
+
     // Build the complete workout structure with all exercises and sets
     const exercises = [];
 
@@ -371,6 +389,12 @@ function WorkoutLogger() {
   }
 
   async function handleDeleteTemplate(templateId: string) {
+    // GUEST MODE: Prevent deleting
+    if (isGuest) {
+      alert('🎯 Demo Mode - Sign up to manage templates!\n\nYou\'re currently viewing demo data. Create a free account to manage your own templates.');
+      return;
+    }
+
     if (confirm('Are you sure you want to delete this template?')) {
       try {
         await deleteWorkoutTemplate(templateId);
@@ -556,7 +580,13 @@ function WorkoutLogger() {
                     </button>
                   )}
                   <button
-                    onClick={() => setShowTemplateBuilder(true)}
+                    onClick={() => {
+                      if (isGuest) {
+                        alert('🎯 Demo Mode - Sign up to create your own templates!\n\nYou\'re currently viewing demo data. Create a free account to save your own templates.');
+                        return;
+                      }
+                      setShowTemplateBuilder(true);
+                    }}
                     className="text-primary-blue text-sm flex items-center gap-1 hover:text-primary-blue/80 transition-colors"
                   >
                     <Plus size={16} />
@@ -615,6 +645,10 @@ function WorkoutLogger() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => {
+                                  if (isGuest) {
+                                    alert('🎯 Demo Mode - Sign up to edit templates!\n\nYou\'re currently viewing demo data. Create a free account to customize your own templates.');
+                                    return;
+                                  }
                                   setEditingTemplate(template);
                                   setShowTemplateBuilder(true);
                                 }}
@@ -749,6 +783,10 @@ function WorkoutLogger() {
                           {user && (
                             <button
                               onClick={() => {
+                                if (isGuest) {
+                                  alert('🎯 Demo Mode - Sign up to copy templates!\n\nYou\'re currently viewing demo data. Create a free account to customize built-in templates.');
+                                  return;
+                                }
                                 setEditingTemplate(template as WorkoutTemplate);
                                 setShowTemplateBuilder(true);
                               }}

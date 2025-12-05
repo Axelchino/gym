@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, X } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors, getSelectedColors } from '../utils/themeHelpers';
 
 export function GuestBanner() {
   const navigate = useNavigate();
+  const { user, isGuest } = useAuth();
   const { theme } = useTheme();
   const accentColors = getAccentColors(theme);
   const selectedColors = getSelectedColors(theme);
@@ -18,6 +20,41 @@ export function GuestBanner() {
     localStorage.setItem('guest-banner-dismissed', 'true');
   }
 
+  // Don't show banner if user is logged in
+  if (user) return null;
+
+  // For demo mode (isGuest), make it more prominent and non-dismissible
+  if (isGuest) {
+    return (
+      <div className="bg-yellow-50 border-b-4 border-yellow-400 dark:bg-yellow-900/20 dark:border-yellow-600 sticky top-0 z-50 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl" aria-label="Demo mode icon">
+                🎯
+              </span>
+              <div>
+                <p className="font-bold text-yellow-900 dark:text-yellow-100 text-lg">
+                  VIEWING DEMO DATA
+                </p>
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  This is sample data to showcase the app's features. Sign up to track your own workouts!
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/signup')}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-lg whitespace-nowrap"
+            >
+              Sign Up to Track YOUR Workouts
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // For regular guest mode (not demo), show dismissible banner
   if (isDismissed) return null;
 
   return (

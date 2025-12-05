@@ -5,6 +5,8 @@ import {
   getWorkoutTemplates,
   getPrograms
 } from '../services/supabaseDataService';
+import { useAuth } from '../contexts/AuthContext';
+import { getGuestWorkouts, getGuestPRs, getGuestTemplates, getGuestProgram } from '../data/guestMockData';
 
 /**
  * Custom hook to fetch workouts with React Query caching
@@ -29,6 +31,20 @@ export function useWorkouts(startDate?: Date, endDate?: Date) {
  * Used by Analytics and other pages that need full history
  */
 export function useAllWorkouts() {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return mock data instantly
+  if (isGuest) {
+    return {
+      data: getGuestWorkouts(),
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: getGuestWorkouts() }),
+    } as any;
+  }
+
+  // REAL USER: Normal React Query flow
   return useQuery({
     queryKey: ['workouts', 'all'],
     queryFn: () => getWorkoutLogs(),
@@ -57,6 +73,20 @@ export function usePersonalRecords(startDate?: Date, endDate?: Date) {
  * Custom hook to fetch ALL personal records (no date filter)
  */
 export function useAllPersonalRecords() {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return mock PRs instantly
+  if (isGuest) {
+    return {
+      data: getGuestPRs(),
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: getGuestPRs() }),
+    } as any;
+  }
+
+  // REAL USER: Normal React Query flow
   return useQuery({
     queryKey: ['prs', 'all'],
     queryFn: () => getPersonalRecords(),
@@ -69,6 +99,20 @@ export function useAllPersonalRecords() {
  * Used by Program, WorkoutLogger, and other pages
  */
 export function useWorkoutTemplates() {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return mock templates instantly
+  if (isGuest) {
+    return {
+      data: getGuestTemplates(),
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: getGuestTemplates() }),
+    } as any;
+  }
+
+  // REAL USER: Normal React Query flow
   return useQuery({
     queryKey: ['templates'],
     queryFn: () => getWorkoutTemplates(),
@@ -81,6 +125,21 @@ export function useWorkoutTemplates() {
  * Used by Program tab
  */
 export function usePrograms() {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return mock program instantly
+  if (isGuest) {
+    const mockProgram = getGuestProgram();
+    return {
+      data: [mockProgram], // Return as array since getPrograms returns array
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: [mockProgram] }),
+    } as any;
+  }
+
+  // REAL USER: Normal React Query flow
   return useQuery({
     queryKey: ['programs'],
     queryFn: () => getPrograms(),

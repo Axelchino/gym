@@ -1,6 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserProfile } from '../services/supabaseDataService';
 import type { UserProfile } from '../types/user';
+import { useAuth } from '../contexts/AuthContext';
+import { getGuestProfile } from '../data/guestMockData';
 
 /**
  * React Query hook for user profile with optimized caching
@@ -9,6 +11,20 @@ import type { UserProfile } from '../types/user';
  * - Can be prefetched for zero-delay access
  */
 export function useUserProfile(userId: string | null) {
+  const { isGuest } = useAuth();
+
+  // GUEST MODE: Return mock profile instantly
+  if (isGuest) {
+    return {
+      data: getGuestProfile(),
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: () => Promise.resolve({ data: getGuestProfile() }),
+    } as any;
+  }
+
+  // REAL USER: Normal React Query flow
   return useQuery({
     queryKey: ['userProfile', userId],
     queryFn: getUserProfile,
