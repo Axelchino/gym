@@ -26,27 +26,50 @@ export function GuestBanner() {
   // For demo mode (isGuest), make it more prominent and non-dismissible
   if (isGuest) {
     return (
-      <div className="bg-yellow-50 border-b-4 border-yellow-400 dark:bg-yellow-900/20 dark:border-yellow-600 sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+      <div
+        className="sticky top-0 z-50 border-b"
+        style={{
+          backgroundColor: 'var(--surface-elevated)',
+          borderColor: 'var(--border-subtle)'
+        }}
+      >
+        <div className="mx-auto px-6 py-3" style={{ maxWidth: '1536px' }}>
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <span className="text-3xl" aria-label="Demo mode icon">
-                🎯
-              </span>
+              <div
+                className="flex items-center justify-center w-9 h-9 rounded-lg"
+                style={{
+                  backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.1)' : 'rgba(126, 41, 255, 0.1)',
+                  border: `1px solid ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(126, 41, 255, 0.2)'}`
+                }}
+              >
+                <span className="text-xl" aria-label="Demo mode icon">🎯</span>
+              </div>
               <div>
-                <p className="font-bold text-yellow-900 dark:text-yellow-100 text-lg">
-                  VIEWING DEMO DATA
+                <p className="text-sm font-semibold text-primary">
+                  Demo Mode
                 </p>
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  This is sample data to showcase the app's features. Sign up to track your own workouts!
+                <p className="text-xs text-muted">
+                  Exploring sample data · Sign up to track your workouts
                 </p>
               </div>
             </div>
             <button
-              onClick={() => navigate('/signup')}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-lg whitespace-nowrap"
+              onClick={() => navigate('/auth')}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap"
+              style={{
+                backgroundColor: selectedColors.background,
+                color: selectedColors.text,
+                border: `1px solid ${selectedColors.border}`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = selectedColors.background;
+              }}
             >
-              Sign Up to Track YOUR Workouts
+              Create Account
             </button>
           </div>
         </div>

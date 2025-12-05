@@ -17,6 +17,7 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000,   // 10 minutes - cache persists for 10 min (garbage collection)
       retry: 2,                  // Retry failed requests 2 times
       refetchOnWindowFocus: false, // Don't refetch when user returns to tab
+      refetchOnMount: false,    // Don't refetch on component mount if data is still fresh
     },
   },
 })
