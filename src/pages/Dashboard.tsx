@@ -313,12 +313,11 @@ function Dashboard() {
                 )}
               </div>
 
-              <CardTitle className="text-2xl tabular-nums">
-                {isLoading ? '...' : Math.round(animatedVolume).toLocaleString()}
-                <span className="text-base text-muted-foreground ml-1">{weightUnit}</span>
-              </CardTitle>
-
-              <div className="mt-2 h-6">
+              <div className="flex items-baseline gap-2">
+                <CardTitle className="text-2xl tabular-nums">
+                  {isLoading ? '...' : Math.round(animatedVolume).toLocaleString()}
+                  <span className="text-base text-muted-foreground ml-1">{weightUnit}</span>
+                </CardTitle>
                 {volumeTrend && (
                   <Badge variant="outline">
                     {volumeUp ? <TrendingUp size={12} /> : '↓'}
@@ -371,10 +370,10 @@ function Dashboard() {
         <Card className="flex flex-col h-full">
           <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
             <CardDescription>Workouts</CardDescription>
-            <CardTitle className="text-2xl tabular-nums">
-              {isLoading ? '...' : Math.round(animatedWorkouts)}
-            </CardTitle>
-            <div className="mt-2 h-6">
+            <div className="flex items-baseline gap-2">
+              <CardTitle className="text-2xl tabular-nums">
+                {isLoading ? '...' : Math.round(animatedWorkouts)}
+              </CardTitle>
               {workoutsTrend && (
                 <Badge variant="outline">
                   {workoutsUp ? <TrendingUp size={12} /> : '↓'}
@@ -402,9 +401,6 @@ function Dashboard() {
             <CardTitle className="text-2xl tabular-nums">
               {isLoading ? '...' : Math.round(animatedPRs)}
             </CardTitle>
-            <div className="mt-2 h-6">
-              {/* Empty space to maintain consistent height with other cards */}
-            </div>
           </CardHeader>
           <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
             Last 30 days
@@ -428,13 +424,9 @@ function Dashboard() {
                 <span className="text-base text-muted-foreground ml-1">days</span>
               </CardTitle>
 
-              <div className="mt-2 h-6">
-                {/* Empty space to maintain consistent height with other cards */}
-              </div>
-
               {/* Right streak pills: now absolutely positioned */}
               {!isLoading && (
-                  <div className="flex justify-end xl:absolute xl:right-[78px] xl:top-[36px]">
+                  <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
                     <StreakVisualization
                       currentStreak={stats.currentStreak}
                       workoutDates={allWorkouts.map((w: WorkoutLog) => w.date)}
