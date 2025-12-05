@@ -183,8 +183,8 @@ function Analytics() {
         )}
       </div>
 
-      {/* Guest Mode Empty State */}
-      {!user && (
+      {/* Guest Mode Empty State - Only show if NO workouts */}
+      {workouts.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-6">
           <div className="max-w-md text-center space-y-6">
             {/* Icon */}
@@ -275,8 +275,8 @@ function Analytics() {
         </div>
       )}
 
-      {/* Stat Cards - Only show for authenticated users */}
-      {user && (
+      {/* Stat Cards - Show if there are workouts */}
+      {workouts.length > 0 && (
         <>
           <div className="grid grid-cols-5 gap-6">
             {/* Total Volume - 2 columns */}
