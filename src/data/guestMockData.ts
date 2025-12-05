@@ -661,11 +661,18 @@ export function getGuestWorkouts() {
 
   // Helper: Get the most recent occurrence of a weekday (0=Sun, 1=Mon, ..., 6=Sat)
   function getMostRecentWeekday(targetDay: number, weeksAgo: number = 0): Date {
-    const date = new Date(today);
+    const date = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const currentDay = date.getDay();
-    const daysToSubtract = (currentDay - targetDay + 7) % 7 + (weeksAgo * 7);
+
+    // Calculate days to go back
+    let daysToSubtract = (currentDay - targetDay + 7) % 7;
+    if (daysToSubtract === 0 && weeksAgo === 0) {
+      // If today IS the target day and we want this week, use today
+      daysToSubtract = 0;
+    }
+    daysToSubtract += weeksAgo * 7;
+
     date.setDate(date.getDate() - daysToSubtract);
-    date.setHours(0, 0, 0, 0);
     return date;
   }
 
