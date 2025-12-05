@@ -126,7 +126,7 @@ function WorkoutLogger() {
     for (const exercise of activeWorkout.exercises) {
       // Find the most recent workout that contains this exercise
       for (const workout of sortedWorkouts) {
-        const exerciseData = workout.exercises.find(ex => ex.exerciseId === exercise.exerciseId);
+        const exerciseData = workout.exercises.find((ex: WorkoutExercise) => ex.exerciseId === exercise.exerciseId);
         if (exerciseData && exerciseData.sets.length > 0) {
           previousData.set(exercise.exerciseId, exerciseData.sets);
           break; // Found the most recent, stop searching
@@ -299,7 +299,7 @@ function WorkoutLogger() {
         // Find previous workout data for this exercise
         let previousSets: Set[] = [];
         for (const workout of recentWorkouts) {
-          const exerciseData = workout.exercises.find((ex) => ex.exerciseId === exercise.id);
+          const exerciseData = workout.exercises.find((ex: WorkoutExercise) => ex.exerciseId === exercise.id);
           if (exerciseData && exerciseData.sets.length > 0) {
             previousSets = exerciseData.sets;
             break; // Found the most recent
@@ -439,7 +439,7 @@ function WorkoutLogger() {
       let skippedExercises = 0;
 
       // Use React Query cached templates to check for existing IDs
-      const existingIds = new Set(templates.map(t => t.id));
+      const existingIds = new Set(templates.map((t: WorkoutTemplate) => t.id));
 
       for (const template of importedTemplates) {
         // Check if template with same ID already exists
@@ -631,7 +631,7 @@ function WorkoutLogger() {
                 <div>
                   <h3 className="text-sm font-semibold text-secondary mb-3 uppercase tracking-wide">Your Templates</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {templates.map((template) => (
+                    {templates.map((template: WorkoutTemplate) => (
                       <div key={template.id} className="card-elevated flex flex-col">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
@@ -687,7 +687,7 @@ function WorkoutLogger() {
                           {(expandedTemplateId === template.id
                             ? template.exercises
                             : template.exercises.slice(0, 3)
-                          ).map((ex, idx) => {
+                          ).map((ex: { exerciseId: string; targetSets: number; targetReps: number }, idx: number) => {
                             const exerciseName = templateExerciseNames.get(template.id)?.get(ex.exerciseId) || 'Loading...';
                             return (
                               <div key={idx} className="text-xs text-secondary flex items-center gap-2">

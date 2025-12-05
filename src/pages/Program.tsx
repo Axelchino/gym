@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Calendar, Plus, ChevronLeft, ChevronRight, Play, X, Check, TrendingUp, CheckCircle2, Wrench, Trash2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Program } from '../types/workout';
+import type { Program, WorkoutLog } from '../types/workout';
 import { PROGRAM_TEMPLATES } from '../data/programTemplates';
 import { useNavigate } from 'react-router-dom';
 import { ProgramBuilder } from '../components/ProgramBuilder';
@@ -46,7 +46,7 @@ function Program() {
 
   // Memoize active program calculation
   const activeProgram = useMemo(() => {
-    return programs.find(p => p.isActive) || null;
+    return programs.find((p: Program) => p.isActive) || null;
   }, [programs]);
 
   async function handleActivateTemplate(templateId: string) {
@@ -61,7 +61,7 @@ function Program() {
 
     try {
       // Deactivate any active programs
-      const activePrograms = programs.filter(p => p.isActive);
+      const activePrograms = programs.filter((p: Program) => p.isActive);
       for (const prog of activePrograms) {
         await updateProgram(prog.id, { isActive: false });
       }
@@ -97,7 +97,7 @@ function Program() {
 
     try {
       // Deactivate any active programs
-      const activePrograms = programs.filter(p => p.isActive);
+      const activePrograms = programs.filter((p: Program) => p.isActive);
       for (const prog of activePrograms) {
         await updateProgram(prog.id, { isActive: false });
       }
@@ -207,7 +207,7 @@ function Program() {
     const dateString = date.toDateString();
 
     // Check if there's a workout log for this date
-    return workoutLogs.some(log => {
+    return workoutLogs.some((log: WorkoutLog) => {
       const logDate = new Date(log.date);
       return logDate.toDateString() === dateString;
     });
@@ -290,7 +290,7 @@ function Program() {
 
         // Check if completed
         const dateString = checkDate.toDateString();
-        const wasCompleted = workoutLogs.some(log => {
+        const wasCompleted = workoutLogs.some((log: WorkoutLog) => {
           const logDate = new Date(log.date);
           return logDate.toDateString() === dateString;
         });
@@ -633,7 +633,7 @@ function Program() {
 
         {programs.length > 0 ? (
           <div className="space-y-3">
-            {programs.map(program => (
+            {programs.map((program: Program) => (
               <div
                 key={program.id}
                 className="p-4 rounded-lg border transition-colors"

@@ -55,8 +55,8 @@ function Analytics() {
 
         // Get unique exercises from workouts (deduplicate by name, not ID)
         const exerciseMap = new Map<string, { id: string; name: string }>();
-        workouts.forEach(workout => {
-          workout.exercises.forEach(ex => {
+        workouts.forEach((workout: WorkoutLog) => {
+          workout.exercises.forEach((ex) => {
             // Use name as key to avoid duplicates with same name but different IDs
             if (!exerciseMap.has(ex.exerciseName)) {
               exerciseMap.set(ex.exerciseName, { id: ex.exerciseId, name: ex.exerciseName });
@@ -96,7 +96,7 @@ function Analytics() {
         return workouts;
     }
 
-    return workouts.filter(w => new Date(w.date) >= filterDate);
+    return workouts.filter((w: WorkoutLog) => new Date(w.date) >= filterDate);
   };
 
   const filteredWorkouts = getFilteredWorkouts();
@@ -105,10 +105,10 @@ function Analytics() {
   const volumeData = filteredWorkouts
     .slice()
     .reverse()
-    .map((w, index) => ({
+    .map((w: WorkoutLog, index: number) => ({
       date: new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       volume: w.totalVolume,
-      sets: w.exercises.reduce((sum, ex) => sum + ex.sets.filter(s => !s.isWarmup).length, 0),
+      sets: w.exercises.reduce((sum: number, ex) => sum + ex.sets.filter(s => !s.isWarmup).length, 0),
       // Unique key for tooltip to distinguish same-day workouts
       uniqueKey: `${new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}-${index}`,
     }));
