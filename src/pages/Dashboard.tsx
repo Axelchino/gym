@@ -318,14 +318,14 @@ function Dashboard() {
                 <span className="text-base text-muted-foreground ml-1">{weightUnit}</span>
               </CardTitle>
 
-              {volumeTrend && (
-                <div className="mt-2">
+              <div className="mt-2 h-6">
+                {volumeTrend && (
                   <Badge variant="outline">
                     {volumeUp ? <TrendingUp size={12} /> : '↓'}
                     {volumeTrend}%
                   </Badge>
-                </div>
-              )}
+                )}
+              </div>
 
             {!isLoading && volumeSparklineData.length >= 2 && (() => {
               const maxVal = Math.max(...volumeSparklineData);
@@ -374,14 +374,14 @@ function Dashboard() {
             <CardTitle className="text-2xl tabular-nums">
               {isLoading ? '...' : Math.round(animatedWorkouts)}
             </CardTitle>
-            {workoutsTrend && (
-              <div className="mt-2">
+            <div className="mt-2 h-6">
+              {workoutsTrend && (
                 <Badge variant="outline">
                   {workoutsUp ? <TrendingUp size={12} /> : '↓'}
                   {workoutsTrend}%
                 </Badge>
-              </div>
-            )}
+              )}
+            </div>
           </CardHeader>
           <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
             Last 7 days
@@ -402,6 +402,9 @@ function Dashboard() {
             <CardTitle className="text-2xl tabular-nums">
               {isLoading ? '...' : Math.round(animatedPRs)}
             </CardTitle>
+            <div className="mt-2 h-6">
+              {/* Empty space to maintain consistent height with other cards */}
+            </div>
           </CardHeader>
           <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
             Last 30 days
@@ -425,9 +428,13 @@ function Dashboard() {
                 <span className="text-base text-muted-foreground ml-1">days</span>
               </CardTitle>
 
+              <div className="mt-2 h-6">
+                {/* Empty space to maintain consistent height with other cards */}
+              </div>
+
               {/* Right streak pills: now absolutely positioned */}
               {!isLoading && (
-                  <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
+                  <div className="flex justify-end xl:absolute xl:right-[78px] xl:top-[36px]">
                     <StreakVisualization
                       currentStreak={stats.currentStreak}
                       workoutDates={allWorkouts.map((w: WorkoutLog) => w.date)}
