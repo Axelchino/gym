@@ -24,7 +24,14 @@ export function StreakVisualization({
   // Create a set of workout dates (normalized to midnight) for quick lookup
   const workoutDateSet = new Set(
     workoutDates.map((date) => {
-      const d = new Date(date);
+      // Parse date string in local timezone to avoid UTC offset issues
+      let d: Date;
+      if (typeof date === 'string') {
+        const [year, month, day] = date.split('-').map(Number);
+        d = new Date(year, month - 1, day);
+      } else {
+        d = new Date(date);
+      }
       d.setHours(0, 0, 0, 0);
       return d.getTime();
     })

@@ -216,7 +216,14 @@ export function calculateStreak(workouts: WorkoutLog[]): number {
 
   const sortedDates = workouts
     .map(w => {
-      const date = new Date(w.date);
+      // Parse date string in local timezone to avoid UTC offset issues
+      let date: Date;
+      if (typeof w.date === 'string') {
+        const [year, month, day] = w.date.split('-').map(Number);
+        date = new Date(year, month - 1, day);
+      } else {
+        date = new Date(w.date);
+      }
       date.setHours(0, 0, 0, 0);
       return date.getTime();
     })
