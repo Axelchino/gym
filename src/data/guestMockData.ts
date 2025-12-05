@@ -23,6 +23,50 @@ function calculateVolume(exercises: any[]): number {
 export const mockWorkoutTemplate = [
   // Week 1 - Current Week
   {
+    daysAgo: 0,  // Today
+    name: "Pull Day",
+    duration: 4320, // 72 minutes
+    exercises: [
+      {
+        exerciseId: "barbell-deadlift",
+        exerciseName: "Barbell Deadlift",
+        sets: [
+          { weight: 135, reps: 10, rir: 3, completed: true, isWarmup: true, isFailure: false },
+          { weight: 225, reps: 8, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 225, reps: 8, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 225, reps: 7, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "pull-up",
+        exerciseName: "Pull Up",
+        sets: [
+          { weight: 0, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 0, reps: 9, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 0, reps: 8, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "barbell-row",
+        exerciseName: "Barbell Row",
+        sets: [
+          { weight: 135, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 135, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 135, reps: 9, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "dumbbell-curl",
+        exerciseName: "Dumbbell Curl",
+        sets: [
+          { weight: 35, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 35, reps: 11, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 35, reps: 10, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+    ]
+  },
+  {
     daysAgo: 1,  // Yesterday
     name: "Push Day",
     duration: 3840, // 64 minutes
@@ -62,6 +106,42 @@ export const mockWorkoutTemplate = [
           { weight: 50, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 50, reps: 9, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 50, reps: 8, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+    ]
+  },
+  {
+    daysAgo: 2,  // 2 days ago
+    name: "Leg Day",
+    duration: 4500, // 75 minutes
+    exercises: [
+      {
+        exerciseId: "barbell-squat",
+        exerciseName: "Barbell Squat",
+        sets: [
+          { weight: 135, reps: 10, rir: 4, completed: true, isWarmup: true, isFailure: false },
+          { weight: 185, reps: 8, rir: 3, completed: true, isWarmup: true, isFailure: false },
+          { weight: 225, reps: 6, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 225, reps: 6, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 225, reps: 5, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "leg-press",
+        exerciseName: "Leg Press",
+        sets: [
+          { weight: 360, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 360, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 360, reps: 11, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "leg-curl",
+        exerciseName: "Leg Curl",
+        sets: [
+          { weight: 90, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 90, reps: 11, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 90, reps: 10, rir: 1, completed: true, isWarmup: false, isFailure: false },
         ]
       },
     ]
@@ -108,6 +188,41 @@ export const mockWorkoutTemplate = [
           { weight: 35, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 35, reps: 11, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 35, reps: 10, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+    ]
+  },
+  {
+    daysAgo: 4,  // 4 days ago
+    name: "Push Day",
+    duration: 3900, // 65 minutes
+    exercises: [
+      {
+        exerciseId: "barbell-bench-press",
+        exerciseName: "Barbell Bench Press",
+        sets: [
+          { weight: 135, reps: 12, rir: 3, completed: true, isWarmup: true, isFailure: false },
+          { weight: 185, reps: 9, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 185, reps: 8, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 185, reps: 7, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "dumbbell-fly",
+        exerciseName: "Dumbbell Fly",
+        sets: [
+          { weight: 40, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 40, reps: 11, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 40, reps: 10, rir: 1, completed: true, isWarmup: false, isFailure: false },
+        ]
+      },
+      {
+        exerciseId: "lateral-raise",
+        exerciseName: "Lateral Raise",
+        sets: [
+          { weight: 20, reps: 15, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 20, reps: 14, rir: 2, completed: true, isWarmup: false, isFailure: false },
+          { weight: 20, reps: 13, rir: 1, completed: true, isWarmup: false, isFailure: false },
         ]
       },
     ]
