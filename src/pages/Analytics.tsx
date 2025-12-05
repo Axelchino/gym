@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, BarChart3, Award, Trophy, Zap, Dumbbell, Filter, Download, X, Flame } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { calculateWorkoutStats, calculateStreak, getExerciseProgressionByName } from '../utils/analytics';
@@ -13,8 +13,7 @@ import { CalendarHeatmap } from '../components/CalendarHeatmap';
 import { StreakDisplay } from '../components/StreakDisplay';
 import { ProgressReports } from '../components/ProgressReports';
 import { StrengthStandards } from '../components/StrengthStandards';
-import { useAllWorkouts } from '../hooks/useWorkoutData';
-import { db } from '../services/database';
+import { useAllWorkouts, useAllPersonalRecords } from '../hooks/useWorkoutData';
 
 function Analytics() {
   const { user } = useAuth();
@@ -27,32 +26,27 @@ function Analytics() {
   // REACT QUERY: Fetch all workouts with automatic caching
   const { data: workouts = [] } = useAllWorkouts();
 
-  const [recentPRs, setRecentPRs] = useState<PersonalRecord[]>([]);
-  const [allPRs, setAllPRs] = useState<PersonalRecord[]>([]);
+  // REACT QUERY: Fetch all PRs with automatic caching (supports guest mode)
+  const { data: allPRs = [] } = useAllPersonalRecords();
+
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [exerciseList, setExerciseList] = useState<{ id: string; name: string }[]>([]);
   const [timeFilter, setTimeFilter] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [selectedDateWorkouts, setSelectedDateWorkouts] = useState<{ date: Date; workouts: WorkoutLog[] } | null>(null);
 
-  // Load PRs and exercise list whenever workouts change
+  // Calculate recent PRs from all PRs
+  const recentPRs = useMemo(() => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return allPRs.filter(pr => new Date(pr.date) >= thirtyDaysAgo);
+  }, [allPRs]);
+
+  // Load exercise list whenever workouts change
   useEffect(() => {
     if (workouts.length === 0) return;
 
-    async function loadAdditionalData() {
+    function loadExerciseList() {
       try {
-        // Load all PRs
-        const prs = await db.personalRecords
-          .orderBy('date')
-          .reverse()
-          .toArray();
-        setAllPRs(prs);
-
-        // Get PRs from last 30 days
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const recent = prs.filter(pr => new Date(pr.date) >= thirtyDaysAgo);
-        setRecentPRs(recent);
-
         // Get unique exercises from workouts (deduplicate by name, not ID)
         const exerciseMap = new Map<string, { id: string; name: string }>();
         workouts.forEach((workout: WorkoutLog) => {
@@ -70,7 +64,7 @@ function Analytics() {
       }
     }
 
-    loadAdditionalData();
+    loadExerciseList();
   }, [workouts]);
 
   // Calculate stats
