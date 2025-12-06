@@ -15,28 +15,46 @@ export function Header() {
   const selectedColors = getSelectedColors(theme);
 
   // Clear all browser cache and reload
-  function clearCacheAndReload() {
-    // Clear localStorage
-    localStorage.clear();
+  async function clearCacheAndReload() {
+    // Preserve essential app state (use correct key names!)
+    const isGuestMode = localStorage.getItem('isGuestMode');
+    const theme = localStorage.getItem('gym-tracker-theme');
+    const authUser = localStorage.getItem('auth-user');
 
-    // Clear sessionStorage
-    sessionStorage.clear();
+    // Create promises for async cleanup operations
+    const cleanupPromises: Promise<void>[] = [];
 
-    // Clear IndexedDB
-    if (window.indexedDB) {
-      window.indexedDB.databases?.().then((dbs) => {
-        dbs.forEach((db) => {
-          if (db.name) window.indexedDB.deleteDatabase(db.name);
-        });
-      });
+    // Clear browser cache API
+    if ('caches' in window) {
+      cleanupPromises.push(
+        caches.keys().then((names) => {
+          return Promise.all(names.map((name) => caches.delete(name)));
+        }).then(() => {})
+      );
     }
 
     // Unregister service workers
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        registrations.forEach((registration) => registration.unregister());
-      });
+      cleanupPromises.push(
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          return Promise.all(registrations.map((r) => r.unregister()));
+        }).then(() => {})
+      );
     }
+
+    // Wait for all async cleanup to complete
+    await Promise.all(cleanupPromises);
+
+    // Clear localStorage (except essential items) - use correct keys!
+    const keysToPreserve = ['isGuestMode', 'gym-tracker-theme', 'auth-user'];
+    Object.keys(localStorage).forEach(key => {
+      if (!keysToPreserve.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    // Clear sessionStorage
+    sessionStorage.clear();
 
     // Hard reload with cache bypass
     window.location.reload();

@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/database';
 import type { UserProfile } from '../types/user';
 import { useNavigate } from 'react-router-dom';
+import { getGuestProfile } from '../data/guestMockData';
 
 interface StrengthStandardsProps {
   workouts: WorkoutLog[];
@@ -18,17 +19,31 @@ const BIG_LIFTS = ['Squat', 'Bench Press', 'Deadlift', 'Overhead Press'];
 
 export function StrengthStandards({ workouts }: StrengthStandardsProps) {
   const { weightUnit } = useUserSettings();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [demoSex, setDemoSex] = useState<'male' | 'female'>('male'); // For demo mode toggle
 
   useEffect(() => {
     loadUserProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, isGuest]);
 
   const loadUserProfile = async () => {
+    // GUEST MODE: Load guest profile
+    if (isGuest) {
+      const guestProfile = getGuestProfile();
+      setUserProfile({
+        userId: guestProfile.userId,
+        currentWeight: guestProfile.weight,
+        sex: guestProfile.sex,
+        unitPreference: guestProfile.unit === 'lbs' ? 'imperial' : 'metric',
+      } as UserProfile);
+      return;
+    }
+
+    // REAL USER: Load from database
     if (!user) return;
     const profile = await db.users.get(user.id);
     setUserProfile(profile || null);
@@ -36,7 +51,8 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
 
   // Get bodyweight and sex from profile, with fallbacks
   const bodyweight = userProfile?.currentWeight || 75; // Default 75kg if not set
-  const sex = userProfile?.sex === 'female' ? 'female' : 'male'; // Default to male, skip "prefer-not-to-say"
+  // In guest mode, use demoSex toggle; otherwise use profile sex
+  const sex = isGuest ? demoSex : (userProfile?.sex === 'female' ? 'female' : 'male'); // Default to male, skip "prefer-not-to-say"
   const hasProfileData = !!userProfile?.currentWeight && userProfile?.sex && userProfile.sex !== 'prefer-not-to-say';
 
   // Calculate best 1RM for each big lift
@@ -95,7 +111,7 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
         stats,
       };
     });
-  }, [liftStats, bodyweight, sex]);
+  }, [liftStats, bodyweight, sex, demoSex]);
 
   const hasAnyData = strengthLevels.some(l => l.stats !== null);
 
@@ -140,6 +156,57 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
           </div>
         </div>
       </div>
+
+      {/* Demo Mode: Weight & Sex Banner with Toggle */}
+      {isGuest && (
+        <div className="card mb-6" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border-subtle)' }}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="font-semibold mb-2 text-sm" style={{ color: 'var(--text-primary)' }}>
+                Demo Mode Settings
+              </h3>
+              <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
+                For signed-in users, these values come from your profile. In demo mode, you can adjust them here.
+              </p>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <User size={16} style={{ color: 'var(--text-muted)' }} />
+                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                    <span className="font-medium">Weight:</span> {bodyweight} {weightUnit}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                    <span className="font-medium">Sex:</span>
+                  </span>
+                  <div className="flex items-center gap-2 p-1 rounded-lg" style={{ backgroundColor: 'var(--surface-accent)' }}>
+                    <button
+                      onClick={() => setDemoSex('male')}
+                      className="px-3 py-1 text-xs font-medium rounded transition-all"
+                      style={{
+                        backgroundColor: demoSex === 'male' ? 'var(--color-blue, #3B82F6)' : 'transparent',
+                        color: demoSex === 'male' ? 'white' : 'var(--text-secondary)',
+                      }}
+                    >
+                      Male
+                    </button>
+                    <button
+                      onClick={() => setDemoSex('female')}
+                      className="px-3 py-1 text-xs font-medium rounded transition-all"
+                      style={{
+                        backgroundColor: demoSex === 'female' ? 'var(--color-purple, #7E29FF)' : 'transparent',
+                        color: demoSex === 'female' ? 'white' : 'var(--text-secondary)',
+                      }}
+                    >
+                      Female
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Profile Data Prompt */}
       {!hasProfileData && (

@@ -58,14 +58,20 @@ function Analytics() {
           });
         });
         const exercises = Array.from(exerciseMap.values());
-        setExerciseList(exercises.sort((a, b) => a.name.localeCompare(b.name)));
+        const sortedExercises = exercises.sort((a, b) => a.name.localeCompare(b.name));
+        setExerciseList(sortedExercises);
+
+        // Auto-select the first exercise if none is selected (fixes race condition on first load)
+        if (!selectedExercise && sortedExercises.length > 0) {
+          setSelectedExercise(sortedExercises[0].name);
+        }
       } catch (error) {
         console.error('Error loading analytics data:', error);
       }
     }
 
     loadExerciseList();
-  }, [workouts]);
+  }, [workouts, selectedExercise]);
 
   // Calculate stats
   const stats = calculateWorkoutStats(workouts);

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   getWorkoutLogs,
@@ -20,8 +21,9 @@ import { getGuestWorkouts, getGuestPRs, getGuestTemplates, getGuestProgram } fro
 export function useWorkouts(startDate?: Date, endDate?: Date) {
   const { isGuest } = useAuth();
 
-  // GUEST MODE: Return filtered mock data
-  if (isGuest) {
+  // GUEST MODE: Return filtered mock data with stable reference
+  const guestData = useMemo(() => {
+    if (!isGuest) return null;
     const allWorkouts = getGuestWorkouts();
     // Filter workouts by date range if provided
     const filteredWorkouts = (startDate && endDate)
@@ -30,13 +32,16 @@ export function useWorkouts(startDate?: Date, endDate?: Date) {
           return workoutDate >= startDate && workoutDate <= endDate;
         })
       : allWorkouts;
+    return filteredWorkouts;
+  }, [isGuest, startDate, endDate]);
 
+  if (isGuest && guestData) {
     return {
-      data: filteredWorkouts,
+      data: guestData,
       isLoading: false,
       isError: false,
       error: null,
-      refetch: () => Promise.resolve({ data: filteredWorkouts }),
+      refetch: () => Promise.resolve({ data: guestData }),
     } as any;
   }
 
@@ -55,14 +60,18 @@ export function useWorkouts(startDate?: Date, endDate?: Date) {
 export function useAllWorkouts() {
   const { isGuest } = useAuth();
 
-  // GUEST MODE: Return mock data instantly
-  if (isGuest) {
+  // GUEST MODE: Return mock data with stable reference to prevent infinite loops
+  const guestWorkouts = useMemo(() => {
+    return isGuest ? getGuestWorkouts() : null;
+  }, [isGuest]);
+
+  if (isGuest && guestWorkouts) {
     return {
-      data: getGuestWorkouts(),
+      data: guestWorkouts,
       isLoading: false,
       isError: false,
       error: null,
-      refetch: () => Promise.resolve({ data: getGuestWorkouts() }),
+      refetch: () => Promise.resolve({ data: guestWorkouts }),
     } as any;
   }
 
@@ -85,8 +94,9 @@ export function useAllWorkouts() {
 export function usePersonalRecords(startDate?: Date, endDate?: Date) {
   const { isGuest } = useAuth();
 
-  // GUEST MODE: Return filtered mock PRs
-  if (isGuest) {
+  // GUEST MODE: Return filtered mock PRs with stable reference
+  const guestData = useMemo(() => {
+    if (!isGuest) return null;
     const allPRs = getGuestPRs();
     // Filter PRs by date range if provided
     const filteredPRs = (startDate && endDate)
@@ -95,13 +105,16 @@ export function usePersonalRecords(startDate?: Date, endDate?: Date) {
           return prDate >= startDate && prDate <= endDate;
         })
       : allPRs;
+    return filteredPRs;
+  }, [isGuest, startDate, endDate]);
 
+  if (isGuest && guestData) {
     return {
-      data: filteredPRs,
+      data: guestData,
       isLoading: false,
       isError: false,
       error: null,
-      refetch: () => Promise.resolve({ data: filteredPRs }),
+      refetch: () => Promise.resolve({ data: guestData }),
     } as any;
   }
 
@@ -119,14 +132,18 @@ export function usePersonalRecords(startDate?: Date, endDate?: Date) {
 export function useAllPersonalRecords() {
   const { isGuest } = useAuth();
 
-  // GUEST MODE: Return mock PRs instantly
-  if (isGuest) {
+  // GUEST MODE: Return mock PRs with stable reference to prevent infinite loops
+  const guestPRs = useMemo(() => {
+    return isGuest ? getGuestPRs() : null;
+  }, [isGuest]);
+
+  if (isGuest && guestPRs) {
     return {
-      data: getGuestPRs(),
+      data: guestPRs,
       isLoading: false,
       isError: false,
       error: null,
-      refetch: () => Promise.resolve({ data: getGuestPRs() }),
+      refetch: () => Promise.resolve({ data: guestPRs }),
     } as any;
   }
 
@@ -145,14 +162,18 @@ export function useAllPersonalRecords() {
 export function useWorkoutTemplates() {
   const { isGuest } = useAuth();
 
-  // GUEST MODE: Return mock templates instantly
-  if (isGuest) {
+  // GUEST MODE: Return mock templates with stable reference
+  const guestTemplates = useMemo(() => {
+    return isGuest ? getGuestTemplates() : null;
+  }, [isGuest]);
+
+  if (isGuest && guestTemplates) {
     return {
-      data: getGuestTemplates(),
+      data: guestTemplates,
       isLoading: false,
       isError: false,
       error: null,
-      refetch: () => Promise.resolve({ data: getGuestTemplates() }),
+      refetch: () => Promise.resolve({ data: guestTemplates }),
     } as any;
   }
 
@@ -171,15 +192,20 @@ export function useWorkoutTemplates() {
 export function usePrograms() {
   const { isGuest } = useAuth();
 
-  // GUEST MODE: Return mock program instantly
-  if (isGuest) {
+  // GUEST MODE: Return mock program with stable reference
+  const guestPrograms = useMemo(() => {
+    if (!isGuest) return null;
     const mockProgram = getGuestProgram();
+    return [mockProgram]; // Return as array since getPrograms returns array
+  }, [isGuest]);
+
+  if (isGuest && guestPrograms) {
     return {
-      data: [mockProgram], // Return as array since getPrograms returns array
+      data: guestPrograms,
       isLoading: false,
       isError: false,
       error: null,
-      refetch: () => Promise.resolve({ data: [mockProgram] }),
+      refetch: () => Promise.resolve({ data: guestPrograms }),
     } as any;
   }
 
