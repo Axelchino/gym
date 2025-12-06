@@ -367,11 +367,11 @@ function Analytics() {
         </>
       )}
 
-      {/* Progress Reports - Only for authenticated users */}
-      {user && <ProgressReports workouts={workouts} allPRs={allPRs} />}
+      {/* Progress Reports - Show if there are workouts */}
+      {workouts.length > 0 && <ProgressReports workouts={workouts} allPRs={allPRs} />}
 
-      {/* Time Filter - Only for authenticated users */}
-      {user && (
+      {/* Time Filter - Show if there are workouts */}
+      {workouts.length > 0 && (
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <Filter size={14} className="text-muted opacity-60" strokeWidth={1.5} />
@@ -406,8 +406,8 @@ function Analytics() {
         </div>
       )}
 
-      {/* Volume Over Time Chart - Only for authenticated users */}
-      {user && (
+      {/* Volume Over Time Chart - Show if there are workouts */}
+      {workouts.length > 0 && (
         volumeData.length > 0 ? (
           <div className="card-elevated">
             <h2 className="text-lg font-semibold text-primary mb-4">Volume Over Time</h2>
@@ -437,8 +437,8 @@ function Analytics() {
         )
       )}
 
-      {/* Exercise Progression Chart - Only for authenticated users */}
-      {user && (
+      {/* Exercise Progression Chart - Show if there are workouts */}
+      {workouts.length > 0 && (
         <div className="card-elevated">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-primary">Exercise Progression</h2>
@@ -494,8 +494,8 @@ function Analytics() {
         </div>
       )}
 
-      {/* PR Timeline - Only for authenticated users */}
-      {user && (
+      {/* PR Timeline - Show if there are PRs */}
+      {allPRs.length > 0 && (
         <div className="card-elevated">
         <h2 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
           <Trophy size={20} style={{ color: accentColors.primary }} strokeWidth={1.5} />
@@ -586,8 +586,8 @@ function Analytics() {
       </div>
       )}
 
-      {/* Workout Statistics - Only for authenticated users */}
-      {user && (
+      {/* Workout Statistics - Show if there are workouts */}
+      {workouts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="card-elevated">
             <h3 className="text-lg font-semibold text-primary mb-3">Overall Stats</h3>
@@ -639,11 +639,11 @@ function Analytics() {
         </div>
       )}
 
-      {/* Strength Standards - Only for authenticated users */}
-      {user && <StrengthStandards workouts={workouts} />}
+      {/* Strength Standards - Show if there are workouts */}
+      {workouts.length > 0 && <StrengthStandards workouts={workouts} />}
 
-      {/* Calendar & Streak Section - Only for authenticated users */}
-      {user && (
+      {/* Calendar & Streak Section - Show if there are workouts */}
+      {workouts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StreakDisplay workouts={workouts} />
           <CalendarHeatmap
