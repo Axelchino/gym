@@ -38,7 +38,7 @@ function Analytics() {
   const recentPRs = useMemo(() => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return allPRs.filter(pr => new Date(pr.date) >= thirtyDaysAgo);
+    return allPRs.filter((pr: PersonalRecord) => new Date(pr.date) >= thirtyDaysAgo);
   }, [allPRs]);
 
   // Load exercise list whenever workouts change
@@ -510,7 +510,7 @@ function Analytics() {
 
         {allPRs.length > 0 ? (
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {allPRs.map((pr, index) => (
+            {allPRs.map((pr: PersonalRecord, index: number) => (
               <div key={index} className="rounded-lg p-4 transition-all" style={{
                 backgroundColor: 'var(--surface-accent)',
                 border: '1px solid var(--border-subtle)',

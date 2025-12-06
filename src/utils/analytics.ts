@@ -215,14 +215,15 @@ export function calculateStreak(workouts: WorkoutLog[]): number {
   if (workouts.length === 0) return 0;
 
   const sortedDates = workouts
-    .map(w => {
+    .map((w: WorkoutLog) => {
       // Parse date string in local timezone to avoid UTC offset issues
       let date: Date;
-      if (typeof w.date === 'string') {
-        const [year, month, day] = w.date.split('-').map(Number);
+      const workoutDate = w.date as string | Date;
+      if (typeof workoutDate === 'string') {
+        const [year, month, day] = workoutDate.split('-').map(Number);
         date = new Date(year, month - 1, day);
       } else {
-        date = new Date(w.date);
+        date = new Date(workoutDate);
       }
       date.setHours(0, 0, 0, 0);
       return date.getTime();

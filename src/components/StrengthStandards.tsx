@@ -35,10 +35,16 @@ export function StrengthStandards({ workouts }: StrengthStandardsProps) {
     if (isGuest) {
       const guestProfile = getGuestProfile();
       setUserProfile({
+        id: guestProfile.userId,
         userId: guestProfile.userId,
+        name: 'Guest User',
         currentWeight: guestProfile.weight,
         sex: guestProfile.sex,
+        goal: 'hypertrophy' as const,
+        experienceLevel: 'intermediate' as const,
         unitPreference: guestProfile.unit === 'lbs' ? 'imperial' : 'metric',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as UserProfile);
       return;
     }
