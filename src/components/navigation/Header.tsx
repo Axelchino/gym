@@ -226,14 +226,14 @@ export function Header() {
                   Try Workout
                 </button>
 
-                {/* Sign In button - guest mode - primary purple button */}
+                {/* Sign In button - guest mode - lighter blue style */}
                 <button
                   onClick={() => navigate('/auth')}
                   className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
                   style={{
-                    backgroundColor: selectedColors.background,
-                    color: selectedColors.text,
-                    border: `1px solid ${selectedColors.border}`,
+                    backgroundColor: theme === 'dark' ? '#0092E6' : theme === 'amoled' ? selectedColors.background : accentColors.background,
+                    color: '#FFFFFF',
+                    border: 'none',
                     borderRadius: '10px',
                     height: '40px',
                     paddingLeft: '18px',
@@ -241,20 +241,20 @@ export function Header() {
                     whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#00A2FF' : accentColors.backgroundHover;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = selectedColors.background;
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#0092E6' : theme === 'amoled' ? selectedColors.background : accentColors.background;
                     if (document.activeElement !== e.currentTarget) {
                       e.currentTarget.style.boxShadow = 'none';
                     }
                   }}
                   onMouseDown={(e) => {
-                    e.currentTarget.style.backgroundColor = accentColors.background;
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#007FCC' : accentColors.background;
                     e.currentTarget.style.transform = 'translateY(1px)';
                   }}
                   onMouseUp={(e) => {
-                    e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#00A2FF' : accentColors.backgroundHover;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                   onFocus={(e) => {
@@ -262,7 +262,7 @@ export function Header() {
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.backgroundColor = selectedColors.background;
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? '#0092E6' : theme === 'amoled' ? selectedColors.background : accentColors.background;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >

@@ -193,7 +193,7 @@ export const themeTokens = {
       border: DARK_BORDER_SUBTLE,         // Border for definition
       hoverBorder: DARK_BLUE_HOVER,       // Blue hover border in dark mode
       accentPurple: '#8B42FF',
-      accentGold: '#E1BB62',  // For streaks
+      accentGold: '#0092E6',  // BLUE for streaks and stats (matches Sign In button)
       accentBlue: '#0084FF',   // Not used but needed for type consistency
       accentGray: '#B8B8C8',   // Not used but needed for type consistency
     },
@@ -232,8 +232,8 @@ export const themeTokens = {
     },
 
     sparkline: {
-      color: '#E1BB62',               // Sparkline stroke color (GOLD in dark mode)
-      peakDot: '#EDD08A',             // Peak dot color (lighter gold)
+      color: '#0092E6',               // Sparkline stroke color (BLUE in dark mode)
+      peakDot: '#00A2FF',             // Peak dot color (lighter blue)
     },
   },
 

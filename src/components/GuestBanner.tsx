@@ -29,22 +29,13 @@ export function GuestBanner() {
       <div
         className="sticky top-0 z-50 border-b"
         style={{
-          backgroundColor: 'var(--surface-elevated)',
-          borderColor: 'var(--border-subtle)'
+          backgroundColor: theme === 'dark' ? 'rgba(0, 146, 230, 0.08)' : theme === 'amoled' ? 'rgba(212, 160, 23, 0.08)' : 'rgba(126, 41, 255, 0.08)',
+          borderColor: theme === 'dark' ? 'rgba(0, 146, 230, 0.2)' : theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(126, 41, 255, 0.2)'
         }}
       >
         <div className="mx-auto px-6 py-3" style={{ maxWidth: '1536px' }}>
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <div
-                className="flex items-center justify-center w-9 h-9 rounded-lg"
-                style={{
-                  backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.1)' : 'rgba(126, 41, 255, 0.1)',
-                  border: `1px solid ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(126, 41, 255, 0.2)'}`
-                }}
-              >
-                <span className="text-xl" aria-label="Demo mode icon">🎯</span>
-              </div>
               <div>
                 <p className="text-sm font-semibold text-primary">
                   Demo Mode
@@ -56,17 +47,17 @@ export function GuestBanner() {
             </div>
             <button
               onClick={() => navigate('/auth')}
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap"
+              className="px-4 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap"
               style={{
-                backgroundColor: selectedColors.background,
-                color: selectedColors.text,
-                border: `1px solid ${selectedColors.border}`,
+                backgroundColor: theme === 'dark' ? '#0092E6' : theme === 'amoled' ? selectedColors.background : accentColors.background,
+                color: '#FFFFFF',
+                border: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = accentColors.backgroundHover;
+                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#00A2FF' : accentColors.backgroundHover;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = selectedColors.background;
+                e.currentTarget.style.backgroundColor = theme === 'dark' ? '#0092E6' : theme === 'amoled' ? selectedColors.background : accentColors.background;
               }}
             >
               Create Account
