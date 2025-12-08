@@ -61,8 +61,8 @@ export async function initializeDatabase(): Promise<void> {
 
     console.log('💾 Importing exercises into IndexedDB...');
 
-    // Bulk add all exercises (preserves IDs from JSON)
-    await db.exercises.bulkAdd(exercises);
+    // Bulk put all exercises (preserves IDs from JSON, updates if exists)
+    await db.exercises.bulkPut(exercises);
 
     const finalCount = await db.exercises.count();
     console.log(`✓ Successfully imported ${finalCount} exercises`);

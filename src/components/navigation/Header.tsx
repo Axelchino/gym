@@ -18,8 +18,9 @@ export function Header() {
   async function clearCacheAndReload() {
     // Preserve essential app state (use correct key names!)
     const isGuestMode = localStorage.getItem('isGuestMode');
-    const theme = localStorage.getItem('gym-tracker-theme');
     const authUser = localStorage.getItem('auth-user');
+    // Only preserve theme for logged-in users (guests should always use OS theme)
+    const theme = user ? localStorage.getItem('gym-tracker-theme') : null;
 
     // Create promises for async cleanup operations
     const cleanupPromises: Promise<void>[] = [];
@@ -46,7 +47,10 @@ export function Header() {
     await Promise.all(cleanupPromises);
 
     // Clear localStorage (except essential items) - use correct keys!
-    const keysToPreserve = ['isGuestMode', 'gym-tracker-theme', 'auth-user'];
+    // For guests, don't preserve theme (they should use OS preference)
+    const keysToPreserve = user
+      ? ['isGuestMode', 'gym-tracker-theme', 'auth-user']
+      : ['isGuestMode', 'auth-user'];
     Object.keys(localStorage).forEach(key => {
       if (!keysToPreserve.includes(key)) {
         localStorage.removeItem(key);

@@ -31,17 +31,41 @@ function getSystemTheme(): 'light' | 'dark' {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Initial: Use OS detection for guests
+    // Initial: Use OS detection for guests (don't use localStorage for guests)
     return getSystemTheme();
   });
 
   // Use React Query to get profile - will be instant if prefetched by AuthContext
   const { data: profile, isLoading: isLoadingProfile } = useUserProfile(user?.id || null);
 
+  // Listen to OS theme changes for guest users
+  useEffect(() => {
+    if (user) return; // Only for guests
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleThemeChange = (e: MediaQueryListEvent) => {
+      const systemTheme = e.matches ? 'dark' : 'light';
+      setThemeState(systemTheme);
+    };
+
+    // Modern browsers
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleThemeChange);
+      return () => mediaQuery.removeEventListener('change', handleThemeChange);
+    }
+    // Older browsers
+    else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleThemeChange);
+      return () => mediaQuery.removeListener(handleThemeChange);
+    }
+  }, [user]);
+
   // Apply theme from profile when available
   useEffect(() => {
     if (!user) {
-      // User logged out - revert to OS detection
+      // User logged out - revert to OS detection and clear any saved theme
+      localStorage.removeItem('gym-tracker-theme');
       const systemTheme = getSystemTheme();
       setThemeState(systemTheme);
       return;
@@ -61,9 +85,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Add current theme class
     document.documentElement.classList.add(`theme-${theme}`);
 
-    // Save to localStorage as backup (for guests)
-    localStorage.setItem('gym-tracker-theme', theme);
-  }, [theme]);
+    // Save to localStorage only for logged-in users (guests should always use OS theme)
+    if (user) {
+      localStorage.setItem('gym-tracker-theme', theme);
+    }
+  }, [theme, user]);
 
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
