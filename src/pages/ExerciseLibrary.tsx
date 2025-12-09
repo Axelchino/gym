@@ -6,6 +6,23 @@ import { searchExercises, type SearchFilters } from '../utils/searchEngine';
 import { initializeDatabase } from '../services/initializeDatabase';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors } from '../utils/themeHelpers';
+import { useAuth } from '../contexts/AuthContext';
+
+// Demo mode exercises - only show these exercises to guests (names match exercises.json)
+const DEMO_EXERCISE_NAMES = [
+  'Bench Press',
+  'Incline Dumbbell Press',
+  'One Arm Triceps Pushdown',
+  'Dumbbell Shoulder Press',
+  'Deadlift',
+  'Pull-Up',
+  'Barbell Bent Over Row',
+  'Dumbbell Curl',
+  'Barbell Squat',
+  'Leg Press',
+  'Leg Curl',
+  'Standing Barbell Calf Raise',
+];
 
 function ExerciseLibrary() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -14,6 +31,7 @@ function ExerciseLibrary() {
   const [filters, setFilters] = useState<SearchFilters>({});
   const [showFilterModal, setShowFilterModal] = useState(false);
   const { theme } = useTheme();
+  const { user } = useAuth();
   const accentColors = getAccentColors(theme);
 
   // Theme-aware colors for difficulty badges
@@ -67,7 +85,18 @@ function ExerciseLibrary() {
         await initializeDatabase();
 
         const allExercises = await exerciseService.getAll();
-        setExercises(allExercises);
+
+        // GUEST MODE: Only show demo exercises (data protection - prevent scraping full database)
+        if (!user) {
+          const demoExercises = allExercises.filter(ex =>
+            DEMO_EXERCISE_NAMES.includes(ex.name)
+          );
+          setExercises(demoExercises);
+        } else {
+          // AUTHENTICATED: Show all exercises
+          setExercises(allExercises);
+        }
+
         setLoading(false);
       } catch (error) {
         console.error('Failed to load exercises:', error);
@@ -75,7 +104,7 @@ function ExerciseLibrary() {
       }
     }
     loadExercises();
-  }, []);
+  }, [user]);
 
   // Use unified search engine with memoization for performance
   const searchResults = useMemo(
@@ -99,6 +128,24 @@ function ExerciseLibrary() {
         <h1 className="text-3xl font-bold mb-2 text-primary">Exercise Library</h1>
         <p className="text-sm text-secondary">{exercises.length} exercises available</p>
       </div>
+
+      {/* Demo Mode Notice */}
+      {!user && (
+        <div
+          className="rounded-lg p-4 border"
+          style={{
+            backgroundColor: 'var(--surface-accent)',
+            borderColor: 'var(--border-medium)'
+          }}
+        >
+          <p className="text-sm text-primary font-medium">
+            Demo Mode: Showing {exercises.length} sample exercises from the PPL program
+          </p>
+          <p className="text-xs text-secondary mt-1">
+            Create an account to access the full library of 1,171+ exercises
+          </p>
+        </div>
+      )}
 
       {/* Search and Filter */}
       <div className="flex gap-3">

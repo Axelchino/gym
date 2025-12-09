@@ -27,7 +27,7 @@ export function GuestBanner() {
   if (isGuest) {
     return (
       <div
-        className="sticky top-0 z-50 border-b"
+        className="border-b"
         style={{
           backgroundColor: theme === 'dark' ? 'rgba(0, 146, 230, 0.08)' : theme === 'amoled' ? 'rgba(212, 160, 23, 0.08)' : 'rgba(126, 41, 255, 0.08)',
           borderColor: theme === 'dark' ? 'rgba(0, 146, 230, 0.2)' : theme === 'amoled' ? 'rgba(212, 160, 23, 0.2)' : 'rgba(126, 41, 255, 0.2)'
@@ -37,11 +37,11 @@ export function GuestBanner() {
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
               <div>
-                <p className="text-sm font-semibold text-primary">
+                <p className="text-base font-semibold text-primary">
                   Demo Mode
                 </p>
-                <p className="text-xs text-muted">
-                  Exploring sample data · Sign up to track your workouts
+                <p className="text-sm text-muted">
+                  Exploring sample data · Create an account to track your workouts
                 </p>
               </div>
             </div>
@@ -72,7 +72,7 @@ export function GuestBanner() {
   if (isDismissed) return null;
 
   return (
-    <div className="sticky top-0 z-50" style={{ backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.08)' : 'rgba(126, 41, 255, 0.08)', borderBottom: `1px solid ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.15)' : 'rgba(126, 41, 255, 0.15)'}` }}>
+    <div style={{ backgroundColor: theme === 'amoled' ? 'rgba(212, 160, 23, 0.08)' : 'rgba(126, 41, 255, 0.08)', borderBottom: `1px solid ${theme === 'amoled' ? 'rgba(212, 160, 23, 0.15)' : 'rgba(126, 41, 255, 0.15)'}` }}>
       <div className="mx-auto px-6 py-3" style={{ maxWidth: '1280px' }}>
         <div className="flex items-center justify-between gap-4">
           {/* Left: Icon + Message */}
@@ -83,7 +83,7 @@ export function GuestBanner() {
                 Guest Mode - workouts won't be saved
               </span>
               <span className="text-xs text-muted">
-                Sign up to keep your data
+                Create an account to keep your data
               </span>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function GuestBanner() {
                 e.currentTarget.style.backgroundColor = selectedColors.background;
               }}
             >
-              Sign Up
+              Create Account
             </button>
             <button
               onClick={handleDismiss}

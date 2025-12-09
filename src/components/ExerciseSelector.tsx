@@ -5,6 +5,23 @@ import { db } from '../services/database';
 import { searchExercises } from '../utils/searchEngine';
 import { useTheme } from '../contexts/ThemeContext';
 import { getAccentColors } from '../utils/themeHelpers';
+import { useAuth } from '../contexts/AuthContext';
+
+// Demo mode exercises - only show these exercises to guests (names match exercises.json)
+const DEMO_EXERCISE_NAMES = [
+  'Bench Press',
+  'Incline Dumbbell Press',
+  'One Arm Triceps Pushdown',
+  'Dumbbell Shoulder Press',
+  'Deadlift',
+  'Pull-Up',
+  'Barbell Bent Over Row',
+  'Dumbbell Curl',
+  'Barbell Squat',
+  'Leg Press',
+  'Leg Curl',
+  'Standing Barbell Calf Raise',
+];
 
 interface ExerciseSelectorProps {
   onSelect: (exercise: Exercise) => void;
@@ -13,6 +30,7 @@ interface ExerciseSelectorProps {
 
 export function ExerciseSelector({ onSelect, onClose }: ExerciseSelectorProps) {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const accentColors = getAccentColors(theme);
   const [searchQuery, setSearchQuery] = useState('');
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -20,12 +38,23 @@ export function ExerciseSelector({ onSelect, onClose }: ExerciseSelectorProps) {
 
   useEffect(() => {
     loadExercises();
-  }, []);
+  }, [user]);
 
   async function loadExercises() {
     setIsLoading(true);
     const allExercises = await db.exercises.toArray();
-    setExercises(allExercises);
+
+    // GUEST MODE: Only show demo exercises (data protection - prevent scraping full database)
+    if (!user) {
+      const demoExercises = allExercises.filter(ex =>
+        DEMO_EXERCISE_NAMES.includes(ex.name)
+      );
+      setExercises(demoExercises);
+    } else {
+      // AUTHENTICATED: Show all exercises
+      setExercises(allExercises);
+    }
+
     setIsLoading(false);
   }
 

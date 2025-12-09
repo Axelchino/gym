@@ -29,7 +29,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 12, rir: 3, completed: true, isWarmup: true, isFailure: false },
           { weight: 185, reps: 8, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -39,7 +39,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-incline-press",
-        exerciseName: "Dumbbell Incline Press",
+        exerciseName: "Incline Dumbbell Press",
         sets: [
           { weight: 60, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 60, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -48,7 +48,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "cable-tricep-pushdown",
-        exerciseName: "Cable Tricep Pushdown",
+        exerciseName: "One Arm Triceps Pushdown",
         sets: [
           { weight: 80, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 80, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -73,7 +73,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-deadlift",
-        exerciseName: "Barbell Deadlift",
+        exerciseName: "Deadlift",
         sets: [
           { weight: 135, reps: 10, rir: 4, completed: true, isWarmup: true, isFailure: false },
           { weight: 225, reps: 8, rir: 3, completed: true, isWarmup: true, isFailure: false },
@@ -103,7 +103,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-bicep-curl",
-        exerciseName: "Dumbbell Bicep Curl",
+        exerciseName: "Dumbbell Curl",
         sets: [
           { weight: 35, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 35, reps: 11, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -148,7 +148,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "standing-calf-raise",
-        exerciseName: "Standing Calf Raise",
+        exerciseName: "Standing Barbell Calf Raise",
         sets: [
           { weight: 200, reps: 15, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 200, reps: 15, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -166,7 +166,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 12, rir: 3, completed: true, isWarmup: true, isFailure: false },
           { weight: 180, reps: 8, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -176,7 +176,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-incline-press",
-        exerciseName: "Dumbbell Incline Press",
+        exerciseName: "Incline Dumbbell Press",
         sets: [
           { weight: 55, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 55, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -185,7 +185,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "cable-tricep-pushdown",
-        exerciseName: "Cable Tricep Pushdown",
+        exerciseName: "One Arm Triceps Pushdown",
         sets: [
           { weight: 75, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 75, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -210,7 +210,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-deadlift",
-        exerciseName: "Barbell Deadlift",
+        exerciseName: "Deadlift",
         sets: [
           { weight: 135, reps: 10, rir: 4, completed: true, isWarmup: true, isFailure: false },
           { weight: 225, reps: 8, rir: 3, completed: true, isWarmup: true, isFailure: false },
@@ -240,7 +240,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-bicep-curl",
-        exerciseName: "Dumbbell Bicep Curl",
+        exerciseName: "Dumbbell Curl",
         sets: [
           { weight: 32.5, reps: 12, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 32.5, reps: 11, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -285,7 +285,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "standing-calf-raise",
-        exerciseName: "Standing Calf Raise",
+        exerciseName: "Standing Barbell Calf Raise",
         sets: [
           { weight: 195, reps: 15, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 195, reps: 15, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -303,7 +303,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 12, rir: 3, completed: true, isWarmup: true, isFailure: false },
           { weight: 175, reps: 8, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -313,7 +313,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-incline-press",
-        exerciseName: "Dumbbell Incline Press",
+        exerciseName: "Incline Dumbbell Press",
         sets: [
           { weight: 50, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
           { weight: 50, reps: 10, rir: 2, completed: true, isWarmup: false, isFailure: false },
@@ -322,7 +322,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "cable-tricep-pushdown",
-        exerciseName: "Cable Tricep Pushdown",
+        exerciseName: "One Arm Triceps Pushdown",
         sets: [
           { weight: 70, reps: 12, completed: true, isWarmup: false, isFailure: false },
           { weight: 70, reps: 12, completed: true, isWarmup: false, isFailure: false },
@@ -347,7 +347,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-deadlift",
-        exerciseName: "Barbell Deadlift",
+        exerciseName: "Deadlift",
         sets: [
           { weight: 135, reps: 10, rir: 4, completed: true, isWarmup: true, isFailure: false },
           { weight: 225, reps: 8, rir: 3, completed: true, isWarmup: true, isFailure: false },
@@ -376,7 +376,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-bicep-curl",
-        exerciseName: "Dumbbell Bicep Curl",
+        exerciseName: "Dumbbell Curl",
         sets: [
           { weight: 30, reps: 12, completed: true, isWarmup: false, isFailure: false },
           { weight: 30, reps: 11, completed: true, isWarmup: false, isFailure: false },
@@ -421,7 +421,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "standing-calf-raise",
-        exerciseName: "Standing Calf Raise",
+        exerciseName: "Standing Barbell Calf Raise",
         sets: [
           { weight: 190, reps: 15, completed: true, isWarmup: false, isFailure: false },
           { weight: 190, reps: 15, completed: true, isWarmup: false, isFailure: false },
@@ -439,7 +439,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 12, completed: true, isWarmup: true, isFailure: false },
           { weight: 170, reps: 8, completed: true, isWarmup: false, isFailure: false },
@@ -449,7 +449,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "dumbbell-incline-press",
-        exerciseName: "Dumbbell Incline Press",
+        exerciseName: "Incline Dumbbell Press",
         sets: [
           { weight: 47.5, reps: 10, completed: true, isWarmup: false, isFailure: false },
           { weight: 47.5, reps: 10, completed: true, isWarmup: false, isFailure: false },
@@ -458,7 +458,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "cable-tricep-pushdown",
-        exerciseName: "Cable Tricep Pushdown",
+        exerciseName: "One Arm Triceps Pushdown",
         sets: [
           { weight: 65, reps: 12, completed: true, isWarmup: false, isFailure: false },
           { weight: 65, reps: 12, completed: true, isWarmup: false, isFailure: false },
@@ -474,7 +474,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-deadlift",
-        exerciseName: "Barbell Deadlift",
+        exerciseName: "Deadlift",
         sets: [
           { weight: 135, reps: 10, completed: true, isWarmup: true, isFailure: false },
           { weight: 225, reps: 8, completed: true, isWarmup: true, isFailure: false },
@@ -548,7 +548,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 12, completed: true, isWarmup: true, isFailure: false },
           { weight: 185, reps: 6, completed: true, isWarmup: false, isFailure: false },
@@ -582,7 +582,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 10, completed: true, isWarmup: true, isFailure: false },
           { weight: 175, reps: 8, completed: true, isWarmup: false, isFailure: false },
@@ -591,7 +591,7 @@ export const mockWorkoutTemplate = [
       },
       {
         exerciseId: "barbell-deadlift",
-        exerciseName: "Barbell Deadlift",
+        exerciseName: "Deadlift",
         sets: [
           { weight: 225, reps: 8, completed: true, isWarmup: true, isFailure: false },
           { weight: 275, reps: 5, completed: true, isWarmup: false, isFailure: false },
@@ -607,7 +607,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-bench-press",
-        exerciseName: "Barbell Bench Press",
+        exerciseName: "Bench Press",
         sets: [
           { weight: 135, reps: 12, completed: true, isWarmup: true, isFailure: false },
           { weight: 165, reps: 8, completed: true, isWarmup: false, isFailure: false },
@@ -631,7 +631,7 @@ export const mockWorkoutTemplate = [
     exercises: [
       {
         exerciseId: "barbell-deadlift",
-        exerciseName: "Barbell Deadlift",
+        exerciseName: "Deadlift",
         sets: [
           { weight: 135, reps: 10, completed: true, isWarmup: true, isFailure: false },
           { weight: 225, reps: 6, completed: true, isWarmup: true, isFailure: false },
@@ -733,7 +733,7 @@ export function getGuestPRs() {
       id: 'guest-pr-1',
       userId: 'guest',
       exerciseId: 'barbell-bench-press',
-      exerciseName: 'Barbell Bench Press',
+      exerciseName: 'Bench Press',
       type: 'weight' as const,
       value: 225,
       date: new Date(today.getTime() - 7 * 86400000).toISOString().split('T')[0],
@@ -755,7 +755,7 @@ export function getGuestPRs() {
       id: 'guest-pr-3',
       userId: 'guest',
       exerciseId: 'barbell-deadlift',
-      exerciseName: 'Barbell Deadlift',
+      exerciseName: 'Deadlift',
       type: 'weight' as const,
       value: 365,
       date: new Date(today.getTime() - 3 * 86400000).toISOString().split('T')[0],
@@ -788,7 +788,7 @@ export function getGuestPRs() {
       id: 'guest-pr-6',
       userId: 'guest',
       exerciseId: 'barbell-bench-press',
-      exerciseName: 'Barbell Bench Press',
+      exerciseName: 'Bench Press',
       type: 'reps' as const,
       value: 10,
       date: new Date(today.getTime() - 21 * 86400000).toISOString().split('T')[0],
@@ -821,7 +821,7 @@ export function getGuestTemplates() {
       exercises: [
         {
           exerciseId: 'barbell-bench-press',
-          exerciseName: 'Barbell Bench Press',
+          exerciseName: 'Bench Press',
           targetSets: 4,
           targetReps: '8-10',
           targetRIR: 2,
@@ -829,14 +829,14 @@ export function getGuestTemplates() {
         },
         {
           exerciseId: 'dumbbell-incline-press',
-          exerciseName: 'Dumbbell Incline Press',
+          exerciseName: 'Incline Dumbbell Press',
           targetSets: 3,
           targetReps: '10-12',
           targetRIR: 2,
         },
         {
           exerciseId: 'cable-tricep-pushdown',
-          exerciseName: 'Cable Tricep Pushdown',
+          exerciseName: 'One Arm Triceps Pushdown',
           targetSets: 3,
           targetReps: '12-15',
           targetRIR: 2,
@@ -860,7 +860,7 @@ export function getGuestTemplates() {
       exercises: [
         {
           exerciseId: 'barbell-deadlift',
-          exerciseName: 'Barbell Deadlift',
+          exerciseName: 'Deadlift',
           targetSets: 5,
           targetReps: '5',
           targetRIR: 2,
@@ -882,7 +882,7 @@ export function getGuestTemplates() {
         },
         {
           exerciseId: 'dumbbell-bicep-curl',
-          exerciseName: 'Dumbbell Bicep Curl',
+          exerciseName: 'Dumbbell Curl',
           targetSets: 3,
           targetReps: '10-12',
           targetRIR: 2,
@@ -921,7 +921,7 @@ export function getGuestTemplates() {
         },
         {
           exerciseId: 'standing-calf-raise',
-          exerciseName: 'Standing Calf Raise',
+          exerciseName: 'Standing Barbell Calf Raise',
           targetSets: 3,
           targetReps: '15-20',
           targetRIR: 2,
@@ -939,48 +939,60 @@ export function getGuestTemplates() {
 // ============================================
 export function getGuestProgram() {
   const today = new Date();
-  const programStartDate = new Date(today.getTime() - 21 * 86400000); // Started 3 weeks ago
+  const programStartDate = new Date(today.getTime() - 84 * 86400000); // Started 12 weeks ago
+
+  // Calculate how many weeks since program started
+  const weeksSinceStart = Math.floor((today.getTime() - programStartDate.getTime()) / (7 * 86400000));
+  const currentWeek = weeksSinceStart + 1;
+
+  // Generate weeks dynamically - show 12 past weeks + current week + 4 future weeks
+  const weeks = [];
+  const totalWeeks = Math.max(16, currentWeek + 4); // Always show at least 16 weeks, or more if needed
+
+  for (let weekNum = 1; weekNum <= totalWeeks; weekNum++) {
+    const weekStartDate = new Date(programStartDate.getTime() + (weekNum - 1) * 7 * 86400000);
+    const isPastWeek = weekNum < currentWeek;
+    const isCurrentWeek = weekNum === currentWeek;
+
+    weeks.push({
+      weekNumber: weekNum,
+      workouts: [
+        {
+          dayOfWeek: 1, // Monday
+          templateId: 'guest-template-1',
+          templateName: 'Push Day',
+          completed: isPastWeek,
+          completedDate: isPastWeek ? new Date(weekStartDate.getTime() + 0 * 86400000).toISOString().split('T')[0] : undefined
+        },
+        {
+          dayOfWeek: 3, // Wednesday
+          templateId: 'guest-template-2',
+          templateName: 'Pull Day',
+          completed: isPastWeek,
+          completedDate: isPastWeek ? new Date(weekStartDate.getTime() + 2 * 86400000).toISOString().split('T')[0] : undefined
+        },
+        {
+          dayOfWeek: 5, // Friday
+          templateId: 'guest-template-3',
+          templateName: 'Leg Day',
+          completed: isPastWeek,
+          completedDate: isPastWeek ? new Date(weekStartDate.getTime() + 4 * 86400000).toISOString().split('T')[0] : undefined
+        }
+      ]
+    });
+  }
 
   return {
     id: 'guest-program-1',
     userId: 'guest',
-    name: 'PPL 6-Day Split',
-    weeks: [
-      {
-        weekNumber: 1,
-        workouts: [
-          { dayOfWeek: 1, templateId: 'guest-template-1', completed: true, completedDate: new Date(programStartDate.getTime() + 0 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 2, templateId: 'guest-template-2', completed: true, completedDate: new Date(programStartDate.getTime() + 1 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 3, templateId: 'guest-template-3', completed: true, completedDate: new Date(programStartDate.getTime() + 2 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 4, templateId: 'guest-template-1', completed: true, completedDate: new Date(programStartDate.getTime() + 3 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 5, templateId: 'guest-template-2', completed: true, completedDate: new Date(programStartDate.getTime() + 4 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 6, templateId: 'guest-template-3', completed: false },
-        ]
-      },
-      {
-        weekNumber: 2,
-        workouts: [
-          { dayOfWeek: 1, templateId: 'guest-template-1', completed: true, completedDate: new Date(programStartDate.getTime() + 7 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 2, templateId: 'guest-template-2', completed: true, completedDate: new Date(programStartDate.getTime() + 8 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 3, templateId: 'guest-template-3', completed: true, completedDate: new Date(programStartDate.getTime() + 9 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 4, templateId: 'guest-template-1', completed: true, completedDate: new Date(programStartDate.getTime() + 10 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 5, templateId: 'guest-template-2', completed: true, completedDate: new Date(programStartDate.getTime() + 11 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 6, templateId: 'guest-template-3', completed: true, completedDate: new Date(programStartDate.getTime() + 12 * 86400000).toISOString().split('T')[0] },
-        ]
-      },
-      {
-        weekNumber: 3,
-        workouts: [
-          { dayOfWeek: 1, templateId: 'guest-template-1', completed: true, completedDate: new Date(programStartDate.getTime() + 14 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 2, templateId: 'guest-template-2', completed: true, completedDate: new Date(programStartDate.getTime() + 15 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 3, templateId: 'guest-template-3', completed: true, completedDate: new Date(programStartDate.getTime() + 16 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 4, templateId: 'guest-template-1', completed: true, completedDate: new Date(programStartDate.getTime() + 17 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 5, templateId: 'guest-template-2', completed: true, completedDate: new Date(programStartDate.getTime() + 18 * 86400000).toISOString().split('T')[0] },
-          { dayOfWeek: 6, templateId: 'guest-template-3', completed: false },
-        ]
-      },
-    ],
-    currentWeek: 3,
+    name: 'PPL 3-Day Split',
+    description: 'Push/Pull/Legs split running 3 days per week (Mon/Wed/Fri) for balanced muscle development',
+    duration: 52, // Ongoing program (1 year shown)
+    daysPerWeek: 3,
+    goal: 'hypertrophy' as const,
+    isActive: true,
+    weeks,
+    currentWeek,
     startDate: programStartDate.toISOString().split('T')[0],
     createdAt: programStartDate.toISOString(),
     updatedAt: new Date().toISOString(),

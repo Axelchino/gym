@@ -140,14 +140,34 @@ function WorkoutLogger() {
   async function loadTemplateExerciseNames() {
     const nameMap = new Map<string, Map<string, string>>();
 
+    // Process user templates from database
     for (const template of templates) {
       const exerciseNamesForTemplate = new Map<string, string>();
 
       for (const ex of template.exercises) {
-        const exercise = await db.exercises.get(ex.exerciseId);
-        if (exercise) {
-          exerciseNamesForTemplate.set(ex.exerciseId, exercise.name);
+        // Guest templates have exerciseName already, database templates need lookup
+        if ('exerciseName' in ex && ex.exerciseName) {
+          // Guest template - use the name directly
+          exerciseNamesForTemplate.set(ex.exerciseId, ex.exerciseName);
+        } else {
+          // Database template - look up the exercise
+          const exercise = await db.exercises.get(ex.exerciseId);
+          if (exercise) {
+            exerciseNamesForTemplate.set(ex.exerciseId, exercise.name);
+          }
         }
+      }
+
+      nameMap.set(template.id, exerciseNamesForTemplate);
+    }
+
+    // Process built-in templates (exerciseId is already the exercise name)
+    for (const template of BUILTIN_WORKOUT_TEMPLATES) {
+      const exerciseNamesForTemplate = new Map<string, string>();
+
+      for (const ex of template.exercises) {
+        // For built-in templates, exerciseId IS the exercise name
+        exerciseNamesForTemplate.set(ex.exerciseId, ex.exerciseId);
       }
 
       nameMap.set(template.id, exerciseNamesForTemplate);
@@ -515,30 +535,10 @@ function WorkoutLogger() {
         {/* Quick Start */}
         <button
           onClick={handleStartWorkout}
-          className="w-full rounded-lg transition-all flex items-center justify-center gap-3 py-6"
-          style={{
-            background: theme === 'light'
-              ? 'linear-gradient(180deg, #FAFAFA 0%, #E4D2FF 100%)'
-              : theme === 'amoled'
-                ? 'linear-gradient(180deg, #1A1A1A 0%, #2A2A2A 100%)'
-                : 'linear-gradient(180deg, #2D2640 0%, #3D3650 100%)',
-            border: `1px solid ${accentColors.border}`
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-          onMouseDown={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseUp={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
+          className="btn-primary w-full flex items-center justify-center gap-3"
         >
-          <Play style={{ color: accentColors.primary }} size={24} />
-          <span className="text-lg font-semibold" style={{ color: accentColors.primary }}>Start Empty Workout</span>
+          <Play size={24} />
+          <span className="text-lg font-semibold">Start Empty Workout</span>
         </button>
 
         {/* Templates Section */}

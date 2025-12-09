@@ -5,6 +5,39 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GymTracker Pro</title>
+    <!-- Suppress Supabase SES lockdown warnings -->
+    <script>
+      // Override console methods IMMEDIATELY to catch SES warnings
+      (function() {
+        const filter = function(message) {
+          return typeof message === 'string' && (
+            message.includes('Removing intrinsics') ||
+            message.includes('SES Removing') ||
+            message.includes('lockdown-install') ||
+            message.includes('unpermitted intrinsics')
+          );
+        };
+
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalInfo = console.info;
+
+        console.log = function(...args) {
+          if (filter(args[0])) return;
+          originalLog.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+          if (filter(args[0])) return;
+          originalWarn.apply(console, args);
+        };
+
+        console.info = function(...args) {
+          if (filter(args[0])) return;
+          originalInfo.apply(console, args);
+        };
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
