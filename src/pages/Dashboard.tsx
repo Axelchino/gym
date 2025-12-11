@@ -27,45 +27,69 @@ function parseLocalDate(dateStr: string | Date): Date {
 
 // shadcn-style Card components (minimal version for now)
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden ${className}`}>
+  <div
+    className={`rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden ${className}`}
+  >
     {children}
   </div>
 );
 
-const CardHeader = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>
-    {children}
-  </div>
-);
+const CardHeader = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>{children}</div>;
 
-const CardTitle = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+const CardTitle = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <div className={`text-3xl font-semibold leading-none tracking-tight ${className}`}>
     {children}
   </div>
 );
 
-const CardDescription = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`text-sm text-muted-foreground ${className}`}>
-    {children}
-  </div>
-);
+const CardDescription = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={`text-sm text-muted-foreground ${className}`}>{children}</div>;
 
-const CardContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`p-6 pt-0 ${className}`}>
-    {children}
-  </div>
-);
+const CardContent = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={`p-6 pt-0 ${className}`}>{children}</div>;
 
-const CardFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`flex items-center p-6 pt-0 ${className}`}>
-    {children}
-  </div>
-);
+const CardFooter = ({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={`flex items-center p-6 pt-0 ${className}`}>{children}</div>;
 
-const Badge = ({ children, variant = 'default' }: { children: React.ReactNode; variant?: string }) => (
-  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold ${
-    variant === 'outline' ? 'border bg-background' : 'bg-primary text-primary-foreground'
-  }`}>
+const Badge = ({
+  children,
+  variant = 'default',
+}: {
+  children: React.ReactNode;
+  variant?: string;
+}) => (
+  <span
+    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold ${
+      variant === 'outline' ? 'border bg-background' : 'bg-primary text-primary-foreground'
+    }`}
+  >
     {children}
   </span>
 );
@@ -127,26 +151,36 @@ function Dashboard() {
       const workoutDate = parseLocalDate(w.date);
       return workoutDate >= sevenDaysAgo && workoutDate <= today;
     });
-    const volumeLast7Days = workoutsLast7Days.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
+    const volumeLast7Days = workoutsLast7Days.reduce(
+      (sum: number, w: WorkoutLog) => sum + w.totalVolume,
+      0
+    );
 
     // Previous 7 days (for comparison)
     const workoutsPrev7Days = allWorkouts.filter((w: WorkoutLog) => {
       const workoutDate = parseLocalDate(w.date);
       return workoutDate >= fourteenDaysAgo && workoutDate < sevenDaysAgo;
     });
-    const volumePrev7Days = workoutsPrev7Days.reduce((sum: number, w: WorkoutLog) => sum + w.totalVolume, 0);
+    const volumePrev7Days = workoutsPrev7Days.reduce(
+      (sum: number, w: WorkoutLog) => sum + w.totalVolume,
+      0
+    );
 
     // Best workout (highest volume)
-    const bestWorkout = allWorkouts.length > 0
-      ? allWorkouts.reduce((best: WorkoutLog, current: WorkoutLog) =>
-          current.totalVolume > best.totalVolume ? current : best
-        )
-      : null;
+    const bestWorkout =
+      allWorkouts.length > 0
+        ? allWorkouts.reduce((best: WorkoutLog, current: WorkoutLog) =>
+            current.totalVolume > best.totalVolume ? current : best
+          )
+        : null;
 
     // Days since last PR
-    const daysSinceLastPR = allPRs.length > 0
-      ? Math.floor((today.getTime() - parseLocalDate(allPRs[0].date).getTime()) / (1000 * 60 * 60 * 24))
-      : null;
+    const daysSinceLastPR =
+      allPRs.length > 0
+        ? Math.floor(
+            (today.getTime() - parseLocalDate(allPRs[0].date).getTime()) / (1000 * 60 * 60 * 24)
+          )
+        : null;
 
     return {
       workoutsLast7Days: workoutsLast7Days.length,
@@ -224,7 +258,10 @@ function Dashboard() {
 
     // Sort
     if (sortBy === 'newest') {
-      filtered.sort((a: WorkoutLog, b: WorkoutLog) => parseLocalDate(b.date).getTime() - parseLocalDate(a.date).getTime());
+      filtered.sort(
+        (a: WorkoutLog, b: WorkoutLog) =>
+          parseLocalDate(b.date).getTime() - parseLocalDate(a.date).getTime()
+      );
     } else if (sortBy === 'heaviest') {
       filtered.sort((a: WorkoutLog, b: WorkoutLog) => b.totalVolume - a.totalVolume);
     } else if (sortBy === 'duration') {
@@ -308,79 +345,90 @@ function Dashboard() {
     <div className="space-y-8">
       {/* Stats Grid - 4 cards, same height, different widths */}
       <div
-          className="
+        className="
             grid gap-3 sm:gap-4
-            grid-cols-2                 /* base: two columns */
-            max-[480px]:grid-cols-1     /* very small mobile: single column */
-            xl:grid-cols-4              /* desktop: four columns */
-            xl:[grid-template-columns:2fr_1fr_1fr_2fr]
-            auto-rows-fr
+            grid-cols-2                                      /* mobile and up: 2 equal columns   */
+            xl:grid-cols-4                                   /* desktop: four columns */
+            [grid-template-columns:repeat(2,minmax(0,1fr))]
+            xl:[grid-template-columns:2fr_1fr_1fr_2fr]       /* xl: your wide/narrow layout      */
           "
-        >
+      >
         {/* Volume Card + Sparkline */}
         <Card className="flex flex-col h-full col-span-2 xl:col-span-1 overflow-visible">
           <CardHeader className="relative flex-1 pt-2 px-3 sm:pt-2 sm:px-3">
-              <div className="flex items-center justify-between">
-                <CardDescription>Total Volume</CardDescription>
-                {!isLoading && stats.bestWorkout && (
-                  <span className="text-xs text-muted-foreground">
-                    Best, {parseLocalDate(stats.bestWorkout.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
-                )}
-              </div>
+            <div className="flex items-center justify-between">
+              <CardDescription>Total Volume</CardDescription>
+              {!isLoading && stats.bestWorkout && (
+                <span className="text-xs text-muted-foreground">
+                  Best,{' '}
+                  {parseLocalDate(stats.bestWorkout.date).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              )}
+            </div>
 
-              <div className="flex items-baseline gap-2">
-                <CardTitle className="text-2xl tabular-nums">
-                  {isLoading ? '...' : Math.round(animatedVolume).toLocaleString()}
-                  <span className="text-base text-muted-foreground ml-1">{weightUnit}</span>
-                </CardTitle>
-                {volumeTrend && (
-                  <Badge variant="outline">
-                    {volumeUp ? <TrendingUp size={12} /> : '↓'}
-                    {volumeTrend}%
-                  </Badge>
-                )}
-              </div>
+            <div className="flex items-baseline gap-2">
+              <CardTitle className="text-2xl tabular-nums">
+                {isLoading ? '...' : Math.round(animatedVolume).toLocaleString()}
+                <span className="text-base text-muted-foreground ml-1">{weightUnit}</span>
+              </CardTitle>
+              {volumeTrend && (
+                <Badge variant="outline">
+                  {volumeUp ? <TrendingUp size={12} /> : '↓'}
+                  {volumeTrend}%
+                </Badge>
+              )}
+            </div>
 
-            {!isLoading && volumeSparklineData.length >= 2 && (() => {
-              const maxVal = Math.max(...volumeSparklineData);
-              const minVal = Math.min(...volumeSparklineData);
-              const yDomain: [number, number] | undefined = maxVal === 0 ? [0, 100] : undefined;
+            {!isLoading &&
+              volumeSparklineData.length >= 2 &&
+              (() => {
+                const maxVal = Math.max(...volumeSparklineData);
+                const minVal = Math.min(...volumeSparklineData);
+                const yDomain: [number, number] | undefined = maxVal === 0 ? [0, 100] : undefined;
 
-              return (
-                <div className="pointer-events-none absolute top-5 right-2 h-[95px] w-[245px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={volumeSparklineData.map((vol, i) => ({ value: vol, day: i }))}
-                      margin={{ top: 5, right: 5, left: 5, bottom: 15 }}
-                    >
-                      <defs>
-                        <linearGradient id="miniVolumeGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={tokens.sparkline.color} stopOpacity={1.0} />
-                          <stop offset="95%" stopColor={tokens.sparkline.color} stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
-                      <YAxis hide domain={yDomain} />
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke={tokens.sparkline.color}
-                        strokeWidth={1}
-                        fill="url(#miniVolumeGradient)"
-                        isAnimationActive={true}
-                        baseValue={0}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              );
-            })()}
-            </CardHeader>
+                return (
+                  <div className="pointer-events-none absolute top-5 right-2 h-[95px] w-[245px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={volumeSparklineData.map((vol, i) => ({ value: vol, day: i }))}
+                        margin={{ top: 5, right: 5, left: 5, bottom: 15 }}
+                      >
+                        <defs>
+                          <linearGradient id="miniVolumeGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop
+                              offset="5%"
+                              stopColor={tokens.sparkline.color}
+                              stopOpacity={1.0}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor={tokens.sparkline.color}
+                              stopOpacity={0.1}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <YAxis hide domain={yDomain} />
+                        <Area
+                          type="monotone"
+                          dataKey="value"
+                          stroke={tokens.sparkline.color}
+                          strokeWidth={1}
+                          fill="url(#miniVolumeGradient)"
+                          isAnimationActive={true}
+                          baseValue={0}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                );
+              })()}
+          </CardHeader>
 
-            <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
-              Last 7 days
-            </CardFooter>
-          </Card>
+          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">Last 7 days</CardFooter>
+        </Card>
 
         {/* Workouts Card */}
         <Card className="flex flex-col h-full min-w-0 w-full">
@@ -398,9 +446,7 @@ function Dashboard() {
               )}
             </div>
           </CardHeader>
-          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
-            Last 7 days
-          </CardFooter>
+          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">Last 7 days</CardFooter>
         </Card>
 
         {/* PRs Card */}
@@ -418,44 +464,40 @@ function Dashboard() {
               {isLoading ? '...' : Math.round(animatedPRs)}
             </CardTitle>
           </CardHeader>
-          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
-            Last 30 days
-          </CardFooter>
+          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">Last 30 days</CardFooter>
         </Card>
 
         {/* Streak Card + Visualization */}
-          <Card className="flex flex-col h-full col-span-2 xl:col-span-1">
-            <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3 sm:pt-2 sm:px-3">
-              <div className="flex items-center justify-between">
-                <CardDescription>Current Streak</CardDescription>
-                {!isLoading && (
-                  <span className="text-xs text-muted-foreground">
-                    {todayFormatted}
-                  </span>
-                )}
-              </div>
-
-              <CardTitle className="text-2xl tabular-nums">
-                {isLoading ? '...' : Math.round(animatedStreak)}
-                <span className="text-base text-muted-foreground ml-1">days</span>
-              </CardTitle>
-
-              {/* Right streak pills: now absolutely positioned */}
+        <Card className="flex flex-col h-full col-span-2 xl:col-span-1">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3 sm:pt-2 sm:px-3">
+            <div className="flex items-center justify-between">
+              <CardDescription>Current Streak</CardDescription>
               {!isLoading && (
-                  <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
-                    <StreakVisualization
-                      currentStreak={stats.currentStreak}
-                      workoutDates={allWorkouts.map((w: WorkoutLog) => w.date)}
-                      animate
-                    />
-                  </div>
+                <span className="text-xs text-muted-foreground">{todayFormatted}</span>
               )}
-            </CardHeader>
+            </div>
 
-            <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
-              Keep it going!
-            </CardFooter>
-          </Card>
+            <CardTitle className="text-2xl tabular-nums">
+              {isLoading ? '...' : Math.round(animatedStreak)}
+              <span className="text-base text-muted-foreground ml-1">days</span>
+            </CardTitle>
+
+            {/* Right streak pills: now absolutely positioned */}
+            {!isLoading && (
+              <div className="mt-4 flex justify-end xl:mt-0 xl:absolute xl:right-[78px] xl:top-[36px]">
+                <StreakVisualization
+                  currentStreak={stats.currentStreak}
+                  workoutDates={allWorkouts.map((w: WorkoutLog) => w.date)}
+                  animate
+                />
+              </div>
+            )}
+          </CardHeader>
+
+          <CardFooter className="text-xs text-muted-foreground pb-3 px-3">
+            Keep it going!
+          </CardFooter>
+        </Card>
       </div>
 
       {/* Recent Activity - Diary format */}
