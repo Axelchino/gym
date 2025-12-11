@@ -528,7 +528,7 @@ function WorkoutLogger() {
     return (
       <div className="space-y-6 pb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2 text-primary">Start Workout</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-primary">Start Workout</h1>
           <p className="text-sm text-secondary">Choose a template or start a blank workout</p>
         </div>
 
@@ -891,16 +891,16 @@ function WorkoutLogger() {
       <div className="sticky top-0 z-10 backdrop-blur-sm pb-4" style={{ backgroundColor: 'var(--surface-primary-translucent, var(--surface-primary))', borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-2xl font-bold text-primary">{activeWorkout.name}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-primary">{activeWorkout.name}</h1>
             <p className="text-sm text-secondary flex items-center gap-2">
               <Clock size={14} />
               {stats.duration} min
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2">
             <button
               onClick={toggleUnit}
-              className="px-3 py-2 text-xs font-mono rounded-lg transition-colors"
+              className="px-2 sm:px-3 py-2 text-xs font-mono rounded-lg transition-colors"
               style={{
                 backgroundColor: 'var(--surface-accent)',
                 color: 'var(--text-primary)',
@@ -918,7 +918,7 @@ function WorkoutLogger() {
             </button>
             <button
               onClick={() => setShowTimer(!showTimer)}
-              className="px-3 py-2 text-xs rounded-lg transition-all"
+              className="px-2 sm:px-3 py-2 text-xs rounded-lg transition-all"
               style={{
                 backgroundColor: showTimer ? accentColors.primary : 'var(--surface-accent)',
                 color: showTimer ? 'white' : 'var(--text-primary)',
@@ -940,7 +940,7 @@ function WorkoutLogger() {
             </button>
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
+              className="px-2 sm:px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
               style={{
                 backgroundColor: 'var(--surface-accent)',
                 color: 'var(--text-primary)',
@@ -954,11 +954,11 @@ function WorkoutLogger() {
               }}
             >
               <X size={16} />
-              Cancel
+              <span className="hidden sm:inline">Cancel</span>
             </button>
             <button
               onClick={() => setShowSaveConfirm(true)}
-              className="px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
+              className="px-2 sm:px-4 py-2 text-sm rounded-lg transition-all flex items-center gap-1"
               style={{
                 backgroundColor: stats.completedSets === 0 || isSaving ? 'var(--surface-accent)' : selectedColors.background,
                 color: stats.completedSets === 0 || isSaving ? 'var(--text-muted)' : selectedColors.text,
@@ -979,7 +979,7 @@ function WorkoutLogger() {
               disabled={stats.completedSets === 0 || isSaving}
             >
               <Save size={16} />
-              {isSaving ? 'Saving...' : 'Finish'}
+              <span className="hidden xs:inline">{isSaving ? 'Saving...' : 'Finish'}</span>
             </button>
           </div>
           {/* Warning when no sets completed */}
@@ -1018,7 +1018,7 @@ function WorkoutLogger() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div className="rounded p-2 text-center" style={{ backgroundColor: 'var(--surface-accent)' }}>
             <p className="text-xs text-secondary">Exercises</p>
             <p className="text-lg font-bold text-primary">{stats.exerciseCount}</p>

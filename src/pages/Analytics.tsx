@@ -163,7 +163,7 @@ function Analytics() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-primary mb-2">Progress & Analytics</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2">Progress & Analytics</h1>
           <p className="text-secondary text-sm">Track your strength gains and volume trends</p>
         </div>
         {user && workouts.length > 0 && (
@@ -284,9 +284,9 @@ function Analytics() {
       {/* Stat Cards - Show if there are workouts */}
       {workouts.length > 0 && (
         <>
-          <div className="grid grid-cols-5 gap-6">
-            {/* Total Volume - 2 columns */}
-            <div className="col-span-2 card-stats">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
+            {/* Total Volume - 2 columns on desktop, full width on mobile */}
+            <div className="col-span-1 sm:col-span-2 lg:col-span-2 card-stats">
               <div className="flex items-start mb-3">
                 <div className="flex items-center gap-1.5">
                   <TrendingUp className="text-muted opacity-60" size={14} strokeWidth={1.5} />
@@ -703,7 +703,7 @@ function Analytics() {
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-3 gap-4 mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface)' }}>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface)' }}>
                     <div>
                       <div className="text-xs text-muted mb-1">Volume</div>
                       <div className="text-lg font-bold" style={{ color: accentColors.primary }}>
@@ -729,7 +729,7 @@ function Analytics() {
                     {workout.exercises.map((exercise, exIdx) => (
                       <div key={exIdx} className="rounded-lg p-3" style={{ backgroundColor: 'var(--surface)' }}>
                         <div className="font-medium text-sm text-primary mb-2">{exercise.exerciseName}</div>
-                        <div className="grid grid-cols-4 gap-2 text-xs">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                           {exercise.sets.filter(s => !s.isWarmup && s.completed).map((set, setIdx) => (
                             <div key={setIdx} className="rounded px-2 py-1 text-center text-secondary" style={{
                               backgroundColor: 'var(--surface-accent)'

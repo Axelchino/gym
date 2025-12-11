@@ -15,7 +15,7 @@ export function Layout() {
       {!user && <GuestBanner />}
 
       {/* Main content - Centered container with 1536px max width */}
-      <main className="mx-auto px-6 py-8" style={{ maxWidth: '1536px' }}>
+      <main className="mx-auto px-3 sm:px-6 py-4 sm:py-8" style={{ maxWidth: '1536px' }}>
         <Outlet />
       </main>
     </div>

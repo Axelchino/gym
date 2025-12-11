@@ -309,17 +309,17 @@ function Dashboard() {
       {/* Stats Grid - 4 cards, same height, different widths */}
       <div
           className="
-            grid gap-4
-            grid-cols-2                 /* default: two columns */
-            max-[480px]:grid-cols-1     /* only stack on very small screens */
-            xl:grid-cols-4
+            grid gap-3 sm:gap-4
+            grid-cols-2                 /* base: two columns */
+            max-[480px]:grid-cols-1     /* very small mobile: single column */
+            xl:grid-cols-4              /* desktop: four columns */
             xl:[grid-template-columns:2fr_1fr_1fr_2fr]
             auto-rows-fr
           "
         >
         {/* Volume Card + Sparkline */}
         <Card className="flex flex-col h-full col-span-2 xl:col-span-1 overflow-visible">
-          <CardHeader className="relative flex-1 pt-2 px-3">
+          <CardHeader className="relative flex-1 pt-2 px-3 sm:pt-2 sm:px-3">
               <div className="flex items-center justify-between">
                 <CardDescription>Total Volume</CardDescription>
                 {!isLoading && stats.bestWorkout && (
@@ -383,15 +383,15 @@ function Dashboard() {
           </Card>
 
         {/* Workouts Card */}
-        <Card className="flex flex-col h-full">
-          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
+        <Card className="flex flex-col h-full min-w-0 w-full">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3 sm:pt-2 sm:px-3">
             <CardDescription>Workouts</CardDescription>
-            <div className="flex items-baseline gap-2">
+            <div className="flex flex-wrap items-baseline gap-2">
               <CardTitle className="text-2xl tabular-nums">
                 {isLoading ? '...' : Math.round(animatedWorkouts)}
               </CardTitle>
               {workoutsTrend && (
-                <Badge variant="outline">
+                <Badge variant="outline" className="hidden sm:inline-flex">
                   {workoutsUp ? <TrendingUp size={12} /> : '↓'}
                   {workoutsTrend}%
                 </Badge>
@@ -404,8 +404,8 @@ function Dashboard() {
         </Card>
 
         {/* PRs Card */}
-        <Card className="flex flex-col h-full">
-          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
+        <Card className="flex flex-col h-full min-w-0 w-full">
+          <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3 sm:pt-2 sm:px-3">
             <div className="flex items-center justify-between">
               <CardDescription>PRs</CardDescription>
               {!isLoading && stats.daysSinceLastPR !== null && (
@@ -425,7 +425,7 @@ function Dashboard() {
 
         {/* Streak Card + Visualization */}
           <Card className="flex flex-col h-full col-span-2 xl:col-span-1">
-            <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3">
+            <CardHeader className="relative flex-1 overflow-hidden pt-2 px-3 sm:pt-2 sm:px-3">
               <div className="flex items-center justify-between">
                 <CardDescription>Current Streak</CardDescription>
                 {!isLoading && (
@@ -586,8 +586,8 @@ function Dashboard() {
                     e.currentTarget.style.borderColor = 'var(--border-subtle)';
                   }}
                 >
-                  {/* Two-column grid layout */}
-                  <div className="grid grid-cols-[1fr,160px] gap-4 p-4">
+                  {/* Two-column grid layout - responsive */}
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr,160px] gap-3 sm:gap-4 p-3 sm:p-4">
                     {/* Left column */}
                     <div className="space-y-2">
                       {/* Line 1: Title + metadata */}

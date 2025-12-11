@@ -73,14 +73,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-      <div className="mx-auto px-6 py-3" style={{ maxWidth: '1536px' }}>
+      <div className="mx-auto px-3 sm:px-6 py-2 sm:py-3" style={{ maxWidth: '1536px' }}>
         <div className="flex items-center justify-between">
           {/* Left: Logo + Navigation */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 sm:gap-6 min-w-0">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 group">
-              <Dumbbell className="text-secondary opacity-60 group-hover:opacity-100 transition-opacity" size={24} strokeWidth={1.5} />
-              <span className="text-lg font-semibold text-primary tracking-tight">GymTracker Pro</span>
+            <Link to="/" className="flex items-center gap-1 sm:gap-2 group flex-shrink-0">
+              <Dumbbell className="text-secondary opacity-60 group-hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
+              <span className="text-base sm:text-lg font-semibold text-primary tracking-tight hidden xs:inline">GymTracker Pro</span>
             </Link>
 
             {/* Navigation */}
@@ -91,7 +91,7 @@ export function Header() {
                   <Link
                     key={to}
                     to={to}
-                    className="relative px-4 py-3 text-sm font-medium text-primary hover:text-secondary transition-colors"
+                    className="relative px-2 sm:px-3 lg:px-4 py-2 lg:py-3 text-[10px] sm:text-xs lg:text-sm font-medium text-primary hover:text-secondary transition-colors whitespace-nowrap"
                     style={{
                       borderBottom: isActive ? `2px solid ${tokens.navigation.activeIndicator}` : '2px solid transparent',
                     }}
@@ -104,9 +104,9 @@ export function Header() {
           </div>
 
           {/* Right: Search + Actions */}
-          <div className="flex items-center gap-3">
-            {/* Search */}
-            <div className="relative">
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* Search - Hidden on mobile */}
+            <div className="relative hidden lg:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted opacity-50" size={16} strokeWidth={1.5} />
               <input
                 type="text"
@@ -115,13 +115,15 @@ export function Header() {
                 className="pl-10 pr-4 py-2 bg-card text-primary text-sm border border-card rounded-md focus:outline-none focus:ring-2 focus:ring-brand-purple/50 focus:border-transparent transition-all placeholder:text-muted"
               />
             </div>
-            {/* Offline Indicator */}
-            <OfflineIndicator />
+            {/* Offline Indicator - Hidden on small mobile */}
+            <div className="hidden sm:block">
+              <OfflineIndicator />
+            </div>
 
-            {/* Clear Cache Button */}
+            {/* Clear Cache Button - Hidden on mobile */}
             <button
               onClick={clearCacheAndReload}
-              className="p-2 rounded-md hover:bg-surface-accent transition-colors"
+              className="hidden sm:block p-2 rounded-md hover:bg-surface-accent transition-colors"
               title="Clear Cache & Reload"
             >
               <RotateCcw className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={18} strokeWidth={1.5} />
@@ -133,24 +135,24 @@ export function Header() {
                 {/* Profile Button - authenticated only */}
                 <button
                   onClick={() => navigate('/profile')}
-                  className="p-2 rounded-md hover:bg-surface-accent transition-colors"
+                  className="p-1.5 sm:p-2 rounded-md hover:bg-surface-accent transition-colors"
                   title="Profile"
                 >
-                  <User className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
+                  <User className="text-secondary opacity-60 hover:opacity-100 transition-opacity" size={18} strokeWidth={1.5} />
                 </button>
 
                 {/* Start Workout - authenticated */}
                 <button
                   onClick={() => navigate('/workout')}
-                  className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
+                  className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
                   style={{
                     backgroundColor: tokens.button.primaryBg,
                     color: tokens.button.primaryText,
                     border: tokens.button.primaryBorder === 'none' ? 'none' : `1px solid ${tokens.button.primaryBorder}`,
                     borderRadius: '10px',
-                    height: '40px',
-                    paddingLeft: '24px',
-                    paddingRight: '24px',
+                    height: '36px',
+                    paddingLeft: '12px',
+                    paddingRight: '12px',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = tokens.button.primaryHover;
@@ -186,15 +188,15 @@ export function Header() {
                 {/* Try Workout - guest mode - secondary button style */}
                 <button
                   onClick={() => navigate('/workout')}
-                  className="flex items-center gap-2 text-sm font-medium transition-all focus:outline-none focus-visible:outline-none"
+                  className="flex items-center gap-1 text-xs sm:text-sm font-medium transition-all focus:outline-none focus-visible:outline-none"
                   style={{
                     backgroundColor: 'transparent',
                     color: 'var(--text-secondary)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: '10px',
-                    height: '40px',
-                    paddingLeft: '18px',
-                    paddingRight: '18px',
+                    height: '36px',
+                    paddingLeft: '10px',
+                    paddingRight: '10px',
                     whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
@@ -233,15 +235,15 @@ export function Header() {
                 {/* Sign In button - guest mode - lighter blue style */}
                 <button
                   onClick={() => navigate('/auth')}
-                  className="flex items-center gap-2 text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
+                  className="flex items-center gap-1 text-xs sm:text-sm font-semibold transition-all focus:outline-none focus-visible:outline-none"
                   style={{
                     backgroundColor: theme === 'dark' ? '#0092E6' : theme === 'amoled' ? selectedColors.background : accentColors.background,
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: '10px',
-                    height: '40px',
-                    paddingLeft: '18px',
-                    paddingRight: '18px',
+                    height: '36px',
+                    paddingLeft: '12px',
+                    paddingRight: '12px',
                     whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
