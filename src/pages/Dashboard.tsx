@@ -81,14 +81,16 @@ const CardFooter = ({
 const Badge = ({
   children,
   variant = 'default',
+  className = '',
 }: {
   children: React.ReactNode;
   variant?: string;
+  className?: string;
 }) => (
   <span
     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold ${
       variant === 'outline' ? 'border bg-background' : 'bg-primary text-primary-foreground'
-    }`}
+    } ${className}`}
   >
     {children}
   </span>
