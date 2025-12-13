@@ -284,7 +284,7 @@ function Analytics() {
       {/* Stat Cards - Show if there are workouts */}
       {workouts.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
+          <div className="grid gap-3 sm:gap-6 [grid-template-columns:repeat(2,minmax(0,1fr))] sm:grid-cols-2 lg:grid-cols-5 lg:[grid-template-columns:2fr_1fr_1fr_1fr_1fr]">
             {/* Total Volume - 2 columns on desktop, full width on mobile */}
             <div className="col-span-1 sm:col-span-2 lg:col-span-2 card-stats">
               <div className="flex items-start mb-3">
@@ -594,7 +594,7 @@ function Analytics() {
 
       {/* Workout Statistics - Show if there are workouts */}
       {workouts.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid gap-4 [grid-template-columns:repeat(2,minmax(0,1fr))] md:grid-cols-2">
           <div className="card-elevated">
             <h3 className="text-lg font-semibold text-primary mb-3">Overall Stats</h3>
             <div className="space-y-2 text-sm">
@@ -650,7 +650,7 @@ function Analytics() {
 
       {/* Calendar & Streak Section - Show if there are workouts */}
       {workouts.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid gap-4 [grid-template-columns:repeat(2,minmax(0,1fr))] lg:grid-cols-2">
           <StreakDisplay workouts={workouts} />
           <CalendarHeatmap
             workouts={workouts}
@@ -703,7 +703,7 @@ function Analytics() {
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface)' }}>
+                  <div className="grid gap-3 sm:gap-4 mb-4 p-3 rounded-lg [grid-template-columns:repeat(2,minmax(0,1fr))] sm:grid-cols-3" style={{ backgroundColor: 'var(--surface)' }}>
                     <div>
                       <div className="text-xs text-muted mb-1">Volume</div>
                       <div className="text-lg font-bold" style={{ color: accentColors.primary }}>
@@ -729,7 +729,7 @@ function Analytics() {
                     {workout.exercises.map((exercise, exIdx) => (
                       <div key={exIdx} className="rounded-lg p-3" style={{ backgroundColor: 'var(--surface)' }}>
                         <div className="font-medium text-sm text-primary mb-2">{exercise.exerciseName}</div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div className="grid gap-2 text-xs [grid-template-columns:repeat(2,minmax(0,1fr))] sm:grid-cols-4">
                           {exercise.sets.filter(s => !s.isWarmup && s.completed).map((set, setIdx) => (
                             <div key={setIdx} className="rounded px-2 py-1 text-center text-secondary" style={{
                               backgroundColor: 'var(--surface-accent)'
