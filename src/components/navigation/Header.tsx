@@ -80,7 +80,7 @@ export function Header() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-1 sm:gap-2 group flex-shrink-0">
               <Dumbbell className="text-secondary opacity-60 group-hover:opacity-100 transition-opacity" size={20} strokeWidth={1.5} />
-              <span className="text-base sm:text-lg font-semibold text-primary tracking-tight hidden xs:inline">GymTracker Pro</span>
+              <span className="text-base sm:text-lg font-semibold text-primary tracking-tight">GymTracker Pro</span>
             </Link>
 
             {/* Navigation */}
