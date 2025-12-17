@@ -3,8 +3,14 @@ import type { Set, WorkoutLog } from '../types/workout';
 /**
  * Calculate total volume for a set of sets
  * Volume = Weight × Reps (enter weight per dumbbell)
+ * Excludes cardio, stretching, and sports exercises (volume doesn't apply)
  */
-export function calculateVolume(sets: Set[], equipment: string): number {
+export function calculateVolume(sets: Set[], equipment: string, category?: string): number {
+  // Exclude categories where volume calculation doesn't make sense
+  if (category && ['Cardio', 'Stretch', 'Stretching', 'Sports'].includes(category)) {
+    return 0;
+  }
+
   return sets
     .filter(s => !s.isWarmup && s.completed)
     .reduce((sum, s) => sum + (s.weight * s.reps), 0);
@@ -262,7 +268,7 @@ export interface MuscleGroupVolume {
 
 export function getVolumeByMuscleGroup(
   workouts: WorkoutLog[],
-  exercises: Map<string, { primaryMuscles: string[]; equipment: string }>
+  exercises: Map<string, { primaryMuscles: string[]; equipment: string; category: string }>
 ): MuscleGroupVolume[] {
   const muscleVolume = new Map<string, { volume: number; sets: number }>();
 
@@ -271,7 +277,7 @@ export function getVolumeByMuscleGroup(
       const exerciseData = exercises.get(ex.exerciseId);
       if (!exerciseData) return;
 
-      const volume = calculateVolume(ex.sets, exerciseData.equipment);
+      const volume = calculateVolume(ex.sets, exerciseData.equipment, exerciseData.category);
       const sets = ex.sets.filter(s => !s.isWarmup && s.completed).length;
 
       exerciseData.primaryMuscles.forEach(muscle => {

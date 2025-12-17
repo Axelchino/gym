@@ -32,6 +32,7 @@ export interface LoggedExercise {
   exerciseId: string;
   exerciseName: string;
   equipment: string; // Added for dumbbell volume calculation
+  category?: string; // Added for cardio/stretching exclusion
   orderIndex: number;
   sets: Set[];
   totalVolume: number;

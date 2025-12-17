@@ -7,6 +7,11 @@
 function calculateVolume(exercises: any[]): number {
   let total = 0;
   exercises.forEach(ex => {
+    // Exclude categories where volume calculation doesn't make sense
+    if (ex.category && ['Cardio', 'Stretch', 'Stretching', 'Sports'].includes(ex.category)) {
+      return; // Skip this exercise
+    }
+
     ex.sets.forEach((set: any) => {
       if (!set.completed || set.isWarmup) return;
       total += set.weight * set.reps;

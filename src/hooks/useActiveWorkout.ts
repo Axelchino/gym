@@ -59,7 +59,13 @@ export function useActiveWorkout() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Helper function to calculate volume (weight × reps - enter weight per dumbbell)
-  const calculateVolume = useCallback((sets: Set[], equipment: string) => {
+  // Excludes cardio, stretching, and sports exercises (volume doesn't apply)
+  const calculateVolume = useCallback((sets: Set[], equipment: string, category?: string) => {
+    // Exclude categories where volume calculation doesn't make sense
+    if (category && ['Cardio', 'Stretch', 'Stretching', 'Sports'].includes(category)) {
+      return 0;
+    }
+
     return sets
       .filter(s => !s.isWarmup && s.completed)
       .reduce((sum, s) => sum + (s.weight * s.reps), 0);
@@ -141,6 +147,7 @@ export function useActiveWorkout() {
       exerciseId: exercise.id,
       exerciseName: exercise.name,
       equipment: exercise.equipment,
+      category: exercise.category,
       orderIndex: activeWorkout.exercises.length,
       sets: [initialSet], // Start with 1 empty set instead of empty array
       totalVolume: 0,
@@ -197,7 +204,7 @@ export function useActiveWorkout() {
           };
 
           const updatedSets = [...exercise.sets, newSet];
-          const totalVolume = calculateVolume(updatedSets, exercise.equipment);
+          const totalVolume = calculateVolume(updatedSets, exercise.equipment, exercise.category);
 
           return {
             ...exercise,
@@ -225,7 +232,7 @@ export function useActiveWorkout() {
             set.id === setId ? { ...set, ...updates, timestamp: new Date() } : set
           );
 
-          const totalVolume = calculateVolume(updatedSets, exercise.equipment);
+          const totalVolume = calculateVolume(updatedSets, exercise.equipment, exercise.category);
 
           return {
             ...exercise,
@@ -253,7 +260,7 @@ export function useActiveWorkout() {
             .filter(set => set.id !== setId)
             .map((set, index) => ({ ...set, setNumber: index + 1 }));
 
-          const totalVolume = calculateVolume(updatedSets, exercise.equipment);
+          const totalVolume = calculateVolume(updatedSets, exercise.equipment, exercise.category);
 
           return {
             ...exercise,

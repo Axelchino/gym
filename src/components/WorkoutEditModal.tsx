@@ -49,7 +49,12 @@ export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false 
     }
   }
 
-  function calculateVolume(sets: Set[], equipment: string) {
+  function calculateVolume(sets: Set[], equipment: string, category?: string) {
+    // Exclude categories where volume calculation doesn't make sense
+    if (category && ['Cardio', 'Stretch', 'Stretching', 'Sports'].includes(category)) {
+      return 0;
+    }
+
     return sets
       .filter(s => !s.isWarmup && s.completed)
       .reduce((sum, s) => sum + (s.weight * s.reps), 0);
@@ -67,7 +72,7 @@ export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false 
             set.id === setId ? { ...set, ...updates, timestamp: new Date() } : set
           );
 
-          const totalVolume = calculateVolume(updatedSets, exercise.equipment);
+          const totalVolume = calculateVolume(updatedSets, exercise.equipment, exercise.category);
 
           return {
             ...exercise,
