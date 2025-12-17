@@ -56,6 +56,7 @@ export interface Exercise {
   searchAliases?: string; // Comma-separated alternate search terms
   videoUrl?: string;
   imageUrl?: string;
+  bodyweightMultiplier?: number; // Percentage of bodyweight (0.64 for push-ups, 1.0 for pull-ups, etc.)
   isCustom: boolean;
   createdAt: Date;
   updatedAt: Date;

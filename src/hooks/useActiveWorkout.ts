@@ -11,6 +11,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { syncManager } from '../services/syncManager';
 import { appendMuscleEffortData } from '../services/muscleEffortService';
+import { useUserProfile } from './useUserProfile';
 
 const ACTIVE_WORKOUT_KEY = 'gym-tracker-active-workout';
 const GUEST_WORKOUTS_KEY = 'gym-tracker-guest-workouts';
@@ -51,6 +52,7 @@ function loadWorkoutFromStorage(): ActiveWorkout | null {
 
 export function useActiveWorkout() {
   const { user } = useAuth();
+  const { data: userProfile } = useUserProfile(user?.id || null);
   const [activeWorkout, setActiveWorkout] = useState<ActiveWorkout | null>(loadWorkoutFromStorage);
   const [isWorkoutActive, setIsWorkoutActive] = useState(() => {
     const stored = loadWorkoutFromStorage();
@@ -128,13 +130,19 @@ export function useActiveWorkout() {
   const addExercise = useCallback((exercise: Exercise) => {
     if (!activeWorkout) return;
 
+    // Auto-populate weight for bodyweight exercises with multiplier
+    let autoWeight = 0;
+    if (exercise.bodyweightMultiplier && userProfile?.currentWeight) {
+      autoWeight = Math.round(userProfile.currentWeight * exercise.bodyweightMultiplier);
+    }
+
     // Create initial empty set so user can start logging immediately
     const initialSet: Set = {
       id: crypto.randomUUID(),
       workoutLogId: '', // Will be set when workout is saved
       exerciseId: exercise.id,
       setNumber: 1,
-      weight: 0,
+      weight: autoWeight, // Auto-populate for bodyweight exercises
       reps: 0,
       isWarmup: false,
       isDropSet: false,
@@ -157,7 +165,7 @@ export function useActiveWorkout() {
       ...activeWorkout,
       exercises: [...activeWorkout.exercises, newLoggedExercise],
     });
-  }, [activeWorkout, calculateVolume]);
+  }, [activeWorkout, calculateVolume, userProfile]);
 
   // Remove exercise from workout
   const removeExercise = useCallback((exerciseId: string) => {
