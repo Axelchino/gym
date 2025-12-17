@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useActiveWorkout } from '../hooks/useActiveWorkout';
 import { useUserSettings } from '../hooks/useUserSettings';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { useRestTimer } from '../hooks/useRestTimer';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -31,6 +32,7 @@ import type { WorkoutLog } from '../types/workout';
 function WorkoutLogger() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isGuest } = useAuth();
+  const { data: userProfile } = useUserProfile(user?.id || null);
   const queryClient = useQueryClient();
   const { theme } = useTheme();
   const accentColors = getAccentColors(theme);
@@ -1064,6 +1066,22 @@ function WorkoutLogger() {
                     );
                   })()}
                 </div>
+                {/* Bodyweight Multiplier Indicator */}
+                {exercise.sets[0] && exercise.sets[0].weight > 0 && userProfile?.currentWeight &&
+                 (() => {
+                   // Calculate expected bodyweight multiplier from first set
+                   const expectedMultiplier = exercise.sets[0].weight / userProfile.currentWeight;
+                   // Only show if multiplier seems reasonable (between 0.3 and 1.2)
+                   if (expectedMultiplier >= 0.3 && expectedMultiplier <= 1.2) {
+                     return (
+                       <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                         Auto-weight: {(expectedMultiplier * 100).toFixed(0)}% of bodyweight ({exercise.sets[0].weight} {weightUnit})
+                       </div>
+                     );
+                   }
+                   return null;
+                 })()
+                }
               </div>
               <button
                 onClick={() => removeExercise(exercise.exerciseId)}
