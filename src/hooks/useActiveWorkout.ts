@@ -58,12 +58,11 @@ export function useActiveWorkout() {
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  // Helper function to calculate volume (handles dumbbell 2x multiplier)
+  // Helper function to calculate volume (weight × reps - enter weight per dumbbell)
   const calculateVolume = useCallback((sets: Set[], equipment: string) => {
-    const multiplier = equipment === 'Dumbbell' ? 2 : 1;
     return sets
       .filter(s => !s.isWarmup && s.completed)
-      .reduce((sum, s) => sum + (s.weight * s.reps * multiplier), 0);
+      .reduce((sum, s) => sum + (s.weight * s.reps), 0);
   }, []);
 
   // Persist active workout to localStorage whenever it changes

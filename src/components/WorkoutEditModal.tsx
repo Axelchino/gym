@@ -50,10 +50,9 @@ export function WorkoutEditModal({ workoutId, onClose, onSave, readOnly = false 
   }
 
   function calculateVolume(sets: Set[], equipment: string) {
-    const multiplier = equipment === 'Dumbbell' ? 2 : 1;
     return sets
       .filter(s => !s.isWarmup && s.completed)
-      .reduce((sum, s) => sum + (s.weight * s.reps * multiplier), 0);
+      .reduce((sum, s) => sum + (s.weight * s.reps), 0);
   }
 
   function handleUpdateSet(exerciseId: string, setId: string, updates: Partial<Set>) {

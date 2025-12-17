@@ -2,13 +2,12 @@ import type { Set, WorkoutLog } from '../types/workout';
 
 /**
  * Calculate total volume for a set of sets
- * Volume = Weight × Reps × Multiplier (2x for dumbbells)
+ * Volume = Weight × Reps (enter weight per dumbbell)
  */
 export function calculateVolume(sets: Set[], equipment: string): number {
-  const multiplier = equipment === 'Dumbbell' ? 2 : 1;
   return sets
     .filter(s => !s.isWarmup && s.completed)
-    .reduce((sum, s) => sum + (s.weight * s.reps * multiplier), 0);
+    .reduce((sum, s) => sum + (s.weight * s.reps), 0);
 }
 
 /**

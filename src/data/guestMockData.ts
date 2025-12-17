@@ -9,9 +9,7 @@ function calculateVolume(exercises: any[]): number {
   exercises.forEach(ex => {
     ex.sets.forEach((set: any) => {
       if (!set.completed || set.isWarmup) return;
-      const multiplier = ex.exerciseName.toLowerCase().includes('dumbbell') &&
-                        !ex.exerciseName.toLowerCase().includes('single') ? 2 : 1;
-      total += set.weight * set.reps * multiplier;
+      total += set.weight * set.reps;
     });
   });
   return total;
