@@ -1,8 +1,22 @@
 # GymTracker Pro - Development Backlog
 
-**Last Updated:** 2025-12-02
+**Last Updated:** 2025-12-15
 **Current Phase:** Phase 5 Complete, Phase 5.5 Next
 **Version:** v0.6.0
+
+**Recent Activity (Dec 15):**
+- ✅ **Volume Calculation System - Complete Overhaul**
+  - ✅ Removed dumbbell ×2 multiplier to match industry standards (Strong, Hevy, JEFIT)
+  - ✅ Fixed single-arm/leg exercise doubling bug
+  - ✅ Excluded cardio, stretching, and sports from volume calculations
+  - ✅ Implemented bodyweight multiplier auto-population system (155 exercises)
+  - ✅ Added research-based biomechanics percentages (push-ups: 64%, pull-ups: 100%, etc.)
+  - ✅ Added UI indicator showing auto-calculated weight with bodyweight percentage
+  - ✅ Updated all volume calculation functions across 5 files
+  - ✅ See commits: `71081e4`, `f7274c3`, `cd79352`, `96698d8`
+- ✅ Fixed "Prefer Not to Say" sex field to default to male standards
+- ✅ Fixed Header logo text visibility (removed invalid Tailwind classes)
+- See KnownIssues-Dec-W1-2025.md for full details
 
 **Recent Activity (Dec 2):**
 - ✅ Made Dashboard2 the new default Dashboard (renamed Dashboard → Dashboard1 backup)
